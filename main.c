@@ -21,14 +21,14 @@ typedef struct Hmap {
     struct Hmap *next;
 } map_t;
 
-// This will initalize a map and then return a pointer to it.
+// This will initalize a hashmap and then return a pointer to it.
 map_t *initalizemap() {
     map_t* var1 = malloc(sizeof(map_t));
     var1->next = NULL;
     return var1;
 }
 
-// This will replace the maps key and value and valuetype with a new one
+// This will replace the hashmaps key and value and valuetype with a new one
 int resetpair(map_t* hm, char *key, void *value, int valuetype) {
     if (hm == NULL) {
         return 1;
@@ -40,7 +40,7 @@ int resetpair(map_t* hm, char *key, void *value, int valuetype) {
     return 0;
 }
 
-// This will add a new pair to the end of the map
+// This will add a new pair to the end of the hashmap
 int addlast(map_t *hm, char *key, void *value, int valuetype) {
     map_t* current = hm;
     if (hm == NULL) {
@@ -57,9 +57,19 @@ int addlast(map_t *hm, char *key, void *value, int valuetype) {
     return 0;
 }
 
+// Adds a pair after another pair in a hashmap
+void addafter(map_t *hm, char *key, void *value, int valuetype) {
+    map_t *hmnext = hm->next;
+    map_t *newmap = initalizemap();
+    newmap->key = strdup(key);
+    newmap->value = value;
+    newmap->valuetype = valuetype;
+    hm->next = newmap;
+    newmap->next = hmnext;
+}
 
 
-// This will delete the last pair the map
+// This will delete the last pair of the hashmap
 int deletelast(map_t *hm) {
     map_t *current = hm;
     if (current->next == NULL) {
@@ -77,7 +87,7 @@ int deletelast(map_t *hm) {
     return 1;
 }
 
-// This will get a map out by name. If hm is the base of all the other pairs in that specific map, the next pair of hm is to be classified as the base.
+// This will get a hashmap out by name. If hm is the base of all the other pairs in that specific hashmap, the next pair of hm is to be classified as the base.
 int deletebykey(map_t *hm, const char *keytofind) {
     map_t *current = hm;
     map_t *prev = NULL;
