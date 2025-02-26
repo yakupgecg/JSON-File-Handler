@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define RAW -1 // For making a string without double quotes
+#define RAW -1 // For making a string without double quotes. For example making a null in JSON file format
 #define SHR 0
 #define STR 1
 #define INT 2
@@ -15,7 +15,7 @@
 #define LDBL 7
 
 typedef struct Hmap {
-    const char *key;
+    char *key;
     void *value;
     int valuetype;
     struct Hmap *next;
@@ -40,8 +40,8 @@ int resetpair(map_t* hm, char *key, void *value, int valuetype) {
     return 0;
 }
 
-// This will add a new pair to the end
-int addpair(map_t *hm, char *key, void *value, int valuetype) {
+// This will add a new pair to the end of the map
+int addlast(map_t *hm, char *key, void *value, int valuetype) {
     map_t* current = hm;
     if (hm == NULL) {
         return 1;
@@ -57,7 +57,7 @@ int addpair(map_t *hm, char *key, void *value, int valuetype) {
     return 0;
 }
 
-// Next: Add function to add pairs after another
+
 
 // This will delete the last pair the map
 int deletelast(map_t *hm) {
@@ -79,21 +79,26 @@ int deletelast(map_t *hm) {
 
 // This will get a map out by name. If hm is the base of all the other pairs in that specific map, the next pair of hm is to be classified as the base.
 int deletebykey(map_t *hm, const char *keytofind) {
-    // Next: Finish the function
     map_t *current = hm;
     map_t *prev = NULL;
 
-    if (current->next = NULL) {
-        
+    if (strcmp(current->key, keytofind) == 0) {
+        prev = current;
+        current = current->next;
+        free(prev);
+        return 0;
     }
-
+    prev = hm;
     while (current != NULL) {
         if (strcmp(current->key, keytofind) == 0) {
+            prev->next = current->next;
             free(current);
             return 0;
         }
+        prev = current;
         current = current->next;
     }
+    return 1;
 }
 
 // Calculates the length of the hashmap, but if the pair is not the root of the hashmap, it will start from pair
@@ -128,64 +133,64 @@ char *mapToJson(map_t *hm, size_t size) {
     buffer[0] = '\0'; 
     strcat(buffer, "{");
     while (current != NULL) {
-        char *unmd1 = malloc(4392);
-        sprintf(unmd1, "\"%s\": ", current->key);
-        strcat(buffer, unmd1);
+        char *strtocpy = malloc(1000);
+        sprintf(strtocpy, "\"%s\": ", current->key);
+        strcat(buffer, strtocpy);
         switch (current->valuetype) {
             case INT:
-                sprintf(unmd1, "%d", *(int*)current->value);
-                strcat(buffer, unmd1);
-                free(unmd1);
+                sprintf(strtocpy, "%d", *(int*)current->value);
+                strcat(buffer, strtocpy);
+                free(strtocpy);
                 break;
             case FLT:
-                sprintf(unmd1, "%f", *(float*)current->value);
-                strcat(buffer, unmd1);
-                free(unmd1);
+                sprintf(strtocpy, "%f", *(float*)current->value);
+                strcat(buffer, strtocpy);
+                free(strtocpy);
                 break;
             case DBL:
-                sprintf(unmd1, "%lf", *(double*)current->value);
-                strcat(buffer, unmd1);
-                free(unmd1);
+                sprintf(strtocpy, "%lf", *(double*)current->value);
+                strcat(buffer, strtocpy);
+                free(strtocpy);
                 break;
             case LONG:
-                sprintf(unmd1, "%ld", *(long*)current->value);
-                strcat(buffer, unmd1);
-                free(unmd1);
+                sprintf(strtocpy, "%ld", *(long*)current->value);
+                strcat(buffer, strtocpy);
+                free(strtocpy);
                 break;
             case LL:
-                sprintf(unmd1, "%lld", *(long long*)current->value);
-                strcat(buffer, unmd1);
-                free(unmd1);
+                sprintf(strtocpy, "%lld", *(long long*)current->value);
+                strcat(buffer, strtocpy);
+                free(strtocpy);
                 break;
             case LDBL:
-                sprintf(unmd1, "%Lf", *(long double*)current->value);
-                strcat(buffer, unmd1);
-                free(unmd1);
+                sprintf(strtocpy, "%Lf", *(long double*)current->value);
+                strcat(buffer, strtocpy);
+                free(strtocpy);
                 break;
             case STR:
-                sprintf(unmd1, "\"%s\"", (char*)current->value);
-                strcat(buffer, unmd1);
-                free(unmd1);
+                sprintf(strtocpy, "\"%s\"", (char*)current->value);
+                strcat(buffer, strtocpy);
+                free(strtocpy);
                 break;
             case SHR:
-                sprintf(unmd1, "%hd", *(short*)current->value);
-                strcat(buffer, unmd1);
-                free(unmd1);
+                sprintf(strtocpy, "%hd", *(short*)current->value);
+                strcat(buffer, strtocpy);
+                free(strtocpy);
                 break;
             case RAW:
-                sprintf(unmd1, "%s", *(char*)current->value);
-                strcat(buffer, unmd1);
-                free(unmd1);
+                sprintf(strtocpy, "%s", *(char*)current->value);
+                strcat(buffer, strtocpy);
+                free(strtocpy);
             default:
-                sprintf(unmd1, "\"<Unknown type>\"");
-                strcat(buffer, unmd1);
-                free(unmd1);
+                sprintf(strtocpy, "\"<Unknown type>\"");
+                strcat(buffer, strtocpy);
+                free(strtocpy);
                 break;
         }
         current = current->next;
         if (current != NULL) {
-            sprintf(unmd1, ", ");
-            strcat(buffer, unmd1);
+            sprintf(strtocpy, ", ");
+            strcat(buffer, strtocpy);
         }
     }
     strcat(buffer, "}");
@@ -200,7 +205,7 @@ char *pairToJson(map_t *hm, size_t size) {
     }
     json[0] = '\0';
     strcat(json, "{");
-    char *buf = malloc(500);
+    char *buf = malloc(1000);
     sprintf(buf, "\"%s\": ", hm->key);
     strcat(json, buf);
     switch (hm->valuetype) {
@@ -208,7 +213,7 @@ char *pairToJson(map_t *hm, size_t size) {
             sprintf(buf, "%d}", *(int*)hm->value);
             strcat(json, buf);
             break;
-        case FLT:
+        case FLT: 
             sprintf(buf, "%f}", *(float*)hm->value);
             strcat(json, buf);
             break;
