@@ -28,7 +28,7 @@ map_t *initalizemap() {
     return var1;
 }
 
-// Next: Add a resto functions for every datatype like a restoint or restostring function
+// Next: make a function that adds a pair after a map
 
 int resetkey(map_t *pair, char *key) {
     free(pair->key);
@@ -135,7 +135,7 @@ int restolongdouble(map_t *pair, long double value) {
     return 0;
 }
  
-// Calculates the length of the hashmap, but if the pair is not the root of the hashmap, it will start from pair
+// Returns the length of the hashmap, but if the pair is not the root of the hashmap, it will start from pair
 size_t maplen(map_t *hm) {
     size_t len = 0;
     map_t *current = hm;
@@ -146,6 +146,7 @@ size_t maplen(map_t *hm) {
     return len;
 }
 
+// Forgot to mention the update about this function in the last commit
 void freemap(map_t* hm) {
     map_t* current = hm;
     map_t* next;
@@ -162,6 +163,7 @@ void freemap(map_t* hm) {
     }
 }
 
+// Forcefully frees a pair (pair will still be displayed by mapToJson or pairToJson function)
 void freepair(map_t *pair) {
     if (pair->key != NULL) {
         free(pair->key);
