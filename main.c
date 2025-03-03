@@ -5,14 +5,14 @@
 #include <string.h>
 
 #define RAW -1 // For making a string without double quotes. For example making a null in JSON file format
-#define SHR 0
-#define STR 1
-#define INT 2
-#define FLT 3
-#define DBL 4
-#define LONG 5
-#define LL 6
-#define LDBL 7
+#define SHR 0 // Short
+#define STR 1 // String
+#define INT 2 // Integer
+#define FLT 3 // Float
+#define DBL 4 // Double
+#define LONG 5 // Long
+#define LL 6 // Long long
+#define LDBL 7  // Long Double
 
 typedef struct Hmap {
     char *key;
@@ -21,7 +21,7 @@ typedef struct Hmap {
     struct Hmap *next;
 } map_t;
 
-// This will initalize a hashmap and then return a pointer to it.
+// This will initalize a hashmap and then return a pointer to it
 map_t *initalizemap() {
     map_t* map = malloc(sizeof(map_t));
     if (map == NULL) {
@@ -189,6 +189,7 @@ size_t maplen(map_t *map) {
     return len;
 }
 
+// Frees all the pairs after map and itself
 int freemap(map_t* map) {
     if (map == NULL) {
         return 1;
@@ -209,7 +210,7 @@ int freemap(map_t* map) {
     return 0;
 }
 
-// Forcefully frees a pair (pair will still be displayed by mapToJson or pairToJson function)
+// Forcefully frees a pair
 void freepair(map_t *pair) {
     if (pair->key != NULL) {
         free(pair->key);
