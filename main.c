@@ -32,6 +32,9 @@ map_t *initalizemap() {
 }
 
 int addlast(map_t *map) {
+    if (map == NULL) {
+        return 1;
+    }
     map_t *current = map->next;
     while (current->next != NULL) {
         current = current->next;
@@ -45,6 +48,9 @@ int addlast(map_t *map) {
 
 
 int resetkey(map_t *pair, char *key) {
+    if (pair == NULL) {
+        return 1;
+    }
     free(pair->key);
     pair->key = strdup(key);
     if (pair->key == NULL) {
@@ -56,6 +62,9 @@ int resetkey(map_t *pair, char *key) {
 // Note that these resto functions are shorthand for reset to
 
 int restoint(map_t *pair, int value) {
+    if (pair == NULL) {
+        return 1;
+    }
     pair->value = malloc(sizeof(int));
     if (pair->value == NULL) {
         return 1;
@@ -66,6 +75,9 @@ int restoint(map_t *pair, int value) {
 }
 
 int restoshort(map_t *pair, short value) {
+    if (pair == NULL) {
+        return 1;
+    }
     pair->value = malloc(sizeof(short));
     if (pair->value == NULL) {
         return 1;
@@ -76,6 +88,9 @@ int restoshort(map_t *pair, short value) {
 }
 
 int restofloat(map_t *pair, float value) {
+    if (pair == NULL) {
+        return 1;
+    }
     pair->value = malloc(sizeof(float));
     if (pair->value == NULL) {
         return 1;
@@ -86,6 +101,9 @@ int restofloat(map_t *pair, float value) {
 }
 
 int restostring(map_t *pair, char *val_ptr, int str_len) {
+    if (pair == NULL) {
+        return 1;
+    }
     pair->value = malloc(str_len * sizeof(char));
     if (pair->value == NULL) {
         return 1;
@@ -96,6 +114,9 @@ int restostring(map_t *pair, char *val_ptr, int str_len) {
 }
 
 int restoraw(map_t *pair, char *val_ptr, int str_len) {
+    if (pair == NULL) {
+        return 1;
+    }
     pair->value = malloc(str_len * sizeof(char));
     if (pair->value == NULL) {
         return 1;
@@ -106,6 +127,9 @@ int restoraw(map_t *pair, char *val_ptr, int str_len) {
 }
 
 int restodouble(map_t *pair, double value) {
+    if (pair == NULL) {
+        return 1;
+    }
     pair->value = malloc(sizeof(double));
     if (pair->value == NULL) {
         return 1;
@@ -116,6 +140,9 @@ int restodouble(map_t *pair, double value) {
 }
 
 int restolong(map_t *pair, long value) {
+    if (pair == NULL) {
+        return 1;
+    }
     pair->value = malloc(sizeof(long));
     if (pair->value == NULL) {
         return 1;
@@ -126,6 +153,9 @@ int restolong(map_t *pair, long value) {
 }
 
 int restolonglong(map_t *pair, long long value) {
+    if (pair == NULL) {
+        return 1;
+    }
     pair->value = malloc(sizeof(long long));
     if (pair->value == NULL) {
         return 1;
@@ -136,6 +166,9 @@ int restolonglong(map_t *pair, long long value) {
 }
 
 int restolongdouble(map_t *pair, long double value) {
+    if (pair == NULL) {
+        return 1;
+    }
     pair->value = malloc(sizeof(long double));
     if (pair->value == NULL) {
         return 1;
@@ -156,8 +189,10 @@ size_t maplen(map_t *map) {
     return len;
 }
 
-// Forgot to mention the update about this function in the last commit
-void freemap(map_t* map) {
+int freemap(map_t* map) {
+    if (map == NULL) {
+        return 1;
+    }
     map_t* current = map;
     map_t* next;
     while (current != NULL) {
@@ -171,6 +206,7 @@ void freemap(map_t* map) {
         free(current);
         current = next;
     }
+    return 0;
 }
 
 // Forcefully frees a pair (pair will still be displayed by mapToJson or pairToJson function)
