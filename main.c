@@ -31,7 +31,18 @@ map_t *initalizemap() {
     return map;
 }
 
-// Next: make a function that adds a pair after a map
+int addlast(map_t *map) {
+    map_t *current = map->next;
+    while (current->next != NULL) {
+        current = current->next;
+    }
+    current->next = initalizemap();
+    if (current->next == NULL) {
+        return 1;
+    }
+    return 0;
+}
+
 
 int resetkey(map_t *pair, char *key) {
     free(pair->key);
@@ -41,6 +52,8 @@ int resetkey(map_t *pair, char *key) {
     }
     return 0;
 }
+
+// Note that these resto functions are shorthand for reset to
 
 int restoint(map_t *pair, int value) {
     pair->value = malloc(sizeof(int));
@@ -79,6 +92,16 @@ int restostring(map_t *pair, char *val_ptr, int str_len) {
     }
     pair->value = strdup(val_ptr);
     pair->valuetype = STR;
+    return 0;
+}
+
+int restoraw(map_t *pair, char *val_ptr, int str_len) {
+    pair->value = malloc(str_len * sizeof(char));
+    if (pair->value == NULL) {
+        return 1;
+    }
+    pair->value = strdup(val_ptr);
+    pair->valuetype = RAW;
     return 0;
 }
 
