@@ -31,6 +31,7 @@ map_t *initializemap() {
     return map;
 }
 
+// Adds a pair to the end of the given map
 int addlast(map_t *map) {
     if (map == NULL) {
         return 1;
@@ -47,6 +48,7 @@ int addlast(map_t *map) {
 }
 
 
+// Resets pairs key to the given string
 int resetkey(map_t *pair, char *key) {
     if (pair == NULL) {
         return 1;
@@ -59,8 +61,7 @@ int resetkey(map_t *pair, char *key) {
     return 0;
 }
 
-// Note that these resto functions are shorthand for reset to
-
+// Resets pairs value to the given integer
 int restoint(map_t *pair, int value) {
     if (pair == NULL) {
         return 1;
@@ -74,6 +75,7 @@ int restoint(map_t *pair, int value) {
     return 0;
 }
 
+// Resets pairs value to the given short
 int restoshort(map_t *pair, short value) {
     if (pair == NULL) {
         return 1;
@@ -87,6 +89,7 @@ int restoshort(map_t *pair, short value) {
     return 0;
 }
 
+// Resets pairs value to the given float
 int restofloat(map_t *pair, float value) {
     if (pair == NULL) {
         return 1;
@@ -100,6 +103,7 @@ int restofloat(map_t *pair, float value) {
     return 0;
 }
 
+// Resets pairs value to the given string and adds double quotes to the start and end
 int restostring(map_t *pair, char *val_ptr, int str_len) {
     if (pair == NULL) {
         return 1;
@@ -113,6 +117,7 @@ int restostring(map_t *pair, char *val_ptr, int str_len) {
     return 0;
 }
 
+// Resets pairs value to the given string
 int restoraw(map_t *pair, char *val_ptr, int str_len) {
     if (pair == NULL) {
         return 1;
@@ -126,6 +131,7 @@ int restoraw(map_t *pair, char *val_ptr, int str_len) {
     return 0;
 }
 
+// Resets pairs value to the given double
 int restodouble(map_t *pair, double value) {
     if (pair == NULL) {
         return 1;
@@ -139,6 +145,7 @@ int restodouble(map_t *pair, double value) {
     return 0;
 }
 
+// Resets pairs value to the given long
 int restolong(map_t *pair, long value) {
     if (pair == NULL) {
         return 1;
@@ -152,6 +159,7 @@ int restolong(map_t *pair, long value) {
     return 0;
 }
 
+// Resets pairs value to the given long long
 int restolonglong(map_t *pair, long long value) {
     if (pair == NULL) {
         return 1;
@@ -165,6 +173,7 @@ int restolonglong(map_t *pair, long long value) {
     return 0;
 }
 
+// Resets pairs value to the given long double
 int restolongdouble(map_t *pair, long double value) {
     if (pair == NULL) {
         return 1;
@@ -221,6 +230,7 @@ void freepair(map_t *pair) {
     free(pair);
 }
 
+// Gets the value in pair safely
 void *getpairvalue(map_t *pair) {
     if (pair == NULL) {
         return NULL;
