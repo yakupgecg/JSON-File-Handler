@@ -279,9 +279,6 @@ char *pairtoJSON(map_t *pair) {
         case LDBL: buffersize += 350; break;
         default: return NULL;
     }
-    if (pair == NULL) {
-        return NULL;
-    }
     char *buffer = malloc(buffersize);
     if (buffer == NULL) {
         return NULL;
