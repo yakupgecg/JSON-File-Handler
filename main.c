@@ -36,7 +36,7 @@ int addlast(map_t *map) {
     if (map == NULL) {
         return 1;
     }
-    map_t *current = map->next;
+    map_t *current = map;
     while (current->next != NULL) {
         current = current->next;
     }
