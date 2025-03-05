@@ -108,11 +108,10 @@ int restostring(map_t *pair, char *val_ptr, int str_len) {
     if (pair == NULL) {
         return 1;
     }
-    pair->value = malloc(str_len * sizeof(char));
+    pair->value = strdup(val_ptr);
     if (pair->value == NULL) {
         return 1;
     }
-    pair->value = strdup(val_ptr);
     pair->valuetype = STR;
     return 0;
 }
@@ -122,11 +121,10 @@ int restoraw(map_t *pair, char *val_ptr, int str_len) {
     if (pair == NULL) {
         return 1;
     }
-    pair->value = malloc(str_len * sizeof(char));
+    pair->value = strdup(val_ptr);
     if (pair->value == NULL) {
         return 1;
     }
-    pair->value = strdup(val_ptr);
     pair->valuetype = RAW;
     return 0;
 }
