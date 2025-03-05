@@ -258,6 +258,13 @@ void *getpairvalue(map_t *pair) {
 
 // Formats a pair to JSON file format
 char *pairtoJSON(map_t *pair) {
+    if (pair->key == NULL) {
+        return NULL;
+    }
+    if (pair->value == NULL) {
+        pair->valuetype = RAW;
+        pair->value = "null";
+    }
     int buffersize = strlen(pair->key);  
     buffersize += 6; // For the curly braces, ": " and the keys double quotes
     switch (pair->valuetype) {
