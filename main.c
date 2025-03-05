@@ -257,11 +257,25 @@ void *getpairvalue(map_t *pair) {
 }
 
 // Formats a pair to JSON file format
-char *pairtoJSON(map_t *pair, size_t size) {
+char *pairtoJSON(map_t *pair) {
+    int buffersize = strlen(pair->key);  
+    buffersize += 6; // For the curly braces, ": " and the keys double quotes
+    switch (pair->valuetype) {
+        case RAW: buffersize += strlen(pair->value); break;
+        case SHR: buffersize += 6; break;
+        case STR: buffersize += strlen(pair->value)+2; break;
+        case INT: buffersize += 11; break;
+        case FLT: buffersize += 47; break;
+        case DBL: buffersize += 100; break;
+        case LONG: buffersize += 16; break;
+        case LL: buffersize += 20; break;
+        case LDBL: buffersize += 350; break;
+        default: return NULL;
+    }
     if (pair == NULL) {
         return NULL;
     }
-    char *buffer = malloc(size);
+    char *buffer = malloc(buffersize);
     if (buffer == NULL) {
         return NULL;
     }
@@ -289,7 +303,7 @@ char *pairtoJSON(map_t *pair, size_t size) {
                  sprintf(srep, "%g", *(float*)pair->value);
                  strcat(buffer, srep);
                  break;}
-        case DBL:{char srep[150];
+        case DBL:{char srep[100];
                  sprintf(srep, "%lf", *(double*)pair->value);
                  strcat(buffer, srep);
                  break;}
@@ -301,7 +315,7 @@ char *pairtoJSON(map_t *pair, size_t size) {
                 sprintf(srep, "%lld", *(long long*)pair->value);
                 strcat(buffer, srep);
                 break;}
-        case LDBL:{char srep[500];
+        case LDBL:{char srep[350];
                   sprintf(srep, "%Lf", *(long double*)pair->value);
                   strcat(buffer, srep);
                   break;}
