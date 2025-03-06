@@ -13,6 +13,15 @@
 #define LL 6 // Long long
 #define LDBL 7  // Long Double
 
+// Every valuetypes string (representation) length can be customized
+int SHR_STR_LEN = 6;
+int INT_STR_LEN = 11;
+int FLT_STR_LEN = 47;
+int DBL_STR_LEN = 100;
+int LONG_STR_LEN = 20;
+int LL_STR_LEN = 20;
+int LDBL_STR_LEN = 350;
+
 typedef struct Hmap {
     char *key;
     void *value;
@@ -248,13 +257,13 @@ char *pairtoJSON(map_t *pair) {
     buffersize += 6; // For the curly braces, ": " and the keys double quotes
     switch (pair->valuetype) {
         case RAW: buffersize += strlen(pair->value); break;
-        case SHR: buffersize += 6; break;
-        case INT: buffersize += 11; break;
-        case FLT: buffersize += 47; break;
-        case DBL: buffersize += 100; break;
-        case LONG: buffersize += 16; break;
-        case LL: buffersize += 20; break;
-        case LDBL: buffersize += 350; break;
+        case SHR: buffersize += SHR_STR_LEN; break;
+        case INT: buffersize += INT_STR_LEN; break;
+        case FLT: buffersize += FLT_STR_LEN; break;
+        case DBL: buffersize += DBL_STR_LEN; break;
+        case LONG: buffersize += LONG_STR_LEN; break;
+        case LL: buffersize += LL_STR_LEN; break;
+        case LDBL: buffersize += LDBL_STR_LEN; break;
         default: return NULL;
     }
     char *buffer = malloc(buffersize);
@@ -269,31 +278,31 @@ char *pairtoJSON(map_t *pair) {
     strcat(buffer, ": ");
     switch (pair->valuetype) {
         case RAW: strcat(buffer, (char*)pair->value); break;
-        case SHR:{char srep[6]; // srep shortened for string representation
+        case SHR:{char srep[SHR_STR_LEN]; // srep shortened for string representation
                   sprintf(srep, "%hd", *(short*)pair->value);
                   strcat(buffer, srep);
                   break;}
-        case INT:{char srep[11];
+        case INT:{char srep[INT_STR_LEN];
                  sprintf(srep, "%d", *(int*)pair->value);
                  strcat(buffer, srep);
                  break;}
-        case FLT:{char srep[47];
+        case FLT:{char srep[FLT_STR_LEN];
                  sprintf(srep, "%g", *(float*)pair->value);
                  strcat(buffer, srep);
                  break;}
-        case DBL:{char srep[100];
+        case DBL:{char srep[DBL_STR_LEN];
                  sprintf(srep, "%lf", *(double*)pair->value);
                  strcat(buffer, srep);
                  break;}
-        case LONG:{char srep[20];
+        case LONG:{char srep[LONG_STR_LEN];
                   sprintf(srep, "%ld", *(long*)pair->value);
                   strcat(buffer, srep);
                   break;}
-        case LL:{char srep[20];
+        case LL:{char srep[LL_STR_LEN];
                 sprintf(srep, "%lld", *(long long*)pair->value);
                 strcat(buffer, srep);
                 break;}
-        case LDBL:{char srep[350];
+        case LDBL:{char srep[LDBL_STR_LEN];
                   sprintf(srep, "%Lf", *(long double*)pair->value);
                   strcat(buffer, srep);
                   break;}
