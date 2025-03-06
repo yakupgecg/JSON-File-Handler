@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define RAW 0 // For making a string without double quotes. For example making a null in JSON file format
+#define RAW 0 // Raw (For example a string, or a null in JSON)
 #define SHR 1 // Short
 #define INT 2 // Integer
 #define FLT 3 // Float
