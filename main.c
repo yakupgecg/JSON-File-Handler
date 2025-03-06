@@ -4,9 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define RAW -1 // For making a string without double quotes. For example making a null in JSON file format
-#define SHR 0 // Short
-#define STR 1 // String
+#define RAW 0 // For making a string without double quotes. For example making a null in JSON file format
+#define SHR 1 // Short
 #define INT 2 // Integer
 #define FLT 3 // Float
 #define DBL 4 // Double
@@ -100,19 +99,6 @@ int restofloat(map_t *pair, float value) {
     }
     *(float*)pair->value = value;
     pair->valuetype = FLT;
-    return 0;
-}
-
-// Resets pairs value to the given string and adds double quotes to the start and end
-int restostring(map_t *pair, char *val_ptr, int str_len) {
-    if (pair == NULL) {
-        return 1;
-    }
-    pair->value = strdup(val_ptr);
-    if (pair->value == NULL) {
-        return 1;
-    }
-    pair->valuetype = STR;
     return 0;
 }
 
@@ -236,14 +222,6 @@ void *getpairvalue(map_t *pair) {
     switch (pair->valuetype) {
         case RAW: return (char*)pair->value;
         case SHR: return (short*)pair->value;
-        case STR: {
-            char *str = malloc(strlen(pair->value)+3);
-            if (str == NULL) {
-                return NULL;
-            }
-            snprintf(str, strlen(pair->value)+3, "\"%s\"", (char*)pair->value);
-            return str;
-        }
         case INT: return (int*)pair->value;
         case FLT: return (float*)pair->value;
         case DBL: return (double*)pair->value;
@@ -268,7 +246,6 @@ char *pairtoJSON(map_t *pair) {
     switch (pair->valuetype) {
         case RAW: buffersize += strlen(pair->value); break;
         case SHR: buffersize += 6; break;
-        case STR: buffersize += strlen(pair->value)+2; break;
         case INT: buffersize += 11; break;
         case FLT: buffersize += 47; break;
         case DBL: buffersize += 100; break;
@@ -292,10 +269,6 @@ char *pairtoJSON(map_t *pair) {
         case SHR:{char srep[6]; // srep shortened for string representation
                   sprintf(srep, "%hd", *(short*)pair->value);
                   strcat(buffer, srep);
-                  break;}
-        case STR:{strcat(buffer, "\"");
-                  strcat(buffer, (char*)pair->value);
-                  strcat(buffer, "\"");
                   break;}
         case INT:{char srep[11];
                  sprintf(srep, "%d", *(int*)pair->value);
