@@ -107,10 +107,13 @@ int restoraw(map_t *pair, char *val_ptr, int str_len) {
     if (pair == NULL) {
         return 1;
     }
-    pair->value = strdup(val_ptr);
+    free(pair->value);
+    pair->value = malloc(str_len + 1);
     if (pair->value == NULL) {
         return 1;
     }
+    strncpy(pair->value, val_ptr, str_len);
+    ((char*)pair->value)[str_len] = '\0';
     pair->valuetype = RAW;
     return 0;
 }
