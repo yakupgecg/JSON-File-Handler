@@ -72,24 +72,6 @@ void freepair(map_t *pair) {
     free(pair);
 }
 
-// Gets the value in pair safely
-void *getpairvalue(map_t *pair) {
-    if (pair == NULL) {
-        return NULL;
-    }
-    switch (pair->valuetype) {
-        case RAW: return (char*)pair->value;
-        case SHR: return (short*)pair->value;
-        case INT: return (int*)pair->value;
-        case FLT: return (float*)pair->value;
-        case DBL: return (double*)pair->value;
-        case LONG: return (long*)pair->value;
-        case LL: return (long long*)pair->value;
-        case LDBL: return (long double*)pair->value;
-        default: return NULL;
-    }
-}
-
 // This will initalize a hashmap and then return a pointer to it
 map_t *initializemap() {
     map_t* map = malloc(sizeof(map_t));
