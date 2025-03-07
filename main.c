@@ -74,6 +74,7 @@ int restoint(map_t *pair, int value) {
     if (pair == NULL) {
         return 1;
     }
+    free(pair->value);
     pair->value = malloc(sizeof(int));
     if (pair->value == NULL) {
         return 1;
@@ -88,6 +89,7 @@ int restoshort(map_t *pair, short value) {
     if (pair == NULL) {
         return 1;
     }
+    free(pair->value);
     pair->value = malloc(sizeof(short));
     if (pair->value == NULL) {
         return 1;
@@ -102,6 +104,7 @@ int restofloat(map_t *pair, float value) {
     if (pair == NULL) {
         return 1;
     }
+    free(pair->value);
     pair->value = malloc(sizeof(float));
     if (pair->value == NULL) {
         return 1;
@@ -132,6 +135,7 @@ int restodouble(map_t *pair, double value) {
     if (pair == NULL) {
         return 1;
     }
+    free(pair->value);
     pair->value = malloc(sizeof(double));
     if (pair->value == NULL) {
         return 1;
@@ -146,6 +150,7 @@ int restolong(map_t *pair, long value) {
     if (pair == NULL) {
         return 1;
     }
+    free(pair->value);
     pair->value = malloc(sizeof(long));
     if (pair->value == NULL) {
         return 1;
@@ -160,6 +165,7 @@ int restolonglong(map_t *pair, long long value) {
     if (pair == NULL) {
         return 1;
     }
+    free(pair->value);
     pair->value = malloc(sizeof(long long));
     if (pair->value == NULL) {
         return 1;
@@ -174,6 +180,7 @@ int restolongdouble(map_t *pair, long double value) {
     if (pair == NULL) {
         return 1;
     }
+    free(pair->value);
     pair->value = malloc(sizeof(long double));
     if (pair->value == NULL) {
         return 1;
