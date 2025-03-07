@@ -113,15 +113,16 @@ int addlast(map_t *map) {
     return 0;
 }
 
-int addafter(map_t *map) {
-    if (map == NULL) {
+// Adds another pair after the given pair
+int addafter(map_t *pair) {
+    if (pair == NULL) {
         return 1;
     }
     map_t *new = initializemap();
-    if (map->next != NULL) {
-        new->next = map->next;
+    if (pair->next != NULL) {
+        new->next = pair->next;
     }
-    map->next = new;
+    pair->next = new;
     return 0;
 }
 
