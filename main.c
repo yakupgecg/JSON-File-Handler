@@ -116,6 +116,18 @@ int addlast(map_t *map) {
     return 0;
 }
 
+int addafter(map_t *map) {
+    if (map == NULL) {
+        return 1;
+    }
+    map_t *new = initializemap();
+    if (map->next != NULL) {
+        new->next = map->next;
+    }
+    map->next = new;
+    return 0;
+}
+
 // Removes the last pair in a hashmap
 int removelast(map_t *map) {
     if (map == NULL) {
