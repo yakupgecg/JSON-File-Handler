@@ -29,6 +29,67 @@ typedef struct Hmap {
     struct Hmap *next;
 } map_t;
 
+// Returns the length of the hashmap, but if the pair is not the root of the hashmap, it will start from pair
+size_t maplen(map_t *map) {
+    size_t len = 0;
+    map_t *current = map;
+    while (current != NULL) {
+        len += 1;
+        current = current->next;
+    }
+    return len;
+}
+
+// Frees all the pairs after map and itself
+int freemap(map_t* map) {
+    if (map == NULL) {
+        return 1;
+    }
+    map_t* current = map;
+    map_t* next;
+    while (current != NULL) {
+        next = current->next;
+        if (current->key != NULL) {
+            free(current->key);
+        }
+        if (current->value != NULL) {
+            free(current->value);
+        }
+        free(current);
+        current = next;
+    }
+    return 0;
+}
+
+// Forcefully frees a pair
+void freepair(map_t *pair) {
+    if (pair->key != NULL) {
+        free(pair->key);
+    }
+    if (pair->value != NULL) {
+        free(pair->value);
+    }
+    free(pair);
+}
+
+// Gets the value in pair safely
+void *getpairvalue(map_t *pair) {
+    if (pair == NULL) {
+        return NULL;
+    }
+    switch (pair->valuetype) {
+        case RAW: return (char*)pair->value;
+        case SHR: return (short*)pair->value;
+        case INT: return (int*)pair->value;
+        case FLT: return (float*)pair->value;
+        case DBL: return (double*)pair->value;
+        case LONG: return (long*)pair->value;
+        case LL: return (long long*)pair->value;
+        case LDBL: return (long double*)pair->value;
+        default: return NULL;
+    }
+}
+
 // This will initalize a hashmap and then return a pointer to it
 map_t *initializemap() {
     map_t* map = malloc(sizeof(map_t));
@@ -188,67 +249,6 @@ int restolongdouble(map_t *pair, long double value) {
     *(long double*)pair->value = value;
     pair->valuetype = LDBL;
     return 0;
-}
-
-// Returns the length of the hashmap, but if the pair is not the root of the hashmap, it will start from pair
-size_t maplen(map_t *map) {
-    size_t len = 0;
-    map_t *current = map;
-    while (current != NULL) {
-        len += 1;
-        current = current->next;
-    }
-    return len;
-}
-
-// Frees all the pairs after map and itself
-int freemap(map_t* map) {
-    if (map == NULL) {
-        return 1;
-    }
-    map_t* current = map;
-    map_t* next;
-    while (current != NULL) {
-        next = current->next;
-        if (current->key != NULL) {
-            free(current->key);
-        }
-        if (current->value != NULL) {
-            free(current->value);
-        }
-        free(current);
-        current = next;
-    }
-    return 0;
-}
-
-// Forcefully frees a pair
-void freepair(map_t *pair) {
-    if (pair->key != NULL) {
-        free(pair->key);
-    }
-    if (pair->value != NULL) {
-        free(pair->value);
-    }
-    free(pair);
-}
-
-// Gets the value in pair safely
-void *getpairvalue(map_t *pair) {
-    if (pair == NULL) {
-        return NULL;
-    }
-    switch (pair->valuetype) {
-        case RAW: return (char*)pair->value;
-        case SHR: return (short*)pair->value;
-        case INT: return (int*)pair->value;
-        case FLT: return (float*)pair->value;
-        case DBL: return (double*)pair->value;
-        case LONG: return (long*)pair->value;
-        case LL: return (long long*)pair->value;
-        case LDBL: return (long double*)pair->value;
-        default: return NULL;
-    }
 }
 
 // Formats a pair to JSON file format
