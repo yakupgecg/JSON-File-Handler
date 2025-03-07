@@ -116,6 +116,23 @@ int addlast(map_t *map) {
     return 0;
 }
 
+// Removes the last pair in a hashmap
+int removelast(map_t *map) {
+    if (map == NULL) {
+        return 1;
+    }
+    if (map->next != NULL) {
+        map->next = NULL;
+        return 0;
+    }
+    map_t *current = map;
+    while (current->next != NULL) {
+        current = current->next;
+    }
+    freepair(current);
+    current = NULL;
+    return 0;
+}
 
 // Resets pairs key to the given string
 int resetkey(map_t *pair, char *key) {
