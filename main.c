@@ -72,6 +72,21 @@ void freepair(map_t *pair) {
     free(pair);
 }
 
+// Returns the hash map, which has the key to find
+map_t *getpairbykey(map_t *root, char *key) {
+    if (root == NULL) {
+        return NULL;
+    }
+    map_t *current = root;
+    while (current != NULL) {
+        if (strcmp(current->key, key) == 0) {
+            return current;
+        }
+        current = current->next;
+    }
+    return NULL;
+}
+
 // This will initalize a hashmap and then return a pointer to it
 map_t *initializemap() {
     map_t* map = malloc(sizeof(map_t));
