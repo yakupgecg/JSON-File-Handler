@@ -347,9 +347,29 @@ char *pairtoJSON(map_t *pair) {
 }
 
 // Convert a hash map structure to a JSON string
-char *maptoJSON(map_t *map, unsigned int buffersize) {
+char *maptoJSON(map_t *map) {
     if (map == NULL) {
         return NULL;
+    }
+    unsigned int buffersize = 2;
+    map_t *current = map;
+    while (current != NULL) {
+        buffersize += strlen(current->key) + 4; // For the double quotes of the key and ": "
+        switch (current->valuetype) {
+            case RAW: buffersize += strlen(current->value); break;
+            case SHR: buffersize += SHR_STR_LEN; break;
+            case INT: buffersize += INT_STR_LEN; break;
+            case FLT: buffersize += FLT_STR_LEN; break;
+            case DBL: buffersize += DBL_STR_LEN; break;
+            case LONG: buffersize += LONG_STR_LEN; break;
+            case LL: buffersize += LL_STR_LEN; break;
+            case LDBL: buffersize += LDBL_STR_LEN; break;
+            default: return NULL;
+        }
+        current = current->next;
+        if (current != NULL) {
+            buffersize += 2; // For ", "
+        }
     }
     char *buffer = malloc(buffersize + 1);
     if (buffer == NULL) {
@@ -357,7 +377,7 @@ char *maptoJSON(map_t *map, unsigned int buffersize) {
     }
     buffer[0] = '{';
     buffer[1] = '\0';
-    map_t *current = map;
+    current = map;
     while (current != NULL) {
         strcat(buffer, "\"");
         strcat(buffer, current->key);
