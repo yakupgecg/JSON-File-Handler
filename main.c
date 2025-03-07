@@ -319,6 +319,64 @@ char *pairtoJSON(map_t *pair) {
     return buffer;
 }
 
+// Convert a hash map structure to a JSON string
+char *maptoJSON(map_t *map, unsigned int buffersize) {
+    if (map == NULL) {
+        return NULL;
+    }
+    char *buffer = malloc(buffersize + 1);
+    if (buffer == NULL) {
+        return NULL;
+    }
+    buffer[0] = '{';
+    buffer[1] = '\0';
+    map_t *current = map;
+    while (current != NULL) {
+        strcat(buffer, "\"");
+        strcat(buffer, current->key);
+        strcat(buffer, "\"");
+        strcat(buffer, ": ");
+        switch (current->valuetype) {
+            case RAW: strcat(buffer, (char*)current->value); break;
+            case SHR:{char srep[SHR_STR_LEN]; // srep shortened for string representation
+                      sprintf(srep, "%hd", *(short*)current->value);
+                      strcat(buffer, srep);
+                      break;}
+            case INT:{char srep[INT_STR_LEN];
+                     sprintf(srep, "%d", *(int*)current->value);
+                     strcat(buffer, srep);
+                     break;}
+            case FLT:{char srep[FLT_STR_LEN];
+                     sprintf(srep, "%g", *(float*)current->value);
+                     strcat(buffer, srep);
+                     break;}
+            case DBL:{char srep[DBL_STR_LEN];
+                     sprintf(srep, "%lf", *(double*)current->value);
+                     strcat(buffer, srep);
+                     break;}
+            case LONG:{char srep[LONG_STR_LEN];
+                      sprintf(srep, "%ld", *(long*)current->value);
+                      strcat(buffer, srep);
+                      break;}
+            case LL:{char srep[LL_STR_LEN];
+                    sprintf(srep, "%lld", *(long long*)current->value);
+                    strcat(buffer, srep);
+                    break;}
+            case LDBL:{char srep[LDBL_STR_LEN];
+                      sprintf(srep, "%Lf", *(long double*)current->value);
+                      strcat(buffer, srep);
+                      break;}
+            default: return NULL;
+        }
+        current = current->next;
+        if (current != NULL) {
+            strcat(buffer, ", ");
+        }
+    }
+    strcat(buffer, "}");
+    return buffer;
+}
+
 int main() {
 
 }
