@@ -94,7 +94,7 @@ map_t *initializemap() {
 }
 
 // Adds a pair to the end of the given map
-int addlastH(map_t *map) {
+int appendH(map_t *map) {
     if (map == NULL) {
         return 1;
     }

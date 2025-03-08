@@ -24,7 +24,7 @@ map_t *getprpairbykey(map_t *, char *);
 map_t *initializemap();
 
 // Adds a pair to the end of the given map
-int addlastH(map_t *);
+int appendH(map_t *);
 
 // Adds another pair after the given pair
 int addafterH(map_t *);
