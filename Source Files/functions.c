@@ -61,6 +61,26 @@ map_t *getpairbykey(map_t *root, char *key) {
     return NULL;
 }
 
+// Returns the previous pair before the pair that has the key to find, if found
+map_t *getprpairbykey(map_t *root, char *key) {
+    if (root == NULL) {
+        return NULL;
+    }
+    map_t *prev = root;
+    if (strcmp(prev->key, key) == 0) {
+        return prev;
+    }
+    map_t *current = root->next;
+    while (current != NULL) {
+        if (strcmp(current->key, key) == 0) {
+            return prev;
+        }
+        prev = current;
+        current = current->next;
+    }
+    return NULL;
+}
+
 // This will initalize a hashmap and then return a pointer to it
 map_t *initializemap() {
     map_t* map = malloc(sizeof(map_t));

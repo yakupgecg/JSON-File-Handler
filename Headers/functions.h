@@ -14,8 +14,11 @@ int freemap(map_t *);
 // Forcefully frees a pair
 void freepair(map_t *);
 
-// Returns the hash map, which has the key to find
+// Returns the pair that has the given key
 map_t *getpairbykey(map_t *, char *);
+
+// Returns the pair before the given pair that has the given key, if found
+map_t *getprpairbykey(map_t *, char *);
 
 // This will initalize a hashmap and then return a pointer to it
 map_t *initializemap();
