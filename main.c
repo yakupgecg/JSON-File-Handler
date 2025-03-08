@@ -14,13 +14,13 @@
 #define LDBL 7  // Long Double
 
 // Every valuetypes string (representation) length can be customized
-int SHR_STR_LEN = 6;
-int INT_STR_LEN = 11;
-int FLT_STR_LEN = 47;
-int DBL_STR_LEN = 100;
-int LONG_STR_LEN = 20;
-int LL_STR_LEN = 20;
-int LDBL_STR_LEN = 350;
+extern size_t SHR_STR_LEN = 6;
+extern size_t INT_STR_LEN = 11;
+extern size_t FLT_STR_LEN = 47;
+extern size_t DBL_STR_LEN = 100;
+extern size_t LONG_STR_LEN = 20;
+extern size_t LL_STR_LEN = 20;
+extern size_t LDBL_STR_LEN = 350;
 
 typedef struct Hmap {
     char *key;
