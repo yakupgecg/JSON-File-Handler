@@ -140,6 +140,23 @@ int removelastH(map_t *map) {
     return 0;
 }
 
+// Removes the given map and then reassigns the next pointed the pair before the given map to pair after the given map
+int removeafter(map_t *root, map_t *pairtormv) {
+    if (root == NULL) {
+        return 1;
+    }
+    map_t *current = root;
+    while (current != NULL) {
+        if (strcmp(current->key, pairtormv->key) == 0) {
+            getprpairbykey(root, pairtormv->key)->next = current->next;
+            freepair(current);
+            return 0;
+        }
+        current = current->next;
+    }
+    return 0;
+}
+
 // Resets pairs key to the given string
 int resetkey(map_t *pair, char *key, unsigned int str_len) {
     if (pair == NULL) {

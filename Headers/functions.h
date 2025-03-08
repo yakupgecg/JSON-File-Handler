@@ -32,6 +32,9 @@ int addafterH(map_t *);
 // Removes the last pair in a hashmap
 int removelastH(map_t *);
 
+// Removes the given map and then reassigns the next pointed the pair before the given map to pair after the given map
+int removeafter(map_t *, map_t *);
+
 // Resets pairs key to the given string
 int resetkey(map_t *, char *, unsigned int);
 
