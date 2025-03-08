@@ -24,38 +24,39 @@ map_t *getprpairbykey(map_t *, char *);
 map_t *initializemap();
 
 // Adds a pair to the end of the given map
-int addlast(map_t *);
+int addlastH(map_t *);
 
 // Adds another pair after the given pair
-int addafter(map_t *);
+int addafterH(map_t *);
 
 // Removes the last pair in a hashmap
-int removelast(map_t *);
+int removelastH(map_t *);
+
 // Resets pairs key to the given string
 int resetkey(map_t *, char *, unsigned int);
 
 // Resets pairs value to the given integer
-int restoint(map_t *, int);
+int restointH(map_t *, int);
 
 // Resets pairs value to the given short
-int restoshort(map_t *, short);
+int restoshortH(map_t *, short);
 
 // Resets pairs value to the given float
-int restofloat(map_t *, float);
+int restofloatH(map_t *, float);
 
 // Resets pairs value to the given string
-int restoraw(map_t *, char *, int);
+int restorawH(map_t *, char *, int);
 
 // Resets pairs value to the given double
-int restodouble(map_t *, double);
+int restodoubleH(map_t *, double);
 
 // Resets pairs value to the given long
-int restolong(map_t *, long);
+int restolongH(map_t *, long);
 
 // Resets pairs value to the given long long
-int restolonglong(map_t *, long long);
+int restolonglongH(map_t *, long long);
 
 // Resets pairs value to the given long double
-int restolongdouble(map_t *, long double);
+int restolongdoubleH(map_t *, long double);
 
 #endif

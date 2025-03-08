@@ -94,7 +94,7 @@ map_t *initializemap() {
 }
 
 // Adds a pair to the end of the given map
-int addlast(map_t *map) {
+int addlastH(map_t *map) {
     if (map == NULL) {
         return 1;
     }
@@ -110,7 +110,7 @@ int addlast(map_t *map) {
 }
 
 // Adds another pair after the given pair
-int addafter(map_t *pair) {
+int addafterH(map_t *pair) {
     if (pair == NULL) {
         return 1;
     }
@@ -123,7 +123,7 @@ int addafter(map_t *pair) {
 }
 
 // Removes the last pair in a hashmap
-int removelast(map_t *map) {
+int removelastH(map_t *map) {
     if (map == NULL) {
         return 1;
     }
@@ -156,7 +156,7 @@ int resetkey(map_t *pair, char *key, unsigned int str_len) {
 }
 
 // Resets pairs value to the given integer
-int restoint(map_t *pair, int value) {
+int restointH(map_t *pair, int value) {
     if (pair == NULL) {
         return 1;
     }
@@ -171,7 +171,7 @@ int restoint(map_t *pair, int value) {
 }
 
 // Resets pairs value to the given short
-int restoshort(map_t *pair, short value) {
+int restoshortH(map_t *pair, short value) {
     if (pair == NULL) {
         return 1;
     }
@@ -186,7 +186,7 @@ int restoshort(map_t *pair, short value) {
 }
 
 // Resets pairs value to the given float
-int restofloat(map_t *pair, float value) {
+int restofloatH(map_t *pair, float value) {
     if (pair == NULL) {
         return 1;
     }
@@ -201,7 +201,7 @@ int restofloat(map_t *pair, float value) {
 }
 
 // Resets pairs value to the given string
-int restoraw(map_t *pair, char *val_ptr, int str_len) {
+int restorawH(map_t *pair, char *val_ptr, int str_len) {
     if (pair == NULL) {
         return 1;
     }
@@ -217,7 +217,7 @@ int restoraw(map_t *pair, char *val_ptr, int str_len) {
 }
 
 // Resets pairs value to the given double
-int restodouble(map_t *pair, double value) {
+int restodoubleH(map_t *pair, double value) {
     if (pair == NULL) {
         return 1;
     }
@@ -232,7 +232,7 @@ int restodouble(map_t *pair, double value) {
 }
 
 // Resets pairs value to the given long
-int restolong(map_t *pair, long value) {
+int restolongH(map_t *pair, long value) {
     if (pair == NULL) {
         return 1;
     }
@@ -247,7 +247,7 @@ int restolong(map_t *pair, long value) {
 }
 
 // Resets pairs value to the given long long
-int restolonglong(map_t *pair, long long value) {
+int restolonglongH(map_t *pair, long long value) {
     if (pair == NULL) {
         return 1;
     }
@@ -262,7 +262,7 @@ int restolonglong(map_t *pair, long long value) {
 }
 
 // Resets pairs value to the given long double
-int restolongdouble(map_t *pair, long double value) {
+int restolongdoubleH(map_t *pair, long double value) {
     if (pair == NULL) {
         return 1;
     }
