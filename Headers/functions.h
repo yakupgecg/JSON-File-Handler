@@ -29,7 +29,7 @@ int addafter(map_t *);
 // Removes the last pair in a hashmap
 int removelast(map_t *);
 // Resets pairs key to the given string
-int resetkey(map_t *, char *);
+int resetkey(map_t *, char *, unsigned int);
 
 // Resets pairs value to the given integer
 int restoint(map_t *, int);

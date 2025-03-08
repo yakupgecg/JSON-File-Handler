@@ -121,15 +121,17 @@ int removelast(map_t *map) {
 }
 
 // Resets pairs key to the given string
-int resetkey(map_t *pair, char *key) {
+int resetkey(map_t *pair, char *key, unsigned int str_len) {
     if (pair == NULL) {
         return 1;
     }
     free(pair->key);
-    pair->key = strdup(key);
+    pair->key = malloc(str_len + 1);
     if (pair->key == NULL) {
         return 1;
     }
+    strncpy(pair->key, key, str_len);
+    pair->key[str_len] = '\0';
     return 0;
 }
 
