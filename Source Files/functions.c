@@ -173,7 +173,7 @@ int resetkey(map_t *pair, char *key, unsigned int str_len) {
 }
 
 // Resets pairs value to the given integer
-int restointH(map_t *pair, int value) {
+int setintH(map_t *pair, int value) {
     if (pair == NULL) {
         return 1;
     }
@@ -188,7 +188,7 @@ int restointH(map_t *pair, int value) {
 }
 
 // Resets pairs value to the given short
-int restoshortH(map_t *pair, short value) {
+int setshortH(map_t *pair, short value) {
     if (pair == NULL) {
         return 1;
     }
@@ -203,7 +203,7 @@ int restoshortH(map_t *pair, short value) {
 }
 
 // Resets pairs value to the given float
-int restofloatH(map_t *pair, float value) {
+int setfloatH(map_t *pair, float value) {
     if (pair == NULL) {
         return 1;
     }
@@ -218,7 +218,7 @@ int restofloatH(map_t *pair, float value) {
 }
 
 // Resets pairs value to the given string
-int restorawH(map_t *pair, char *val_ptr, int str_len) {
+int setrawH(map_t *pair, char *val_ptr, int str_len) {
     if (pair == NULL) {
         return 1;
     }
@@ -234,7 +234,7 @@ int restorawH(map_t *pair, char *val_ptr, int str_len) {
 }
 
 // Resets pairs value to the given double
-int restodoubleH(map_t *pair, double value) {
+int setdoubleH(map_t *pair, double value) {
     if (pair == NULL) {
         return 1;
     }
@@ -249,7 +249,7 @@ int restodoubleH(map_t *pair, double value) {
 }
 
 // Resets pairs value to the given long
-int restolongH(map_t *pair, long value) {
+int setlongH(map_t *pair, long value) {
     if (pair == NULL) {
         return 1;
     }
@@ -264,7 +264,7 @@ int restolongH(map_t *pair, long value) {
 }
 
 // Resets pairs value to the given long long
-int restolonglongH(map_t *pair, long long value) {
+int setlonglongH(map_t *pair, long long value) {
     if (pair == NULL) {
         return 1;
     }
@@ -279,7 +279,7 @@ int restolonglongH(map_t *pair, long long value) {
 }
 
 // Resets pairs value to the given long double
-int restolongdoubleH(map_t *pair, long double value) {
+int setlongdoubleH(map_t *pair, long double value) {
     if (pair == NULL) {
         return 1;
     }

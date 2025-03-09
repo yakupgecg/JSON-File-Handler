@@ -39,27 +39,27 @@ int removeafter(map_t *, map_t *);
 int resetkey(map_t *, char *, unsigned int);
 
 // Resets pairs value to the given integer
-int restointH(map_t *, int);
+int setintH(map_t *, int);
 
 // Resets pairs value to the given short
-int restoshortH(map_t *, short);
+int setshortH(map_t *, short);
 
 // Resets pairs value to the given float
-int restofloatH(map_t *, float);
+int setfloatH(map_t *, float);
 
 // Resets pairs value to the given string
-int restorawH(map_t *, char *, int);
+int setrawH(map_t *, char *, int);
 
 // Resets pairs value to the given double
-int restodoubleH(map_t *, double);
+int setdoubleH(map_t *, double);
 
 // Resets pairs value to the given long
-int restolongH(map_t *, long);
+int setlongH(map_t *, long);
 
 // Resets pairs value to the given long long
-int restolonglongH(map_t *, long long);
+int setlonglongH(map_t *, long long);
 
 // Resets pairs value to the given long double
-int restolongdoubleH(map_t *, long double);
+int setlongdoubleH(map_t *, long double);
 
 #endif
