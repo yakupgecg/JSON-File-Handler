@@ -141,7 +141,7 @@ int removelastH(map_t *map) {
 }
 
 // Removes the given map and then reassigns the next pointed the pair before the given map to pair after the given map
-int removeafter(map_t *root, map_t *pairtormv) {
+int removeafterH(map_t *root, map_t *pairtormv) {
     if (root == NULL) {
         return 1;
     }
