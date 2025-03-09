@@ -23,11 +23,11 @@ map_t *getprpairbykey(map_t *, char *);
 // This will initalize a hashmap and then return a pointer to it
 map_t *initializemap();
 
-// Adds a pair to the end of the given map
-int appendH(map_t *);
+// Adds a pair to the end of the given map and returns it
+map_t *appendH(map_t *);
 
-// Adds another pair after the given pair
-int addafterH(map_t *);
+// Adds another pair after the given pair and returns it
+map_t *addafterH(map_t *);
 
 // Removes the last pair in a hashmap
 int removelastH(map_t *);

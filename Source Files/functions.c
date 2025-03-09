@@ -93,10 +93,10 @@ map_t *initializemap() {
     return map;
 }
 
-// Adds a pair to the end of the given map
-int appendH(map_t *map) {
+// Adds a pair to the end of the given map and returns it
+map_t *appendH(map_t *map) {
     if (map == NULL) {
-        return 1;
+        return NULL;
     }
     map_t *current = map;
     while (current->next != NULL) {
@@ -104,22 +104,22 @@ int appendH(map_t *map) {
     }
     current->next = initializemap();
     if (current->next == NULL) {
-        return 1;
+        return NULL;
     }
-    return 0;
+    return current->next;
 }
 
-// Adds another pair after the given pair
-int addafterH(map_t *pair) {
+// Adds another pair after the given pair and returns it
+map_t *addafterH(map_t *pair) {
     if (pair == NULL) {
-        return 1;
+        return NULL;
     }
     map_t *new = initializemap();
     if (pair->next != NULL) {
         new->next = pair->next;
     }
     pair->next = new;
-    return 0;
+    return new;
 }
 
 // Removes the last pair in a hashmap
