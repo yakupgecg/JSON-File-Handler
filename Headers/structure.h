@@ -35,6 +35,10 @@
 #define LDBL 7  // Long Double
 #endif
 
+#ifndef LIST
+#define LIST 8 // Arrays
+#endif
+
 unsigned int SHR_STR_LEN;
 unsigned int INT_STR_LEN;
 unsigned int FLT_STR_LEN;
@@ -49,5 +53,11 @@ typedef struct Hmap {
     int valuetype;
     struct Hmap *next;
 } map_t;
+
+typedef struct Linkedlist {
+    void *value;
+    int valuetype;
+    struct LinkedList *next;
+} list_t;
 
 #endif // HASHMAP_STRUCT_H
