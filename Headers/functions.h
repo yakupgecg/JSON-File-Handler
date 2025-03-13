@@ -40,6 +40,9 @@ map_t *initializemap();
 // Returns the last pair in a hash map
 map_t *getlastpair(map_t *);
 
+// Returns the last element in a list
+list_t *getlastelement(list_t *);
+
 // Initializes a list
 list_t *initializelist();
 

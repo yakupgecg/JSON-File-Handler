@@ -157,6 +157,18 @@ map_t *getlastpair(map_t *root) {
     return current;
 }
 
+// Returns the last element in a list
+list_t *getlastelement(list_t *root) {
+    if (root == NULL) {
+        return NULL;
+    }
+    list_t *current = root;
+    while (current->next != NULL) {
+        current = current->next;
+    }
+    return current;
+}
+
 // Initializes a list
 list_t *initializelist() {
     list_t *list = malloc(sizeof(list_t));
