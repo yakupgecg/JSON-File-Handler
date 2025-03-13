@@ -14,25 +14,15 @@ unsigned int maplen(map_t *map) {
     return len;
 }
 
-// Frees all the pairs after map and itself
-int freemap(map_t* map) {
-    if (map == NULL) {
-        return 1;
-    }
-    map_t* current = map;
-    map_t* next;
+// Returns the length of the list
+unsigned int listlen(list_t *list) {
+    unsigned int len = 0;
+    list_t *current = list;
     while (current != NULL) {
-        next = current->next;
-        if (current->key != NULL) {
-            free(current->key);
-        }
-        if (current->value != NULL) {
-            free(current->value);
-        }
-        free(current);
-        current = next;
+        len += 1;
+        current = current->next;
     }
-    return 0;
+    return len;
 }
 
 // Forcefully frees a pair
@@ -44,6 +34,44 @@ void freepair(map_t *pair) {
         free(pair->value);
     }
     free(pair);
+}
+
+// Forcefully frees an element
+void free_element(list_t *element) {
+    if (element->value != NULL) {
+        free(element->value);
+    }
+    free(element);
+}
+
+// Frees all the pairs after map and itself
+int freemap(map_t* map) {
+    if (map == NULL) {
+        return 1;
+    }
+    map_t *current = map;
+    map_t *next;
+    while (current != NULL) {
+        next = current->next;
+        freepair(current);
+        current = next;
+    }
+    return 0;
+}
+
+// Frees the list (or frees every element after the given element)
+int freelist(list_t *list) {
+    if (list == NULL) {
+        return 1;
+    }
+    list_t *current = list;
+    list_t *next;
+    while (current != NULL) {
+        next = current->next;
+        free_element(current);
+        current = next;
+    }
+    return 0;
 }
 
 // Returns the hash map, which has the key to find
@@ -59,6 +87,22 @@ map_t *getpairbykey(map_t *root, char *key) {
         current = current->next;
     }
     return NULL;
+}
+
+// Returns the element by index. For example if index is 1 it returns root->next
+list_t *getelementbyindex(list_t *root, unsigned int index) {
+    if (root == NULL) {
+        return NULL;
+    }
+    if (index > listlen(root)) {
+        return NULL;
+    }
+    list_t *current = root;
+    int i;
+    for (i = 0; i < index; i++) {
+        current = current->next;
+    }
+    return current;
 }
 
 // Returns the previous pair before the pair that has the key to find, if found
@@ -93,6 +137,18 @@ map_t *initializemap() {
     return map;
 }
 
+// Initializes a list
+list_t *initializelist() {
+    list_t *list = malloc(sizeof(list_t));
+    if (list == NULL) {
+        return NULL;
+    }
+    list->value = malloc(sizeof(int));
+    list->valuetype = RAW;
+    list->next = NULL;
+    return list;
+}
+
 // Adds a pair to the end of the given map and returns it
 map_t *appendH(map_t *map) {
     if (map == NULL) {
@@ -103,6 +159,22 @@ map_t *appendH(map_t *map) {
         current = current->next;
     }
     current->next = initializemap();
+    if (current->next == NULL) {
+        return NULL;
+    }
+    return current->next;
+}
+
+// Adds an element to the end of the given list and returns it
+list_t *appendL(list_t *list) {
+    if (list == NULL) {
+        return NULL;
+    }
+    list_t *current = list;
+    while (current->next != NULL) {
+        current = current->next;
+    }
+    current->next = initializelist();
     if (current->next == NULL) {
         return NULL;
     }
@@ -122,6 +194,19 @@ map_t *addafterH(map_t *pair) {
     return new;
 }
 
+// Adds another element after the given element and returns it
+list_t *addafterL(list_t *element) {
+    if (element == NULL) {
+        return NULL;
+    }
+    list_t *new = initializelist();
+    if (element->next != NULL) {
+        new->next = element->next;
+    }
+    element->next = new;
+    return new;
+} 
+
 // Removes the last pair in a hashmap
 int removelastH(map_t *map) {
     if (map == NULL) {
@@ -136,6 +221,25 @@ int removelastH(map_t *map) {
         current = current->next;
     }
     freepair(current);
+    current = NULL;
+    return 0;
+}
+
+// Removes the last element in a list
+int removelastL(list_t *list) {
+    if (list == NULL) {
+        return 1;
+    }
+    if (list->next == NULL) {
+        free_element(list);
+        list = NULL;
+        return 0;
+    }
+    list_t *current = list;
+    while (current->next != NULL) {
+        current = current->next;
+    }
+    free_element(current);
     current = NULL;
     return 0;
 }
@@ -155,6 +259,23 @@ int removeafterH(map_t *root, map_t *pairtormv) {
         current = current->next;
     }
     return 0;
+}
+
+// Removes an element after the given element
+int removeafterL(list_t *root) {
+    if (root == NULL) {
+        return 1;
+    }
+    if (root->next == NULL) {
+        free_element(root);
+        root = NULL;
+        return 0;
+    } else {
+        list_t *temp = root->next;
+        root->next = temp->next;
+        free_element(temp);
+        return 0;
+    }
 }
 
 // Resets pairs key to the given string
@@ -187,6 +308,20 @@ int setintH(map_t *pair, int value) {
     return 0;
 }
 
+int setintL(list_t *element, int value) {
+    if (element == NULL) {
+        return 1;
+    }
+    free(element->value);
+    element->value = malloc(sizeof(int));
+    if (element->value == NULL) {
+        return 1;
+    }
+    *(int*)element->value = value;
+    element->valuetype = INT;
+    return 0;
+}
+
 // Resets pairs value to the given short
 int setshortH(map_t *pair, short value) {
     if (pair == NULL) {
@@ -202,6 +337,20 @@ int setshortH(map_t *pair, short value) {
     return 0;
 }
 
+int setshortL(list_t *element, short value) {
+    if (element == NULL) {
+        return 1;
+    }
+    free(element->value);
+    element->value = malloc(sizeof(short));
+    if (element->value == NULL) {
+        return 1;
+    }
+    *(short*)element->value = value;
+    element->valuetype = SHR;
+    return 0;
+}
+
 // Resets pairs value to the given float
 int setfloatH(map_t *pair, float value) {
     if (pair == NULL) {
@@ -214,6 +363,20 @@ int setfloatH(map_t *pair, float value) {
     }
     *(float*)pair->value = value;
     pair->valuetype = FLT;
+    return 0;
+}
+
+int setfloatL(list_t *element, float value) {
+    if (element == NULL) {
+        return 1;
+    }
+    free(element->value);
+    element->value = malloc(sizeof(float));
+    if (element->value == NULL) {
+        return 1;
+    }
+    *(float*)element->value = value;
+    element->valuetype = FLT;
     return 0;
 }
 
@@ -233,6 +396,21 @@ int setrawH(map_t *pair, char *val_ptr, int str_len) {
     return 0;
 }
 
+int setrawL(list_t *element, char *val_ptr, unsigned int str_len) {
+    if (element == NULL) {
+        return 1;
+    }
+    free(element->value);
+    element->value = malloc(str_len + 1);
+    if (element->value == NULL) {
+        return 1;
+    }
+    strncpy(element->value, val_ptr, str_len);
+    ((char*)element->value)[str_len] = '\0';
+    element->valuetype = RAW;
+    return 0;
+}
+
 // Resets pairs value to the given double
 int setdoubleH(map_t *pair, double value) {
     if (pair == NULL) {
@@ -245,6 +423,20 @@ int setdoubleH(map_t *pair, double value) {
     }
     *(double*)pair->value = value;
     pair->valuetype = DBL;
+    return 0;
+}
+
+int setdoubleL(list_t *element, double value) {
+    if (element == NULL) {
+        return 1;
+    }
+    free(element->value);
+    element->value = malloc(sizeof(value));
+    if (element->value == NULL) {
+        return 1;
+    }
+    *(double*)element->value = value;
+    element->valuetype = DBL;
     return 0;
 }
 
@@ -263,6 +455,20 @@ int setlongH(map_t *pair, long value) {
     return 0;
 }
 
+int setlongL(list_t *element, long value) {
+    if (element == NULL) {
+        return 1;
+    }
+    free(element->value);
+    element->value = malloc(sizeof(long));
+    if (element->value == NULL) {
+        return 1;
+    }
+    *(long*)element->value = value;
+    element->valuetype = LONG;
+    return 0;
+}
+
 // Resets pairs value to the given long long
 int setlonglongH(map_t *pair, long long value) {
     if (pair == NULL) {
@@ -278,6 +484,21 @@ int setlonglongH(map_t *pair, long long value) {
     return 0;
 }
 
+int setlonglongL(list_t *element, long long value) {
+    if (element == NULL) {
+        return 1;
+    }
+    free(element->value);
+    element->value = malloc(sizeof(long long));
+    if (element->value == NULL) {
+        return 1;
+    }
+    *(long long*)element->value = value;
+    element->valuetype = LL;
+    return 0;
+}
+
+
 // Resets pairs value to the given long double
 int setlongdoubleH(map_t *pair, long double value) {
     if (pair == NULL) {
@@ -290,5 +511,19 @@ int setlongdoubleH(map_t *pair, long double value) {
     }
     *(long double*)pair->value = value;
     pair->valuetype = LDBL;
+    return 0;
+}
+
+int setlongdoubleL(list_t *element, long double value) {
+    if (element == NULL) {
+        return 1;
+    }
+    free(element->value);
+    element->value = malloc(sizeof(long double));
+    if (element->value == NULL) {
+        return 1;
+    }
+    *(long double*)element->value = value;
+    element->valuetype = LDBL;
     return 0;
 }
