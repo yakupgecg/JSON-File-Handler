@@ -14,10 +14,10 @@ unsigned int maplen(map_t *);
 unsigned int listlen(list_t *);
 
 // Forcefully frees a pair
-void freepair(map_t *);
+int freepair(map_t *);
 
 // Forcefully frees an element
-void free_element(list_t *);
+int free_element(list_t *);
 
 // Frees all the pairs after map and itself
 int freemap(map_t *);

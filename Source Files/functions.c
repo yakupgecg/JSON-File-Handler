@@ -26,7 +26,10 @@ unsigned int listlen(list_t *list) {
 }
 
 // Forcefully frees a pair
-void freepair(map_t *pair) {
+int freepair(map_t *pair) {
+    if (pair == NULL) {
+        return 1;
+    }
     if (pair->key != NULL) {
         free(pair->key);
     }
@@ -34,14 +37,19 @@ void freepair(map_t *pair) {
         free(pair->value);
     }
     free(pair);
+    return 0;
 }
 
 // Forcefully frees an element
-void free_element(list_t *element) {
+int free_element(list_t *element) {
+    if (element == NULL) {
+        return 1;
+    }
     if (element->value != NULL) {
         free(element->value);
     }
     free(element);
+    return 0;
 }
 
 // Frees all the pairs after map and itself
