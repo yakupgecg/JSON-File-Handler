@@ -5,6 +5,8 @@
 
 #include "structure.h"
 
+/* This header defines functions for handling hash maps and lists */
+
 // Returns the length of the hashmap, but if the pair is not the root of the hashmap, it will start from pair
 unsigned int maplen(map_t *);
 

@@ -3,6 +3,8 @@
 #ifndef HASHMAP_STRUCT_H
 #define HASHMAP_STRUCT_H
 
+/* This header defines structs, macros and variables */
+
 #ifndef RAW
 #define RAW 0 // Raw (For example a string, or a null in JSON)
 #endif

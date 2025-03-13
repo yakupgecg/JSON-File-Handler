@@ -3,6 +3,17 @@
 #ifndef JSON_H
 #define JSON_H
 
+/* This header includes all the other header files so you do not have to type
+
+#include "structure.h"
+#include "json-handler.h"
+#include "functions.h"
+
+Instead you can just type
+
+#include "JSON.h"
+*/
+
 #include "structure.h"
 #include "json-handler.h"
 #include "functions.h"
