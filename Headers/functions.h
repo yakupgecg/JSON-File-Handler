@@ -37,6 +37,9 @@ map_t *getprpairbykey(map_t *, char *);
 // This will initalize a hashmap and then return a pointer to it
 map_t *initializemap();
 
+// Returns the last pair in a hash map
+map_t *getlastpair(map_t *);
+
 // Initializes a list
 list_t *initializelist();
 
