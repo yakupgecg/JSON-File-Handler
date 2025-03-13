@@ -294,12 +294,16 @@ int resetkey(map_t *pair, char *key, unsigned int str_len) {
     free(pair->key);
     pair->key = malloc(str_len + 1);
     if (pair->key == NULL) {
-        return 1;
+        return 2;
     }
     strncpy(pair->key, key, str_len);
     pair->key[str_len] = '\0';
     return 0;
 }
+
+/* Note about the last functions: 1 return value represents NULL error, indicates if map_t or list_t is null &
+   2 return value represents memory allocation error
+*/
 
 // Resets pairs value to the given integer
 int setintH(map_t *pair, int value) {
@@ -309,7 +313,7 @@ int setintH(map_t *pair, int value) {
     free(pair->value);
     pair->value = malloc(sizeof(int));
     if (pair->value == NULL) {
-        return 1;
+        return 2;
     }
     *(int*)pair->value = value;
     pair->valuetype = INT;
@@ -323,7 +327,7 @@ int setintL(list_t *element, int value) {
     free(element->value);
     element->value = malloc(sizeof(int));
     if (element->value == NULL) {
-        return 1;
+        return 2;
     }
     *(int*)element->value = value;
     element->valuetype = INT;
@@ -338,7 +342,7 @@ int setshortH(map_t *pair, short value) {
     free(pair->value);
     pair->value = malloc(sizeof(short));
     if (pair->value == NULL) {
-        return 1;
+        return 2;
     }
     *(short*)pair->value = value;
     pair->valuetype = SHR;
@@ -352,7 +356,7 @@ int setshortL(list_t *element, short value) {
     free(element->value);
     element->value = malloc(sizeof(short));
     if (element->value == NULL) {
-        return 1;
+        return 2;
     }
     *(short*)element->value = value;
     element->valuetype = SHR;
@@ -367,7 +371,7 @@ int setfloatH(map_t *pair, float value) {
     free(pair->value);
     pair->value = malloc(sizeof(float));
     if (pair->value == NULL) {
-        return 1;
+        return 2;
     }
     *(float*)pair->value = value;
     pair->valuetype = FLT;
@@ -381,7 +385,7 @@ int setfloatL(list_t *element, float value) {
     free(element->value);
     element->value = malloc(sizeof(float));
     if (element->value == NULL) {
-        return 1;
+        return 2;
     }
     *(float*)element->value = value;
     element->valuetype = FLT;
@@ -396,7 +400,7 @@ int setrawH(map_t *pair, char *val_ptr, int str_len) {
     free(pair->value);
     pair->value = malloc(str_len + 1);
     if (pair->value == NULL) {
-        return 1;
+        return 2;
     }
     strncpy(pair->value, val_ptr, str_len);
     ((char*)pair->value)[str_len] = '\0';
@@ -411,7 +415,7 @@ int setrawL(list_t *element, char *val_ptr, unsigned int str_len) {
     free(element->value);
     element->value = malloc(str_len + 1);
     if (element->value == NULL) {
-        return 1;
+        return 2;
     }
     strncpy(element->value, val_ptr, str_len);
     ((char*)element->value)[str_len] = '\0';
@@ -427,7 +431,7 @@ int setdoubleH(map_t *pair, double value) {
     free(pair->value);
     pair->value = malloc(sizeof(double));
     if (pair->value == NULL) {
-        return 1;
+        return 2;
     }
     *(double*)pair->value = value;
     pair->valuetype = DBL;
@@ -441,7 +445,7 @@ int setdoubleL(list_t *element, double value) {
     free(element->value);
     element->value = malloc(sizeof(value));
     if (element->value == NULL) {
-        return 1;
+        return 2;
     }
     *(double*)element->value = value;
     element->valuetype = DBL;
@@ -456,7 +460,7 @@ int setlongH(map_t *pair, long value) {
     free(pair->value);
     pair->value = malloc(sizeof(long));
     if (pair->value == NULL) {
-        return 1;
+        return 2;
     }
     *(long*)pair->value = value;
     pair->valuetype = LONG;
@@ -470,7 +474,7 @@ int setlongL(list_t *element, long value) {
     free(element->value);
     element->value = malloc(sizeof(long));
     if (element->value == NULL) {
-        return 1;
+        return 2;
     }
     *(long*)element->value = value;
     element->valuetype = LONG;
@@ -485,7 +489,7 @@ int setlonglongH(map_t *pair, long long value) {
     free(pair->value);
     pair->value = malloc(sizeof(long long));
     if (pair->value == NULL) {
-        return 1;
+        return 2;
     }
     *(long long*)pair->value = value;
     pair->valuetype = LL;
@@ -499,7 +503,7 @@ int setlonglongL(list_t *element, long long value) {
     free(element->value);
     element->value = malloc(sizeof(long long));
     if (element->value == NULL) {
-        return 1;
+        return 2;
     }
     *(long long*)element->value = value;
     element->valuetype = LL;
@@ -515,7 +519,7 @@ int setlongdoubleH(map_t *pair, long double value) {
     free(pair->value);
     pair->value = malloc(sizeof(long double));
     if (pair->value == NULL) {
-        return 1;
+        return 2;
     }
     *(long double*)pair->value = value;
     pair->valuetype = LDBL;
@@ -529,7 +533,7 @@ int setlongdoubleL(list_t *element, long double value) {
     free(element->value);
     element->value = malloc(sizeof(long double));
     if (element->value == NULL) {
-        return 1;
+        return 2;
     }
     *(long double*)element->value = value;
     element->valuetype = LDBL;
