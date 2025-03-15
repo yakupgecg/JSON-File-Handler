@@ -563,3 +563,25 @@ int setlongdoubleL(list_t *element, long double value) {
     element->valuetype = LDBL;
     return 0;
 }
+
+// Resets pairs value to the given list
+int setlistH(map_t *pair, list_t *element) {
+    if (pair == NULL || element == NULL) {
+        return 1;
+    }
+    free(pair->value);
+    pair->value = element;
+    pair->valuetype = LIST;
+    return 0;
+}
+
+
+int setlistL(list_t *element, list_t *e2) {
+    if (element == NULL) {
+        return 1;
+    }
+    free(element->value);
+    element->value = e2;
+    element->valuetype = LIST;
+    return 0;
+}

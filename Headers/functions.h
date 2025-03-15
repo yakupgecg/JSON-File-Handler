@@ -113,4 +113,9 @@ int setlongdoubleH(map_t *, long double);
 
 int setlongdoubleL(list_t *, long double);
 
+// Resets pairs value to the given list
+int setlistH(map_t *, list_t *);
+
+int setlistL(list_t *, list_t *);
+
 #endif

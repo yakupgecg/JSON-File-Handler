@@ -3,6 +3,30 @@
 #include <string.h>
 #include <stdlib.h>
 
+int calclistsize(list_t *root) {
+    if (root == NULL) {
+        return -1;
+    }
+    int bsize = 0;
+    list_t *current = root;
+    while (current != NULL) {
+        switch (current->valuetype) {
+            case RAW: bsize += strlen(current->value);
+            case SHR: bsize += SHR_STR_LEN; break;
+            case INT: bsize += INT_STR_LEN; break;
+            case FLT: bsize += FLT_STR_LEN; break;
+            case DBL: bsize += DBL_STR_LEN; break;
+            case LONG: bsize += LONG_STR_LEN; break;
+            case LL: bsize += LL_STR_LEN; break;
+            case LDBL: bsize += LDBL_STR_LEN; break;
+            case LIST: bsize += calclistsize(current->value); break;
+            default: return -2;
+        }
+        current = current->next;
+    }
+    return bsize;
+}
+
 // Formats a pair to JSON file format
 char *pairtoJSON(map_t *pair) {
     if (pair->key == NULL) {
@@ -12,7 +36,7 @@ char *pairtoJSON(map_t *pair) {
         pair->valuetype = RAW;
         pair->value = "null";
     }
-    int buffersize = strlen(pair->key);  
+    unsigned int buffersize = strlen(pair->key);  
     buffersize += 6; // For the curly braces, ": " and the keys double quotes
     switch (pair->valuetype) {
         case RAW: buffersize += strlen(pair->value); break;
@@ -23,6 +47,7 @@ char *pairtoJSON(map_t *pair) {
         case LONG: buffersize += LONG_STR_LEN; break;
         case LL: buffersize += LL_STR_LEN; break;
         case LDBL: buffersize += LDBL_STR_LEN; break;
+        case LIST: buffersize += calclistsize(pair->value); break;
         default: return NULL;
     }
     char *buffer = malloc(buffersize);
@@ -65,6 +90,10 @@ char *pairtoJSON(map_t *pair) {
                   sprintf(srep, "%Lf", *(long double*)pair->value);
                   strcat(buffer, srep);
                   break;}
+        case LIST:{char srep[calclistsize(pair->value) + 2];
+                  sprintf(srep, "%s", listoJSON(pair->value));
+                  strcat(buffer, srep);
+                  break;}
         default: return NULL;
     }
     strcat(buffer, "}");
@@ -89,6 +118,7 @@ char *maptoJSON(map_t *map) {
             case LONG: buffersize += LONG_STR_LEN; break;
             case LL: buffersize += LL_STR_LEN; break;
             case LDBL: buffersize += LDBL_STR_LEN; break;
+            case LIST: buffersize += calclistsize(current->value); break;
             default: return NULL;
         }
         current = current->next;
@@ -138,6 +168,10 @@ char *maptoJSON(map_t *map) {
                       sprintf(srep, "%Lf", *(long double*)current->value);
                       strcat(buffer, srep);
                       break;}
+            case LIST:{char srep[calclistsize(current->value) + 2];
+                      sprintf(srep, "%s", listoJSON(current->value));
+                      strcat(buffer, srep);
+                      break;}
             default: return NULL;
         }
         current = current->next;
@@ -146,5 +180,96 @@ char *maptoJSON(map_t *map) {
         }
     }
     strcat(buffer, "}");
+    return buffer;
+}
+
+// Converts a list to JSON file format
+char *listoJSON(list_t *list) {
+    if (list == NULL) {
+        return "L-NULL";
+    }
+    unsigned int buffersize = 3; // 3 for [ and ] and null terminator
+    list_t *current;
+    current = list;
+    while (current != NULL) {
+        if (current->valuetype == LIST) {
+            buffersize += calclistsize(current->value) + 2;
+            current = current->next;
+            continue;
+        }
+        switch (current->valuetype) {
+            case RAW: buffersize += strlen(current->value); break;
+            case SHR: buffersize += SHR_STR_LEN; break;
+            case INT: buffersize += INT_STR_LEN; break;
+            case FLT: buffersize += FLT_STR_LEN; break;
+            case DBL: buffersize += DBL_STR_LEN; break;
+            case LONG: buffersize += LONG_STR_LEN; break;
+            case LL: buffersize += LL_STR_LEN; break;
+            case LDBL: buffersize += LDBL_STR_LEN; break;
+            case LIST: buffersize += calclistsize(current->value); break;
+            default: return "VT-NULL";
+        }
+        current = current->next;
+        if (current != NULL)  {
+            buffersize += 2; // For ", "
+        }
+    }
+    current = list;
+    char *buffer = malloc(buffersize);
+    buffer[0] = '[';
+    buffer[1] = '\0';
+    while (current != NULL) {
+        if (current->valuetype == LIST) {
+            char srep[calclistsize(current->value)];
+            sprintf(srep, "%s", listoJSON(current->value));
+            strcat(buffer, srep);
+            current = current->next;
+            if (current != NULL) {
+                strcat(buffer, ", ");
+            }
+            continue;
+        }
+        switch (current->valuetype) {
+            case RAW: strcat(buffer, (char*)current->value); break;
+            case SHR:{char srep[SHR_STR_LEN];
+                     sprintf(srep, "%hd", *(short*)current->value);
+                     strcat(buffer, srep);
+                     break;}
+            case INT:{char srep[INT_STR_LEN];
+                     sprintf(srep, "%d", *(int*)current->value);
+                     strcat(buffer, srep);
+                     break;}
+            case FLT:{char srep[FLT_STR_LEN];
+                     sprintf(srep, "%g", *(float*)current->value);
+                     strcat(buffer, srep);
+                     break;}
+            case DBL:{char srep[DBL_STR_LEN];
+                     sprintf(srep, "%lf", *(double*)current->value);
+                     strcat(buffer, srep);
+                     break;}
+            case LONG:{char srep[LONG_STR_LEN];
+                      sprintf(srep, "%ld", *(long*)current->value);
+                      strcat(buffer, srep);
+                      break;}
+            case LL:{char srep[LL_STR_LEN];
+                    sprintf(srep, "%lld", *(long long*)current->value);
+                    strcat(buffer, srep);
+                    break;}
+            case LDBL:{char srep[LDBL_STR_LEN];
+                      sprintf(srep, "%Lf", *(long double*)current->value);
+                      strcat(buffer, srep);
+                      break;}
+            case LIST:{char srep[calclistsize(current->value) + 2];
+                      sprintf(srep, "%s", listoJSON(current->value));
+                      strcat(buffer, srep);
+                      break;}
+            default: return "VT-NULL";
+        }
+        current = current->next;
+        if (current != NULL) {
+            strcat(buffer, ", ");
+        }
+    }
+    strcat(buffer, "]");
     return buffer;
 }
