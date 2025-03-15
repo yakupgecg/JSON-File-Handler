@@ -23,7 +23,6 @@ Instead you can just type
 /*
 
 Hello. Because there has not been many updates lately, here is a list of all the features coming soon
-    -Nested objects like  {"Example": {"Foo": 12, "Bar": true}}
     -Syntax checker on JSON strings or files
     -JSON string or file decoder 
     -Finish the project by fixing bugs and ensuring memory management is safe

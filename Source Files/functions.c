@@ -49,6 +49,33 @@ int calclistsize(list_t *root) {
     return bsize;
 }
 
+// Returns the size of the hash map
+int calcmapsize(map_t *root) {
+    if (root == NULL) {
+        return 1;
+    }
+    int bsize = 0;
+    map_t *current = root;
+    while (current != NULL) {
+        bsize += strlen(current->key) + 2;
+        switch (current->valuetype) {
+            case RAW: bsize += strlen(current->value);
+            case SHR: bsize += SHR_STR_LEN; break;
+            case INT: bsize += INT_STR_LEN; break;
+            case FLT: bsize += FLT_STR_LEN; break;
+            case DBL: bsize += DBL_STR_LEN; break;
+            case LONG: bsize += LONG_STR_LEN; break;
+            case LL: bsize += LL_STR_LEN; break;
+            case LDBL: bsize += LDBL_STR_LEN; break;
+            case LIST: bsize += calclistsize(current->value); break;
+            case NMAP: bsize += calcmapsize(current->value); break;
+            default: return -2;
+        }
+        current = current->next;
+    }
+    return bsize;
+}
+
 // Forcefully frees a pair
 int freepair(map_t *pair) {
     if (pair == NULL) {
@@ -608,4 +635,24 @@ int setlistL(list_t *element, list_t *e2) {
     element->value = e2;
     element->valuetype = LIST;
     return 0;
+}
+
+// Resets pairs value to the given hashmap
+int setmapH(map_t *pair, map_t *p2) {
+    if (pair == NULL || p2 == NULL) {
+        return 1;
+    }
+    free(pair->value);
+    pair->value = p2;
+    pair->valuetype = NMAP;
+    return 0;
+}
+
+int setmapL(list_t *element, map_t *map) {
+    if (element == NULL || map == NULL) {
+        return 1;
+    }
+    free(element->value);
+    element->value = map;
+    element->valuetype = NMAP;
 }

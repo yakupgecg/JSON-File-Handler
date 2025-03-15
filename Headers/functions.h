@@ -15,6 +15,8 @@ unsigned int listlen(list_t *);
 
 int calclistsize(list_t *);
 
+int calcmapsize(map_t *);
+
 // Forcefully frees a pair
 int freepair(map_t *);
 
@@ -119,5 +121,10 @@ int setlongdoubleL(list_t *, long double);
 int setlistH(map_t *, list_t *);
 
 int setlistL(list_t *, list_t *);
+
+// Resets pairs value to the given hashmap
+int setmapH(map_t *, map_t *);
+
+int setmapL(list_t *, map_t *);
 
 #endif
