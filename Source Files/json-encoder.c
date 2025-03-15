@@ -1,36 +1,12 @@
-#include "..\Headers\json-handler.h"
+#include "..\Headers\json-encoder.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
-int calclistsize(list_t *root) {
-    if (root == NULL) {
-        return -1;
-    }
-    int bsize = 0;
-    list_t *current = root;
-    while (current != NULL) {
-        switch (current->valuetype) {
-            case RAW: bsize += strlen(current->value);
-            case SHR: bsize += SHR_STR_LEN; break;
-            case INT: bsize += INT_STR_LEN; break;
-            case FLT: bsize += FLT_STR_LEN; break;
-            case DBL: bsize += DBL_STR_LEN; break;
-            case LONG: bsize += LONG_STR_LEN; break;
-            case LL: bsize += LL_STR_LEN; break;
-            case LDBL: bsize += LDBL_STR_LEN; break;
-            case LIST: bsize += calclistsize(current->value); break;
-            default: return -2;
-        }
-        current = current->next;
-    }
-    return bsize;
-}
-
 // Formats a pair to JSON file format
 char *pairtoJSON(map_t *pair) {
     if (pair->key == NULL) {
-        return NULL;
+        return "L-NULL";
     }
     if (pair->value == NULL) {
         pair->valuetype = RAW;
@@ -48,11 +24,12 @@ char *pairtoJSON(map_t *pair) {
         case LL: buffersize += LL_STR_LEN; break;
         case LDBL: buffersize += LDBL_STR_LEN; break;
         case LIST: buffersize += calclistsize(pair->value); break;
-        default: return NULL;
+        case NMAP: buffersize += calcmapsize(pair->value); break;
+        default: return "VT-NULL";
     }
     char *buffer = malloc(buffersize);
     if (buffer == NULL) {
-        return NULL;
+        return "malloc-NULL";
     }
     buffer[0] = '{';
     buffer[1] = '\0';
@@ -94,16 +71,22 @@ char *pairtoJSON(map_t *pair) {
                   sprintf(srep, "%s", listoJSON(pair->value));
                   strcat(buffer, srep);
                   break;}
-        default: return NULL;
+        case NMAP:{char srep[calcmapsize(pair->value) + 2];
+                  sprintf(srep, "%s", listoJSON(pair->value));
+                  strcat(buffer, srep);
+                  break;}
+        default: return "VT-NULL";
     }
     strcat(buffer, "}");
     return buffer;
 }
 
+// Note that maptoJSON() function cannot encode hashmaps nested to lists that are nested to hashmaps (according to my experience)
+
 // Convert a hash map structure to a JSON string
 char *maptoJSON(map_t *map) {
     if (map == NULL) {
-        return NULL;
+        return "L-NULL";
     }
     unsigned int buffersize = 2;
     map_t *current = map;
@@ -119,7 +102,8 @@ char *maptoJSON(map_t *map) {
             case LL: buffersize += LL_STR_LEN; break;
             case LDBL: buffersize += LDBL_STR_LEN; break;
             case LIST: buffersize += calclistsize(current->value); break;
-            default: return NULL;
+            case NMAP: buffersize += calcmapsize(current->value); break;
+            default: return "VT-NULL";
         }
         current = current->next;
         if (current != NULL) {
@@ -128,7 +112,7 @@ char *maptoJSON(map_t *map) {
     }
     char *buffer = malloc(buffersize + 1);
     if (buffer == NULL) {
-        return NULL;
+        return "malloc-NULL";
     }
     buffer[0] = '{';
     buffer[1] = '\0';
@@ -172,7 +156,11 @@ char *maptoJSON(map_t *map) {
                       sprintf(srep, "%s", listoJSON(current->value));
                       strcat(buffer, srep);
                       break;}
-            default: return NULL;
+            case NMAP:{char srep[calcmapsize(current->value) + 2];
+                      sprintf(srep, "%s", listoJSON(current->value));
+                      strcat(buffer, srep);
+                      break;}
+            default: return "VT-NULL";
         }
         current = current->next;
         if (current != NULL) {
@@ -207,6 +195,7 @@ char *listoJSON(list_t *list) {
             case LL: buffersize += LL_STR_LEN; break;
             case LDBL: buffersize += LDBL_STR_LEN; break;
             case LIST: buffersize += calclistsize(current->value); break;
+            case NMAP: buffersize += calcmapsize(current->value); break;
             default: return "VT-NULL";
         }
         current = current->next;
@@ -216,19 +205,12 @@ char *listoJSON(list_t *list) {
     }
     current = list;
     char *buffer = malloc(buffersize);
+    if (buffer == NULL) {
+        return "malloc-NULL";
+    }
     buffer[0] = '[';
     buffer[1] = '\0';
     while (current != NULL) {
-        if (current->valuetype == LIST) {
-            char srep[calclistsize(current->value)];
-            sprintf(srep, "%s", listoJSON(current->value));
-            strcat(buffer, srep);
-            current = current->next;
-            if (current != NULL) {
-                strcat(buffer, ", ");
-            }
-            continue;
-        }
         switch (current->valuetype) {
             case RAW: strcat(buffer, (char*)current->value); break;
             case SHR:{char srep[SHR_STR_LEN];
@@ -261,6 +243,10 @@ char *listoJSON(list_t *list) {
                       break;}
             case LIST:{char srep[calclistsize(current->value) + 2];
                       sprintf(srep, "%s", listoJSON(current->value));
+                      strcat(buffer, srep);
+                      break;}
+            case NMAP:{char srep[calcmapsize(current->value) + 2];
+                      sprintf(srep, "%s", maptoJSON(current->value));
                       strcat(buffer, srep);
                       break;}
             default: return "VT-NULL";

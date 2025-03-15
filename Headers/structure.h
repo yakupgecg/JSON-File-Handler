@@ -41,6 +41,10 @@
 #define LIST 8 // Arrays
 #endif
 
+#ifndef NMAP
+#define NMAP 9 // Nested objects
+#endif
+
 unsigned int SHR_STR_LEN;
 unsigned int INT_STR_LEN;
 unsigned int FLT_STR_LEN;
