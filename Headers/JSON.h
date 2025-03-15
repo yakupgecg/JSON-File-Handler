@@ -27,7 +27,6 @@ Hello. Because there has not been many updates lately, here is a list of all the
     -Nested objects like  {"Example": {"Foo": 12, "Bar": true}}
     -Syntax checker on JSON strings or files
     -JSON string or file decoder 
-    -As much customization as possible
     -Finish the project by fixing bugs and ensuring memory management is safe
 
 At the time I have made all these updates and improvements
