@@ -157,7 +157,7 @@ char *maptoJSON(map_t *map) {
                       strcat(buffer, srep);
                       break;}
             case NMAP:{char srep[calcmapsize(current->value) + 2];
-                      sprintf(srep, "%s", listoJSON(current->value));
+                      sprintf(srep, "%s", maptoJSON(current->value));
                       strcat(buffer, srep);
                       break;}
             default: return "VT-NULL";
