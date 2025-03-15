@@ -7,7 +7,7 @@
 
 #include "parser.h"
 #include "structure.h"
-#include "json-handler.h"
+#include "json-encoder.h"
 #include "functions.h"
 
 Instead you can just type
@@ -17,7 +17,7 @@ Instead you can just type
 
 #include "parser.h"
 #include "structure.h"
-#include "json-handler.h"
+#include "json-encoder.h"
 #include "functions.h"
 
 /*
