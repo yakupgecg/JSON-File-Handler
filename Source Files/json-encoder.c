@@ -72,7 +72,7 @@ char *pairtoJSON(map_t *pair) {
                   strcat(buffer, srep);
                   break;}
         case NMAP:{char srep[calcmapsize(pair->value) + 2];
-                  sprintf(srep, "%s", listoJSON(pair->value));
+                  sprintf(srep, "%s", maptoJSON(pair->value));
                   strcat(buffer, srep);
                   break;}
         default: return "VT-NULL";
