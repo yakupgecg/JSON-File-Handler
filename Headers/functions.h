@@ -13,6 +13,8 @@ unsigned int maplen(map_t *);
 // Returns the length of the list
 unsigned int listlen(list_t *);
 
+int calclistsize(list_t *);
+
 // Forcefully frees a pair
 int freepair(map_t *);
 

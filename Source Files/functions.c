@@ -25,6 +25,30 @@ unsigned int listlen(list_t *list) {
     return len;
 }
 
+int calclistsize(list_t *root) {
+    if (root == NULL) {
+        return -1;
+    }
+    int bsize = 0;
+    list_t *current = root;
+    while (current != NULL) {
+        switch (current->valuetype) {
+            case RAW: bsize += strlen(current->value);
+            case SHR: bsize += SHR_STR_LEN; break;
+            case INT: bsize += INT_STR_LEN; break;
+            case FLT: bsize += FLT_STR_LEN; break;
+            case DBL: bsize += DBL_STR_LEN; break;
+            case LONG: bsize += LONG_STR_LEN; break;
+            case LL: bsize += LL_STR_LEN; break;
+            case LDBL: bsize += LDBL_STR_LEN; break;
+            case LIST: bsize += calclistsize(current->value); break;
+            default: return -2;
+        }
+        current = current->next;
+    }
+    return bsize;
+}
+
 // Forcefully frees a pair
 int freepair(map_t *pair) {
     if (pair == NULL) {
