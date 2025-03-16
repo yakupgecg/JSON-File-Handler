@@ -185,7 +185,7 @@ map_t *getprpairbykey(map_t *root, char *key) {
 }
 
 // This will initalize a hashmap and then return a pointer to it
-map_t *initializemap() {
+map_t *initM() {
     map_t* map = malloc(sizeof(map_t));
     if (map == NULL) {
         return NULL;
@@ -221,7 +221,7 @@ list_t *getlastelement(list_t *root) {
 }
 
 // Initializes a list
-list_t *initializelist() {
+list_t *initL() {
     list_t *list = malloc(sizeof(list_t));
     if (list == NULL) {
         return NULL;

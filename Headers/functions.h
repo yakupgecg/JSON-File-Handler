@@ -39,7 +39,7 @@ list_t *getelementbyindex(list_t *, unsigned int);
 map_t *getprpairbykey(map_t *, char *);
 
 // This will initalize a hashmap and then return a pointer to it
-map_t *initializemap();
+map_t *initM();
 
 // Returns the last pair in a hash map
 map_t *getlastpair(map_t *);
@@ -48,7 +48,7 @@ map_t *getlastpair(map_t *);
 list_t *getlastelement(list_t *);
 
 // Initializes a list
-list_t *initializelist();
+list_t *initL();
 
 // Adds a pair to the end of the given map and returns it
 map_t *appendH(map_t *);
