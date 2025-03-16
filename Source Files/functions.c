@@ -241,7 +241,7 @@ map_t *appendH(map_t *map) {
     while (current->next != NULL) {
         current = current->next;
     }
-    current->next = initializemap();
+    current->next = initM();
     if (current->next == NULL) {
         return NULL;
     }
@@ -257,7 +257,7 @@ list_t *appendL(list_t *list) {
     while (current->next != NULL) {
         current = current->next;
     }
-    current->next = initializelist();
+    current->next = initL();
     if (current->next == NULL) {
         return NULL;
     }
@@ -269,7 +269,7 @@ map_t *addafterH(map_t *pair) {
     if (pair == NULL) {
         return NULL;
     }
-    map_t *new = initializemap();
+    map_t *new = initM();
     if (pair->next != NULL) {
         new->next = pair->next;
     }
@@ -282,7 +282,7 @@ list_t *addafterL(list_t *element) {
     if (element == NULL) {
         return NULL;
     }
-    list_t *new = initializelist();
+    list_t *new = initL();
     if (element->next != NULL) {
         new->next = element->next;
     }
