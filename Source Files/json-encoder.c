@@ -15,7 +15,7 @@ char *pairtoJSON(map_t *pair) {
     unsigned int buffersize = strlen(pair->key);  
     buffersize += 6; // For the curly braces, ": " and the keys double quotes
     switch (pair->valuetype) {
-        case RAW: buffersize += strlen(pair->value); break;
+        case RAW: buffersize += strlen(pair->value) + 1; break;
         case SHR: buffersize += SHR_STR_LEN; break;
         case INT: buffersize += INT_STR_LEN; break;
         case FLT: buffersize += FLT_STR_LEN; break;
@@ -93,7 +93,7 @@ char *maptoJSON(map_t *map) {
     while (current != NULL) {
         buffersize += strlen(current->key) + 4; // For the double quotes of the key and ": "
         switch (current->valuetype) {
-            case RAW: buffersize += strlen(current->value); break;
+            case RAW: buffersize += strlen(current->value) + 1; break;
             case SHR: buffersize += SHR_STR_LEN; break;
             case INT: buffersize += INT_STR_LEN; break;
             case FLT: buffersize += FLT_STR_LEN; break;
@@ -186,7 +186,7 @@ char *listoJSON(list_t *list) {
             continue;
         }
         switch (current->valuetype) {
-            case RAW: buffersize += strlen(current->value); break;
+            case RAW: buffersize += strlen(current->value) + 1; break;
             case SHR: buffersize += SHR_STR_LEN; break;
             case INT: buffersize += INT_STR_LEN; break;
             case FLT: buffersize += FLT_STR_LEN; break;
