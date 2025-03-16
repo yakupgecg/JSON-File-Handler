@@ -362,18 +362,18 @@ int removeafterL(list_t *root) {
 }
 
 // Resets pairs key to the given string
-int resetkey(map_t *pair, char *key, unsigned int str_len) {
+map_t *resetkey(map_t *pair, char *key, unsigned int str_len) {
     if (pair == NULL) {
-        return 1;
+        return NULL;
     }
     free(pair->key);
     pair->key = malloc(str_len + 1);
     if (pair->key == NULL) {
-        return 2;
+        return NULL;
     }
     strncpy(pair->key, key, str_len);
     pair->key[str_len] = '\0';
-    return 0;
+    return pair;
 }
 
 /* Note about the last functions: 1 return value represents NULL error, indicates if map_t or list_t is null &

@@ -75,7 +75,7 @@ int removeafterH(map_t *, map_t *);
 int removeafterL(list_t *);
 
 // Resets pairs key to the given string
-int resetkey(map_t *, char *, unsigned int);
+map_t *resetkey(map_t *, char *, unsigned int);
 
 // Resets pairs value to the given integer
 int setintH(map_t *, int);
