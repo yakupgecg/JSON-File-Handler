@@ -3,7 +3,6 @@
 #ifndef JSONENCODER_H
 #define JSONENCODER_H
 
-#include "structure.h"
 #include "functions.h"
 
 /* This header defines the encoder. And if I will ever make the decoder, it will be here.
