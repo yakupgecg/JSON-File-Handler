@@ -1,1 +1,0 @@
-gcc -I"..\Headers" main.c "..\Source Files\functions.c" "..\Source Files\json-encoder.c" "..\Source Files\structure.c" "..\Source Files\parser.c"
