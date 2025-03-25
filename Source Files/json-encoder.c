@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 // Formats a pair to JSON file format
-char *pairtoJSON(map_t *pair) {
+char *pairtoJSON(obj_t *pair) {
     if (pair->key == NULL) {
         return "L-NULL";
     }
@@ -84,12 +84,12 @@ char *pairtoJSON(map_t *pair) {
 // Note that maptoJSON() function cannot encode hashmaps nested to lists that are nested to hashmaps (according to my experience)
 
 // Convert a hash map structure to a JSON string
-char *maptoJSON(map_t *map) {
+char *maptoJSON(obj_t *map) {
     if (map == NULL) {
         return "L-NULL";
     }
     unsigned int buffersize = 2;
-    map_t *current = map;
+    obj_t *current = map;
     while (current != NULL) {
         buffersize += strlen(current->key) + 4; // For the double quotes of the key and ": "
         switch (current->valuetype) {
@@ -172,12 +172,12 @@ char *maptoJSON(map_t *map) {
 }
 
 // Converts a list to JSON file format
-char *listoJSON(list_t *list) {
+char *listoJSON(array_t *list) {
     if (list == NULL) {
         return "L-NULL";
     }
     unsigned int buffersize = 3; // 3 for [ and ] and null terminator
-    list_t *current;
+    array_t *current;
     current = list;
     while (current != NULL) {
         if (current->valuetype == LIST) {

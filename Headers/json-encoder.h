@@ -8,8 +8,8 @@
 /* This header defines the encoder. And if I will ever make the decoder, it will be here.
 I made made functions seperately from functions.h since they serve a purpose for JSON files */
 
-char *pairtoJSON(map_t*);
-char *maptoJSON(map_t*);
-char *listoJSON(list_t*);
+char *pairtoJSON(obj_t*);
+char *maptoJSON(obj_t*);
+char *listoJSON(array_t*);
 
 #endif

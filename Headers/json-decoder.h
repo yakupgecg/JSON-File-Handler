@@ -3,6 +3,8 @@
 #ifndef JSONDECODER_H
 #define JSONDECODER_H
 
-// Begun working
+#include "structure.h"
+
+map_t *unpackstringH(const char *);
 
 #endif

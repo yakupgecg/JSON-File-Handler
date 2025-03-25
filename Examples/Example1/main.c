@@ -5,7 +5,7 @@
 
 int main() {
     FILE *file = fopen("Test.json", "w");
-    map_t *map = initM();
+    array_t *map = initM();
 
     setrawH(resetkey(map, "Name", 4), "\"CSON\"", 6);
     setrawH(resetkey(appendH(map), "Version", 7), "\"v0.9.4\"", 8);

@@ -4,9 +4,9 @@
 #include <string.h>
 
 // Returns the length of the hashmap, but if the pair is not the root of the hashmap, it will start from pair
-unsigned int maplen(map_t *map) {
+unsigned int maplen(obj_t *map) {
     unsigned int len = 0;
-    map_t *current = map;
+    obj_t *current = map;
     while (current != NULL) {
         len += 1;
         current = current->next;
@@ -15,9 +15,9 @@ unsigned int maplen(map_t *map) {
 }
 
 // Returns the length of the list
-unsigned int listlen(list_t *list) {
+unsigned int listlen(array_t *list) {
     unsigned int len = 0;
-    list_t *current = list;
+    array_t *current = list;
     while (current != NULL) {
         len += 1;
         current = current->next;
@@ -25,12 +25,12 @@ unsigned int listlen(list_t *list) {
     return len;
 }
 
-int calclistsize(list_t *root) {
+int calclistsize(array_t *root) {
     if (root == NULL) {
         return -1;
     }
     int bsize = 0;
-    list_t *current = root;
+    array_t *current = root;
     while (current != NULL) {
         switch (current->valuetype) {
             case RAW: bsize += strlen(current->value);
@@ -50,12 +50,12 @@ int calclistsize(list_t *root) {
 }
 
 // Returns the size of the hash map
-int calcmapsize(map_t *root) {
+int calcmapsize(obj_t *root) {
     if (root == NULL) {
         return 1;
     }
     int bsize = 0;
-    map_t *current = root;
+    obj_t *current = root;
     while (current != NULL) {
         bsize += strlen(current->key) + 2;
         switch (current->valuetype) {
@@ -77,7 +77,7 @@ int calcmapsize(map_t *root) {
 }
 
 // Forcefully frees a pair
-int freepair(map_t *pair) {
+int freepair(obj_t *pair) {
     if (pair == NULL) {
         return 1;
     }
@@ -92,7 +92,7 @@ int freepair(map_t *pair) {
 }
 
 // Forcefully frees an element
-int free_element(list_t *element) {
+int free_element(array_t *element) {
     if (element == NULL) {
         return 1;
     }
@@ -104,12 +104,12 @@ int free_element(list_t *element) {
 }
 
 // Frees all the pairs after map and itself
-int freemap(map_t* map) {
+int freemap(obj_t* map) {
     if (map == NULL) {
         return 1;
     }
-    map_t *current = map;
-    map_t *next;
+    obj_t *current = map;
+    obj_t *next;
     while (current != NULL) {
         next = current->next;
         freepair(current);
@@ -119,12 +119,12 @@ int freemap(map_t* map) {
 }
 
 // Frees the list (or frees every element after the given element)
-int freelist(list_t *list) {
+int freelist(array_t *list) {
     if (list == NULL) {
         return 1;
     }
-    list_t *current = list;
-    list_t *next;
+    array_t *current = list;
+    array_t *next;
     while (current != NULL) {
         next = current->next;
         free_element(current);
@@ -134,11 +134,11 @@ int freelist(list_t *list) {
 }
 
 // Returns the hash map, which has the key to find
-map_t *getpairbykey(map_t *root, char *key) {
+obj_t *getpairbykey(obj_t *root, char *key) {
     if (root == NULL) {
         return NULL;
     }
-    map_t *current = root;
+    obj_t *current = root;
     while (current != NULL) {
         if (strcmp(current->key, key) == 0) {
             return current;
@@ -149,14 +149,14 @@ map_t *getpairbykey(map_t *root, char *key) {
 }
 
 // Returns the element by index. For example if index is 1 it returns root->next
-list_t *getelementbyindex(list_t *root, unsigned int index) {
+array_t *getelementbyindex(array_t *root, unsigned int index) {
     if (root == NULL) {
         return NULL;
     }
     if (index > listlen(root)) {
         return NULL;
     }
-    list_t *current = root;
+    array_t *current = root;
     int i;
     for (i = 0; i < index; i++) {
         current = current->next;
@@ -165,15 +165,15 @@ list_t *getelementbyindex(list_t *root, unsigned int index) {
 }
 
 // Returns the previous pair before the pair that has the key to find, if found
-map_t *getprpairbykey(map_t *root, char *key) {
+obj_t *getprpairbykey(obj_t *root, char *key) {
     if (root == NULL) {
         return NULL;
     }
-    map_t *prev = root;
+    obj_t *prev = root;
     if (strcmp(prev->key, key) == 0) {
         return prev;
     }
-    map_t *current = root->next;
+    obj_t *current = root->next;
     while (current != NULL) {
         if (strcmp(current->key, key) == 0) {
             return prev;
@@ -185,8 +185,8 @@ map_t *getprpairbykey(map_t *root, char *key) {
 }
 
 // This will initalize a hashmap and then return a pointer to it
-map_t *initM() {
-    map_t* map = malloc(sizeof(map_t));
+obj_t *initM() {
+    obj_t* map = malloc(sizeof(obj_t));
     if (map == NULL) {
         return NULL;
     }
@@ -197,11 +197,11 @@ map_t *initM() {
 }
 
 // Returns the last pair in a hash map
-map_t *getlastpair(map_t *root) {
+obj_t *getlastpair(obj_t *root) {
     if (root == NULL) {
         return NULL;
     }
-    map_t *current = root;
+    obj_t *current = root;
     while (current->next !=  NULL) {
         current = current->next;
     }
@@ -209,11 +209,11 @@ map_t *getlastpair(map_t *root) {
 }
 
 // Returns the last element in a list
-list_t *getlastelement(list_t *root) {
+array_t *getlastelement(array_t *root) {
     if (root == NULL) {
         return NULL;
     }
-    list_t *current = root;
+    array_t *current = root;
     while (current->next != NULL) {
         current = current->next;
     }
@@ -221,8 +221,8 @@ list_t *getlastelement(list_t *root) {
 }
 
 // Initializes a list
-list_t *initL() {
-    list_t *list = malloc(sizeof(list_t));
+array_t *initL() {
+    array_t *list = malloc(sizeof(array_t));
     if (list == NULL) {
         return NULL;
     }
@@ -233,11 +233,11 @@ list_t *initL() {
 }
 
 // Adds a pair to the end of the given map and returns it
-map_t *appendH(map_t *map) {
+obj_t *appendH(obj_t *map) {
     if (map == NULL) {
         return NULL;
     }
-    map_t *current = map;
+    obj_t *current = map;
     while (current->next != NULL) {
         current = current->next;
     }
@@ -249,11 +249,11 @@ map_t *appendH(map_t *map) {
 }
 
 // Adds an element to the end of the given list and returns it
-list_t *appendL(list_t *list) {
+array_t *appendL(array_t *list) {
     if (list == NULL) {
         return NULL;
     }
-    list_t *current = list;
+    array_t *current = list;
     while (current->next != NULL) {
         current = current->next;
     }
@@ -265,11 +265,11 @@ list_t *appendL(list_t *list) {
 }
 
 // Adds another pair after the given pair and returns it
-map_t *addafterH(map_t *pair) {
+obj_t *addafterH(obj_t *pair) {
     if (pair == NULL) {
         return NULL;
     }
-    map_t *new = initM();
+    obj_t *new = initM();
     if (pair->next != NULL) {
         new->next = pair->next;
     }
@@ -278,11 +278,11 @@ map_t *addafterH(map_t *pair) {
 }
 
 // Adds another element after the given element and returns it
-list_t *addafterL(list_t *element) {
+array_t *addafterL(array_t *element) {
     if (element == NULL) {
         return NULL;
     }
-    list_t *new = initL();
+    array_t *new = initL();
     if (element->next != NULL) {
         new->next = element->next;
     }
@@ -291,7 +291,7 @@ list_t *addafterL(list_t *element) {
 } 
 
 // Removes the last pair in a hashmap
-int removelastH(map_t *map) {
+int removelastH(obj_t *map) {
     if (map == NULL) {
         return 1;
     }
@@ -299,7 +299,7 @@ int removelastH(map_t *map) {
         map->next = NULL;
         return 0;
     }
-    map_t *current = map;
+    obj_t *current = map;
     while (current->next != NULL) {
         current = current->next;
     }
@@ -309,7 +309,7 @@ int removelastH(map_t *map) {
 }
 
 // Removes the last element in a list
-int removelastL(list_t *list) {
+int removelastL(array_t *list) {
     if (list == NULL) {
         return 1;
     }
@@ -318,7 +318,7 @@ int removelastL(list_t *list) {
         list = NULL;
         return 0;
     }
-    list_t *current = list;
+    array_t *current = list;
     while (current->next != NULL) {
         current = current->next;
     }
@@ -328,11 +328,11 @@ int removelastL(list_t *list) {
 }
 
 // Removes the given map and then reassigns the next pointed the pair before the given map to pair after the given map
-int removeafterH(map_t *root, map_t *pairtormv) {
+int removeafterH(obj_t *root, obj_t *pairtormv) {
     if (root == NULL) {
         return 1;
     }
-    map_t *current = root;
+    obj_t *current = root;
     while (current != NULL) {
         if (strcmp(current->key, pairtormv->key) == 0) {
             getprpairbykey(root, pairtormv->key)->next = current->next;
@@ -345,7 +345,7 @@ int removeafterH(map_t *root, map_t *pairtormv) {
 }
 
 // Removes an element after the given element
-int removeafterL(list_t *root) {
+int removeafterL(array_t *root) {
     if (root == NULL) {
         return 1;
     }
@@ -354,7 +354,7 @@ int removeafterL(list_t *root) {
         root = NULL;
         return 0;
     } else {
-        list_t *temp = root->next;
+        array_t *temp = root->next;
         root->next = temp->next;
         free_element(temp);
         return 0;
@@ -362,7 +362,7 @@ int removeafterL(list_t *root) {
 }
 
 // Resets pairs key to the given string
-map_t *resetkey(map_t *pair, char *key, unsigned int str_len) {
+obj_t *resetkey(obj_t *pair, char *key, unsigned int str_len) {
     if (pair == NULL) {
         return NULL;
     }
@@ -376,12 +376,12 @@ map_t *resetkey(map_t *pair, char *key, unsigned int str_len) {
     return pair;
 }
 
-/* Note about the last functions: 1 return value represents NULL error, indicates if map_t or list_t is null &
+/* Note about the last functions: 1 return value represents NULL error, indicates if obj_t or array_t is null &
    2 return value represents memory allocation error
 */
 
 // Resets pairs value to the given integer
-int setintH(map_t *pair, int value) {
+int setintH(obj_t *pair, int value) {
     if (pair == NULL) {
         return 1;
     }
@@ -395,7 +395,7 @@ int setintH(map_t *pair, int value) {
     return 0;
 }
 
-int setintL(list_t *element, int value) {
+int setintL(array_t *element, int value) {
     if (element == NULL) {
         return 1;
     }
@@ -410,7 +410,7 @@ int setintL(list_t *element, int value) {
 }
 
 // Resets pairs value to the given short
-int setshortH(map_t *pair, short value) {
+int setshortH(obj_t *pair, short value) {
     if (pair == NULL) {
         return 1;
     }
@@ -424,7 +424,7 @@ int setshortH(map_t *pair, short value) {
     return 0;
 }
 
-int setshortL(list_t *element, short value) {
+int setshortL(array_t *element, short value) {
     if (element == NULL) {
         return 1;
     }
@@ -439,7 +439,7 @@ int setshortL(list_t *element, short value) {
 }
 
 // Resets pairs value to the given float
-int setfloatH(map_t *pair, float value) {
+int setfloatH(obj_t *pair, float value) {
     if (pair == NULL) {
         return 1;
     }
@@ -453,7 +453,7 @@ int setfloatH(map_t *pair, float value) {
     return 0;
 }
 
-int setfloatL(list_t *element, float value) {
+int setfloatL(array_t *element, float value) {
     if (element == NULL) {
         return 1;
     }
@@ -468,7 +468,7 @@ int setfloatL(list_t *element, float value) {
 }
 
 // Resets pairs value to the given string
-int setrawH(map_t *pair, char *val_ptr, int str_len) {
+int setrawH(obj_t *pair, char *val_ptr, int str_len) {
     if (pair == NULL) {
         return 1;
     }
@@ -483,7 +483,7 @@ int setrawH(map_t *pair, char *val_ptr, int str_len) {
     return 0;
 }
 
-int setrawL(list_t *element, char *val_ptr, unsigned int str_len) {
+int setrawL(array_t *element, char *val_ptr, unsigned int str_len) {
     if (element == NULL) {
         return 1;
     }
@@ -499,7 +499,7 @@ int setrawL(list_t *element, char *val_ptr, unsigned int str_len) {
 }
 
 // Resets pairs value to the given double
-int setdoubleH(map_t *pair, double value) {
+int setdoubleH(obj_t *pair, double value) {
     if (pair == NULL) {
         return 1;
     }
@@ -513,7 +513,7 @@ int setdoubleH(map_t *pair, double value) {
     return 0;
 }
 
-int setdoubleL(list_t *element, double value) {
+int setdoubleL(array_t *element, double value) {
     if (element == NULL) {
         return 1;
     }
@@ -528,7 +528,7 @@ int setdoubleL(list_t *element, double value) {
 }
 
 // Resets pairs value to the given long
-int setlongH(map_t *pair, long value) {
+int setlongH(obj_t *pair, long value) {
     if (pair == NULL) {
         return 1;
     }
@@ -542,7 +542,7 @@ int setlongH(map_t *pair, long value) {
     return 0;
 }
 
-int setlongL(list_t *element, long value) {
+int setlongL(array_t *element, long value) {
     if (element == NULL) {
         return 1;
     }
@@ -557,7 +557,7 @@ int setlongL(list_t *element, long value) {
 }
 
 // Resets pairs value to the given long long
-int setlonglongH(map_t *pair, long long value) {
+int setlonglongH(obj_t *pair, long long value) {
     if (pair == NULL) {
         return 1;
     }
@@ -571,7 +571,7 @@ int setlonglongH(map_t *pair, long long value) {
     return 0;
 }
 
-int setlonglongL(list_t *element, long long value) {
+int setlonglongL(array_t *element, long long value) {
     if (element == NULL) {
         return 1;
     }
@@ -587,7 +587,7 @@ int setlonglongL(list_t *element, long long value) {
 
 
 // Resets pairs value to the given long double
-int setlongdoubleH(map_t *pair, long double value) {
+int setlongdoubleH(obj_t *pair, long double value) {
     if (pair == NULL) {
         return 1;
     }
@@ -601,7 +601,7 @@ int setlongdoubleH(map_t *pair, long double value) {
     return 0;
 }
 
-int setlongdoubleL(list_t *element, long double value) {
+int setlongdoubleL(array_t *element, long double value) {
     if (element == NULL) {
         return 1;
     }
@@ -616,7 +616,7 @@ int setlongdoubleL(list_t *element, long double value) {
 }
 
 // Resets pairs value to the given list
-int setlistH(map_t *pair, list_t *element) {
+int setlistH(obj_t *pair, array_t *element) {
     if (pair == NULL || element == NULL) {
         return 1;
     }
@@ -627,7 +627,7 @@ int setlistH(map_t *pair, list_t *element) {
 }
 
 
-int setlistL(list_t *element, list_t *e2) {
+int setlistL(array_t *element, array_t *e2) {
     if (element == NULL) {
         return 1;
     }
@@ -638,7 +638,7 @@ int setlistL(list_t *element, list_t *e2) {
 }
 
 // Resets pairs value to the given hashmap
-int setmapH(map_t *pair, map_t *p2) {
+int setmapH(obj_t *pair, obj_t *p2) {
     if (pair == NULL || p2 == NULL) {
         return 1;
     }
@@ -648,7 +648,7 @@ int setmapH(map_t *pair, map_t *p2) {
     return 0;
 }
 
-int setmapL(list_t *element, map_t *map) {
+int setmapL(array_t *element, obj_t *map) {
     if (element == NULL || map == NULL) {
         return 1;
     }

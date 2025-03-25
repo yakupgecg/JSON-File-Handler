@@ -8,123 +8,123 @@
 /* This header defines functions for handling hash maps and lists */
 
 // Returns the length of the hashmap, but if the pair is not the root of the hashmap, it will start from pair
-unsigned int maplen(map_t *);
+unsigned int maplen(obj_t *);
 
 // Returns the length of the list
-unsigned int listlen(list_t *);
+unsigned int listlen(array_t *);
 
-int calclistsize(list_t *);
+int calclistsize(array_t *);
 
-int calcmapsize(map_t *);
+int calcmapsize(obj_t *);
 
 // Forcefully frees a pair
-int freepair(map_t *);
+int freepair(obj_t *);
 
 // Forcefully frees an element
-int free_element(list_t *);
+int free_element(array_t *);
 
 // Frees all the pairs after map and itself
-int freemap(map_t *);
+int freemap(obj_t *);
 
 // Frees the list (or frees every element after the given element)
-int freelist(list_t *);
+int freelist(array_t *);
 
 // Returns the pair that has the given key
-map_t *getpairbykey(map_t *, char *);
+obj_t *getpairbykey(obj_t *, char *);
 
 // Returns the element by index in the given list
-list_t *getelementbyindex(list_t *, unsigned int);
+array_t *getelementbyindex(array_t *, unsigned int);
 
 // Returns the pair before the given pair that has the given key, if found
-map_t *getprpairbykey(map_t *, char *);
+obj_t *getprpairbykey(obj_t *, char *);
 
 // This will initalize a hashmap and then return a pointer to it
-map_t *initM();
+obj_t *initM();
 
 // Returns the last pair in a hash map
-map_t *getlastpair(map_t *);
+obj_t *getlastpair(obj_t *);
 
 // Returns the last element in a list
-list_t *getlastelement(list_t *);
+array_t *getlastelement(array_t *);
 
 // Initializes a list
-list_t *initL();
+array_t *initL();
 
 // Adds a pair to the end of the given map and returns it
-map_t *appendH(map_t *);
+obj_t *appendH(obj_t *);
 
 // Adds an element to the end of the given list and returns it
-list_t *appendL(list_t *);
+array_t *appendL(array_t *);
 
 // Adds another pair after the given pair and returns it
-map_t *addafterH(map_t *);
+obj_t *addafterH(obj_t *);
 
 // Adds another element after the given element and returns it
-list_t *addafterL(list_t *);
+array_t *addafterL(array_t *);
 
 // Removes the last pair in a hashmap
-int removelastH(map_t *);
+int removelastH(obj_t *);
 
 // Removes the last element in a list
-int removelastL(list_t *);
+int removelastL(array_t *);
 
 // Removes the given map and then reassigns the next pointed the pair before the given map to pair after the given map
-int removeafterH(map_t *, map_t *);
+int removeafterH(obj_t *, obj_t *);
 
 // Removes the element after the given element
-int removeafterL(list_t *);
+int removeafterL(array_t *);
 
 // Resets pairs key to the given string
-map_t *resetkey(map_t *, char *, unsigned int);
+obj_t *resetkey(obj_t *, char *, unsigned int);
 
 // Resets pairs value to the given integer
-int setintH(map_t *, int);
+int setintH(obj_t *, int);
 
-int setintL(list_t *, int);
+int setintL(array_t *, int);
 
 // Resets pairs value to the given short
-int setshortH(map_t *, short);
+int setshortH(obj_t *, short);
 
-int setshortL(list_t *, short);
+int setshortL(array_t *, short);
 
 // Resets pairs value to the given float
-int setfloatH(map_t *, float);
+int setfloatH(obj_t *, float);
 
-int setfloatL(list_t *, float);
+int setfloatL(array_t *, float);
 
 // Resets pairs value to the given string
-int setrawH(map_t *, char *, int);
+int setrawH(obj_t *, char *, int);
 
-int setrawL(list_t *, char *, unsigned int);
+int setrawL(array_t *, char *, unsigned int);
 
 // Resets pairs value to the given double
-int setdoubleH(map_t *, double);
+int setdoubleH(obj_t *, double);
 
-int setdoubleL(list_t *, double);
+int setdoubleL(array_t *, double);
 
 // Resets pairs value to the given long
-int setlongH(map_t *, long);
+int setlongH(obj_t *, long);
 
-int setlongL(list_t *, long);
+int setlongL(array_t *, long);
 
 // Resets pairs value to the given long long
-int setlonglongH(map_t *, long long);
+int setlonglongH(obj_t *, long long);
 
-int setlonglongL(list_t *, long long);
+int setlonglongL(array_t *, long long);
 
 // Resets pairs value to the given long double
-int setlongdoubleH(map_t *, long double);
+int setlongdoubleH(obj_t *, long double);
 
-int setlongdoubleL(list_t *, long double);
+int setlongdoubleL(array_t *, long double);
 
 // Resets pairs value to the given list
-int setlistH(map_t *, list_t *);
+int setlistH(obj_t *, array_t *);
 
-int setlistL(list_t *, list_t *);
+int setlistL(array_t *, array_t *);
 
 // Resets pairs value to the given hashmap
-int setmapH(map_t *, map_t *);
+int setmapH(obj_t *, obj_t *);
 
-int setmapL(list_t *, map_t *);
+int setmapL(array_t *, obj_t *);
 
 #endif

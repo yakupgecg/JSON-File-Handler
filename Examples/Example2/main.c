@@ -5,10 +5,10 @@
 
 int main() {
 	FILE *file = fopen("Test.json", "w");
-	map_t *root = initM();
-	map_t *subroot = initM();
-	list_t *source_Files = initL();
-	list_t *header_Files = initL();
+	obj_t *root = initM();
+	obj_t *subroot = initM();
+	array_t *source_Files = initL();
+	array_t *header_Files = initL();
 	char *goalstring = "{\"JSON-File-Handler\": {\"Headers\": [\"structure.h\", \"parser.h\", \"json-encoder.h\", \"functions.h\", \"JSON.h\"], \"Source Files\": [\"structure.c\", \"parser.c\", \"json-encoder.c\", \"functions.c\"]}}";
 
 	setrawL(source_Files, "\"structure.c\"", 13);

@@ -58,12 +58,12 @@ typedef struct Hmap {
     void *value;
     int valuetype;
     struct Hmap *next;
-} map_t;
+} obj_t; // Object
 
 typedef struct Linkedlist {
     void *value;
     int valuetype;
     struct LinkedList *next;
-} list_t;
+} array_t;
 
 #endif // HASHMAP_STRUCT_H
