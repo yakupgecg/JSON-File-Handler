@@ -3,9 +3,9 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-map_t *unpackstringH(const char *str) {
+obj_t *unpackstringH(const char *str) {
     if (!str) return NULL;
-    map_t *root = initM();
+    obj_t *root = initM();
     unsigned int i, j = 0;
     unsigned int str_len = strlen(str);
 

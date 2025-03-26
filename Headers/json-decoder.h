@@ -5,6 +5,6 @@
 
 #include "structure.h"
 
-map_t *unpackstringH(const char *);
+obj_t *unpackstringH(const char *);
 
 #endif
