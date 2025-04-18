@@ -13,12 +13,12 @@ buffer sizer in the encoder calculates the needed buffer size using value types,
 never know the values string representation length, but if it's raw data (valuetype RAW), the buffer sizer can simply
 just calculate the string length. */
 
-char *shortparse(short);
-char *intparse(int);
-char *floatparse(float);
-char *doubleparse(double);
-char *longparse(long);
-char *llparse(long long);
-char *ldparse(long double);
+char *parseShort(short);
+char *parseInt(int);
+char *parseFloat(float);
+char *parseDouble(double);
+char *parseLong(long);
+char *parseLl(long long);
+char *parseLd(long double);
 
 #endif
