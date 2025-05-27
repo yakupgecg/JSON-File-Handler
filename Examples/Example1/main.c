@@ -9,7 +9,7 @@ int main() {
 
     setrawH(resetkey(map, "Name", 4), "\"CSON\"", 6);
     setrawH(resetkey(appendH(map), "Version", 7), "\"v0.9.4\"", 8);
-    setrawH(resetkey(appendH(map), "Age_In_Days", 11), "20", 2);
+    setrawH(resetkey(appendH(map), "Age_In_Days", 11), "null", 4);
     setrawH(resetkey(appendH(map), "isFinished", 10), "false", 5);
 
     char *json = maptoJSON(map);
