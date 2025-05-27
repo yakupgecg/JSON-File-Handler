@@ -656,4 +656,5 @@ int setmapL(array_t *element, obj_t *map) {
     free(element->value);
     element->value = map;
     element->valuetype = NMAP;
+    return 0;
 }
