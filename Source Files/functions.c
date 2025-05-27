@@ -25,6 +25,7 @@ unsigned int listlen(array_t *list) {
     return len;
 }
 
+// Calculates the length of the given array
 int calclistsize(array_t *root) {
     if (root == NULL) {
         return -1;
