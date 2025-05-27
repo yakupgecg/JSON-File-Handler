@@ -13,8 +13,10 @@ unsigned int maplen(obj_t *);
 // Returns the length of the list
 unsigned int listlen(array_t *);
 
+// Counts the length of the given array
 int calclistsize(array_t *);
 
+// Counts the length of the given hashmap
 int calcmapsize(obj_t *);
 
 // Forcefully frees a pair
