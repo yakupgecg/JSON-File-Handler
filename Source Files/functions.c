@@ -34,7 +34,7 @@ int calclistsize(array_t *root) {
     array_t *current = root;
     while (current != NULL) {
         switch (current->valuetype) {
-            case RAW: bsize += strlen(current->value);
+            case RAW: bsize += strlen(current->value); break;
             case SHR: bsize += SHR_STR_LEN; break;
             case INT: bsize += INT_STR_LEN; break;
             case FLT: bsize += FLT_STR_LEN; break;
@@ -60,7 +60,7 @@ int calcmapsize(obj_t *root) {
     while (current != NULL) {
         bsize += strlen(current->key) + 2;
         switch (current->valuetype) {
-            case RAW: bsize += strlen(current->value);
+            case RAW: bsize += strlen(current->value); break;
             case SHR: bsize += SHR_STR_LEN; break;
             case INT: bsize += INT_STR_LEN; break;
             case FLT: bsize += FLT_STR_LEN; break;
