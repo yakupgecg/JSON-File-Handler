@@ -6,7 +6,7 @@
 // Formats a pair to JSON file format
 char *pairtoJSON(obj_t *pair) {
     if (pair->key == NULL) {
-        return "L-NULL";
+        return "A-NULL";
     }
     if (pair->value == NULL) {
         pair->valuetype = RAW;
@@ -29,7 +29,7 @@ char *pairtoJSON(obj_t *pair) {
     }
     char *buffer = malloc(buffersize);
     if (buffer == NULL) {
-        return "malloc-NULL";
+        return "M-NULL";
     }
     buffer[0] = '{';
     buffer[1] = '\0';
@@ -86,7 +86,7 @@ char *pairtoJSON(obj_t *pair) {
 // Convert a hash map structure to a JSON string
 char *maptoJSON(obj_t *map) {
     if (map == NULL) {
-        return "L-NULL";
+        return "A-NULL";
     }
     unsigned int buffersize = 2;
     obj_t *current = map;
@@ -112,7 +112,7 @@ char *maptoJSON(obj_t *map) {
     }
     char *buffer = malloc(buffersize + 1);
     if (buffer == NULL) {
-        return "malloc-NULL";
+        return "M-NULL";
     }
     buffer[0] = '{';
     buffer[1] = '\0';
@@ -174,7 +174,7 @@ char *maptoJSON(obj_t *map) {
 // Converts a list to JSON file format
 char *listoJSON(array_t *list) {
     if (list == NULL) {
-        return "L-NULL";
+        return "A-NULL";
     }
     unsigned int buffersize = 3; // 3 for [ and ] and null terminator
     array_t *current;
@@ -206,7 +206,7 @@ char *listoJSON(array_t *list) {
     current = list;
     char *buffer = malloc(buffersize);
     if (buffer == NULL) {
-        return "malloc-NULL";
+        return "M-NULL";
     }
     buffer[0] = '[';
     buffer[1] = '\0';
