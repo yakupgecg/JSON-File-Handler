@@ -22,17 +22,17 @@ int main() {
 	setrawL(appendL(header_Files), "\"functions.h\"", 13);
 	setrawL(appendL(header_Files), "\"JSON.h\"", 8);
 
-	char *header_Files_json = listoJSON(header_Files);
-	char *source_Files_json = listoJSON(source_Files);
+	char *header_Files_json = encode_list(header_Files);
+	char *source_Files_json = encode_list(source_Files);
 
 	setrawH(resetkey(subroot, "Headers", 7), header_Files_json, strlen(header_Files_json));
 	setrawH(resetkey(appendH(subroot), "Source Files", 12), source_Files_json, strlen(source_Files_json));
 
-	char *json = maptoJSON(subroot);
+	char *json = encode_map(subroot);
 
 	setrawH(resetkey(root, "JSON-File-Handler", 17), json, strlen(json));
 
-	json = maptoJSON(root);
+	json = encode_map(root);
 
 	if (strcmp(json, goalstring) == 0) {
 		printf("Success!");

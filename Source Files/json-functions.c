@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 // Formats a pair to JSON file format
-char *pairtoJSON(obj_t *pair) {
+char *encode_pair(obj_t *pair) {
     if (pair->key == NULL) {
         return "A-NULL";
     }
@@ -68,11 +68,11 @@ char *pairtoJSON(obj_t *pair) {
                   strcat(buffer, srep);
                   break;}
         case LIST:{char srep[calclistsize(pair->value) + 2];
-                  sprintf(srep, "%s", listoJSON(pair->value));
+                  sprintf(srep, "%s", encode_list(pair->value));
                   strcat(buffer, srep);
                   break;}
         case NMAP:{char srep[calcmapsize(pair->value) + 2];
-                  sprintf(srep, "%s", maptoJSON(pair->value));
+                  sprintf(srep, "%s", encode_map(pair->value));
                   strcat(buffer, srep);
                   break;}
         default: return "VT-NULL";
@@ -81,10 +81,10 @@ char *pairtoJSON(obj_t *pair) {
     return buffer;
 }
 
-// Note that maptoJSON() function cannot encode hashmaps nested to lists that are nested to hashmaps (according to my experience)
+// Note that encode_map() function cannot encode hashmaps nested to lists that are nested to hashmaps (according to my experience)
 
 // Convert a hash map structure to a JSON string
-char *maptoJSON(obj_t *map) {
+char *encode_map(obj_t *map) {
     if (map == NULL) {
         return "A-NULL";
     }
@@ -153,11 +153,11 @@ char *maptoJSON(obj_t *map) {
                       strcat(buffer, srep);
                       break;}
             case LIST:{char srep[calclistsize(current->value) + 2];
-                      sprintf(srep, "%s", listoJSON(current->value));
+                      sprintf(srep, "%s", encode_list(current->value));
                       strcat(buffer, srep);
                       break;}
             case NMAP:{char srep[calcmapsize(current->value) + 2];
-                      sprintf(srep, "%s", maptoJSON(current->value));
+                      sprintf(srep, "%s", encode_map(current->value));
                       strcat(buffer, srep);
                       break;}
             default: return "VT-NULL";
@@ -172,7 +172,7 @@ char *maptoJSON(obj_t *map) {
 }
 
 // Converts a list to JSON file format
-char *listoJSON(array_t *list) {
+char *encode_list(array_t *list) {
     if (list == NULL) {
         return "A-NULL";
     }
@@ -242,11 +242,11 @@ char *listoJSON(array_t *list) {
                       strcat(buffer, srep);
                       break;}
             case LIST:{char srep[calclistsize(current->value) + 2];
-                      sprintf(srep, "%s", listoJSON(current->value));
+                      sprintf(srep, "%s", encode_list(current->value));
                       strcat(buffer, srep);
                       break;}
             case NMAP:{char srep[calcmapsize(current->value) + 2];
-                      sprintf(srep, "%s", maptoJSON(current->value));
+                      sprintf(srep, "%s", encode_map(current->value));
                       strcat(buffer, srep);
                       break;}
             default: return "VT-NULL";

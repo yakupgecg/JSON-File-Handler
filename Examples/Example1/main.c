@@ -12,7 +12,7 @@ int main() {
     setrawH(resetkey(appendH(map), "Age_In_Days", 11), "null", 4);
     setrawH(resetkey(appendH(map), "isFinished", 10), "false", 5);
 
-    char *json = maptoJSON(map);
+    char *json = encode_map(map);
     fputs(json, file);
     free(json);
     freemap(map);

@@ -17,7 +17,7 @@ int main() {
     resetkey(appendH(root), "Fahrenheit", 10);
     setrawH(getpairbykey(root, "Fahrenheit"), parseInt(fahrnt), strlen(parseInt(fahrnt)));
 
-    char *json = maptoJSON(root);
+    char *json = encode_map(root);
     
     if (strcmp(goalstring, json) == 0) {
         printf("Successful\n");
