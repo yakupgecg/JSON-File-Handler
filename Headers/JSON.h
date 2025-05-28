@@ -7,7 +7,7 @@
 
 #include "parser.h"
 #include "structure.h"
-#include "json-encoder.h"
+#include "json-functions.h"
 #include "functions.h"
 
 Which takes incredibly much time over including 4 headers, you can just type
@@ -22,7 +22,7 @@ Time to do some math my fellow JSON'ers
 
 #include "parser.h"
 #include "structure.h"
-#include "json-encoder.h"
+#include "json-functions.h"
 #include "functions.h"
 
 /*
