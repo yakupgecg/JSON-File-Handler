@@ -15,7 +15,7 @@ int main() {
     char *json = encode_map(map);
     fputs(json, file);
     free(json);
-    freemap(map);
+    free_map(map);
     fclose(file);
     return 0;
 }

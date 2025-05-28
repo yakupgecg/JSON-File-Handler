@@ -44,9 +44,9 @@ int main() {
 	free(json);
 	free(header_Files_json);
 	free(source_Files_json);
-	freelist(header_Files);
-	freelist(source_Files);
-	freemap(subroot);
-	freemap(root);
+	free_list(header_Files);
+	free_list(source_Files);
+	free_map(subroot);
+	free_map(root);
 	return 0;
 }

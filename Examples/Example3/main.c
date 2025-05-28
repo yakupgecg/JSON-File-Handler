@@ -15,7 +15,7 @@ int main() {
 
     setrawH(root, parseInt(cel), strlen(parseInt(cel)));
     resetkey(appendH(root), "Fahrenheit", 10);
-    setrawH(getpairbykey(root, "Fahrenheit"), parseInt(fahrnt), strlen(parseInt(fahrnt)));
+    setrawH(pairbykey(root, "Fahrenheit"), parseInt(fahrnt), strlen(parseInt(fahrnt)));
 
     char *json = encode_map(root);
     
@@ -24,12 +24,12 @@ int main() {
         fputs(json, file);
     } else {
         printf("Unsuccessful\n\nExpected: %s\nResult: %s\n", goalstring, json);
-        freemap(root);
+        free_map(root);
         fclose(file);
         return 1;
     }
 
-    freemap(root);
+    free_map(root);
     fclose(file);
     return 0;
 }

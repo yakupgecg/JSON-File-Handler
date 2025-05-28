@@ -4,7 +4,7 @@
 #include <string.h>
 
 // Returns the length of the hashmap, but if the pair is not the root of the hashmap, it will start from pair
-unsigned int maplen(obj_t *map) {
+unsigned int map_len(obj_t *map) {
     unsigned int len = 0;
     obj_t *current = map;
     while (current != NULL) {
@@ -15,7 +15,7 @@ unsigned int maplen(obj_t *map) {
 }
 
 // Returns the length of the list
-unsigned int listlen(array_t *list) {
+unsigned int list_len(array_t *list) {
     unsigned int len = 0;
     array_t *current = list;
     while (current != NULL) {
@@ -26,7 +26,7 @@ unsigned int listlen(array_t *list) {
 }
 
 // Calculates the length of the given array
-int calclistsize(array_t *root) {
+int list_size(array_t *root) {
     if (root == NULL) {
         return -1;
     }
@@ -42,7 +42,7 @@ int calclistsize(array_t *root) {
             case LONG: bsize += LONG_STR_LEN; break;
             case LL: bsize += LL_STR_LEN; break;
             case LDBL: bsize += LDBL_STR_LEN; break;
-            case LIST: bsize += calclistsize(current->value); break;
+            case LIST: bsize += list_size(current->value); break;
             default: return -2;
         }
         current = current->next;
@@ -51,7 +51,7 @@ int calclistsize(array_t *root) {
 }
 
 // Returns the size of the hash map
-int calcmapsize(obj_t *root) {
+int map_size(obj_t *root) {
     if (root == NULL) {
         return 1;
     }
@@ -68,8 +68,8 @@ int calcmapsize(obj_t *root) {
             case LONG: bsize += LONG_STR_LEN; break;
             case LL: bsize += LL_STR_LEN; break;
             case LDBL: bsize += LDBL_STR_LEN; break;
-            case LIST: bsize += calclistsize(current->value); break;
-            case NMAP: bsize += calcmapsize(current->value); break;
+            case LIST: bsize += list_size(current->value); break;
+            case NMAP: bsize += map_size(current->value); break;
             default: return -2;
         }
         current = current->next;
@@ -78,7 +78,7 @@ int calcmapsize(obj_t *root) {
 }
 
 // Forcefully frees a pair
-int freepair(obj_t *pair) {
+int free_pair(obj_t *pair) {
     if (pair == NULL) {
         return 1;
     }
@@ -105,7 +105,7 @@ int free_element(array_t *element) {
 }
 
 // Frees all the pairs after map and itself
-int freemap(obj_t* map) {
+int free_map(obj_t* map) {
     if (map == NULL) {
         return 1;
     }
@@ -113,14 +113,14 @@ int freemap(obj_t* map) {
     obj_t *next;
     while (current != NULL) {
         next = current->next;
-        freepair(current);
+        free_pair(current);
         current = next;
     }
     return 0;
 }
 
 // Frees the list (or frees every element after the given element)
-int freelist(array_t *list) {
+int free_list(array_t *list) {
     if (list == NULL) {
         return 1;
     }
@@ -135,7 +135,7 @@ int freelist(array_t *list) {
 }
 
 // Returns the hash map, which has the key to find
-obj_t *getpairbykey(obj_t *root, char *key) {
+obj_t *pairbykey(obj_t *root, char *key) {
     if (root == NULL) {
         return NULL;
     }
@@ -154,7 +154,7 @@ array_t *getelementbyindex(array_t *root, unsigned int index) {
     if (root == NULL) {
         return NULL;
     }
-    if (index > listlen(root)) {
+    if (index > list_len(root)) {
         return NULL;
     }
     array_t *current = root;
@@ -166,7 +166,7 @@ array_t *getelementbyindex(array_t *root, unsigned int index) {
 }
 
 // Returns the previous pair before the pair that has the key to find, if found
-obj_t *getprpairbykey(obj_t *root, char *key) {
+obj_t *pr_pairbykey(obj_t *root, char *key) {
     if (root == NULL) {
         return NULL;
     }
@@ -198,7 +198,7 @@ obj_t *initM() {
 }
 
 // Returns the last pair in a hash map
-obj_t *getlastpair(obj_t *root) {
+obj_t *last_pair(obj_t *root) {
     if (root == NULL) {
         return NULL;
     }
@@ -210,7 +210,7 @@ obj_t *getlastpair(obj_t *root) {
 }
 
 // Returns the last element in a list
-array_t *getlastelement(array_t *root) {
+array_t *last_element(array_t *root) {
     if (root == NULL) {
         return NULL;
     }
@@ -266,7 +266,7 @@ array_t *appendL(array_t *list) {
 }
 
 // Adds another pair after the given pair and returns it
-obj_t *addafterH(obj_t *pair) {
+obj_t *insertH(obj_t *pair) {
     if (pair == NULL) {
         return NULL;
     }
@@ -279,7 +279,7 @@ obj_t *addafterH(obj_t *pair) {
 }
 
 // Adds another element after the given element and returns it
-array_t *addafterL(array_t *element) {
+array_t *insertL(array_t *element) {
     if (element == NULL) {
         return NULL;
     }
@@ -292,7 +292,7 @@ array_t *addafterL(array_t *element) {
 } 
 
 // Removes the last pair in a hashmap
-int removelastH(obj_t *map) {
+int r_lastH(obj_t *map) {
     if (map == NULL) {
         return 1;
     }
@@ -304,13 +304,13 @@ int removelastH(obj_t *map) {
     while (current->next != NULL) {
         current = current->next;
     }
-    freepair(current);
+    free_pair(current);
     current = NULL;
     return 0;
 }
 
 // Removes the last element in a list
-int removelastL(array_t *list) {
+int r_lastL(array_t *list) {
     if (list == NULL) {
         return 1;
     }
@@ -329,15 +329,15 @@ int removelastL(array_t *list) {
 }
 
 // Removes the given map and then reassigns the next pointed the pair before the given map to pair after the given map
-int removeafterH(obj_t *root, obj_t *pairtormv) {
+int r_afterH(obj_t *root, obj_t *pairtormv) {
     if (root == NULL) {
         return 1;
     }
     obj_t *current = root;
     while (current != NULL) {
         if (strcmp(current->key, pairtormv->key) == 0) {
-            getprpairbykey(root, pairtormv->key)->next = current->next;
-            freepair(current);
+            pr_pairbykey(root, pairtormv->key)->next = current->next;
+            free_pair(current);
             return 0;
         }
         current = current->next;
@@ -346,7 +346,7 @@ int removeafterH(obj_t *root, obj_t *pairtormv) {
 }
 
 // Removes an element after the given element
-int removeafterL(array_t *root) {
+int r_afterL(array_t *root) {
     if (root == NULL) {
         return 1;
     }

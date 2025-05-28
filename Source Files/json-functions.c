@@ -23,8 +23,8 @@ char *encode_pair(obj_t *pair) {
         case LONG: buffersize += LONG_STR_LEN; break;
         case LL: buffersize += LL_STR_LEN; break;
         case LDBL: buffersize += LDBL_STR_LEN; break;
-        case LIST: buffersize += calclistsize(pair->value); break;
-        case NMAP: buffersize += calcmapsize(pair->value); break;
+        case LIST: buffersize += list_size(pair->value); break; // updated
+        case NMAP: buffersize += map_size(pair->value); break; // updated
         default: return "VT-NULL";
     }
     char *buffer = malloc(buffersize);
@@ -67,11 +67,11 @@ char *encode_pair(obj_t *pair) {
                   sprintf(srep, "%Lf", *(long double*)pair->value);
                   strcat(buffer, srep);
                   break;}
-        case LIST:{char srep[calclistsize(pair->value) + 2];
+        case LIST:{char srep[list_size(pair->value) + 2];
                   sprintf(srep, "%s", encode_list(pair->value));
                   strcat(buffer, srep);
                   break;}
-        case NMAP:{char srep[calcmapsize(pair->value) + 2];
+        case NMAP:{char srep[map_size(pair->value) + 2];
                   sprintf(srep, "%s", encode_map(pair->value));
                   strcat(buffer, srep);
                   break;}
@@ -101,8 +101,8 @@ char *encode_map(obj_t *map) {
             case LONG: buffersize += LONG_STR_LEN; break;
             case LL: buffersize += LL_STR_LEN; break;
             case LDBL: buffersize += LDBL_STR_LEN; break;
-            case LIST: buffersize += calclistsize(current->value); break;
-            case NMAP: buffersize += calcmapsize(current->value); break;
+            case LIST: buffersize += list_size(current->value); break; // updated
+            case NMAP: buffersize += map_size(current->value); break; // updated
             default: return "VT-NULL";
         }
         current = current->next;
@@ -152,11 +152,11 @@ char *encode_map(obj_t *map) {
                       sprintf(srep, "%Lf", *(long double*)current->value);
                       strcat(buffer, srep);
                       break;}
-            case LIST:{char srep[calclistsize(current->value) + 2];
+            case LIST:{char srep[list_size(current->value) + 2];
                       sprintf(srep, "%s", encode_list(current->value));
                       strcat(buffer, srep);
                       break;}
-            case NMAP:{char srep[calcmapsize(current->value) + 2];
+            case NMAP:{char srep[map_size(current->value) + 2];
                       sprintf(srep, "%s", encode_map(current->value));
                       strcat(buffer, srep);
                       break;}
@@ -181,7 +181,7 @@ char *encode_list(array_t *list) {
     current = list;
     while (current != NULL) {
         if (current->valuetype == LIST) {
-            buffersize += calclistsize(current->value) + 2;
+            buffersize += list_size(current->value) + 2; // updated
             current = current->next;
             continue;
         }
@@ -194,8 +194,8 @@ char *encode_list(array_t *list) {
             case LONG: buffersize += LONG_STR_LEN; break;
             case LL: buffersize += LL_STR_LEN; break;
             case LDBL: buffersize += LDBL_STR_LEN; break;
-            case LIST: buffersize += calclistsize(current->value); break;
-            case NMAP: buffersize += calcmapsize(current->value); break;
+            case LIST: buffersize += list_size(current->value); break;
+            case NMAP: buffersize += map_size(current->value); break;
             default: return "VT-NULL";
         }
         current = current->next;
@@ -241,11 +241,11 @@ char *encode_list(array_t *list) {
                       sprintf(srep, "%Lf", *(long double*)current->value);
                       strcat(buffer, srep);
                       break;}
-            case LIST:{char srep[calclistsize(current->value) + 2];
+            case LIST:{char srep[list_size(current->value) + 2];
                       sprintf(srep, "%s", encode_list(current->value));
                       strcat(buffer, srep);
                       break;}
-            case NMAP:{char srep[calcmapsize(current->value) + 2];
+            case NMAP:{char srep[map_size(current->value) + 2];
                       sprintf(srep, "%s", encode_map(current->value));
                       strcat(buffer, srep);
                       break;}
