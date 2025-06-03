@@ -6,7 +6,7 @@
 // Formats a pair to JSON file format
 char *encode_pair(obj_t *pair) {
     if (pair->key == NULL) {
-        return "A-NULL";
+        return NULL;
     }
     if (pair->value == NULL) {
         pair->valuetype = RAW;
@@ -25,11 +25,11 @@ char *encode_pair(obj_t *pair) {
         case LDBL: buffersize += LDBL_STR_LEN; break;
         case LIST: buffersize += list_size(pair->value); break; // updated
         case NMAP: buffersize += map_size(pair->value); break; // updated
-        default: return "VT-NULL";
+        default: return NULL;
     }
     char *buffer = malloc(buffersize);
     if (buffer == NULL) {
-        return "M-NULL";
+        return NULL;
     }
     buffer[0] = '{';
     buffer[1] = '\0';
@@ -75,7 +75,7 @@ char *encode_pair(obj_t *pair) {
                   sprintf(srep, "%s", encode_map(pair->value));
                   strcat(buffer, srep);
                   break;}
-        default: return "VT-NULL";
+        default: return NULL;
     }
     strcat(buffer, "}");
     return buffer;
@@ -86,7 +86,7 @@ char *encode_pair(obj_t *pair) {
 // Convert a hash map structure to a JSON string
 char *encode_map(obj_t *map) {
     if (map == NULL) {
-        return "A-NULL";
+        return NULL;
     }
     unsigned int buffersize = 2;
     obj_t *current = map;
@@ -103,7 +103,7 @@ char *encode_map(obj_t *map) {
             case LDBL: buffersize += LDBL_STR_LEN; break;
             case LIST: buffersize += list_size(current->value); break; // updated
             case NMAP: buffersize += map_size(current->value); break; // updated
-            default: return "VT-NULL";
+            default: return NULL;
         }
         current = current->next;
         if (current != NULL) {
@@ -112,7 +112,7 @@ char *encode_map(obj_t *map) {
     }
     char *buffer = malloc(buffersize + 1);
     if (buffer == NULL) {
-        return "M-NULL";
+        return NULL;
     }
     buffer[0] = '{';
     buffer[1] = '\0';
@@ -160,7 +160,7 @@ char *encode_map(obj_t *map) {
                       sprintf(srep, "%s", encode_map(current->value));
                       strcat(buffer, srep);
                       break;}
-            default: return "VT-NULL";
+            default: return NULL;
         }
         current = current->next;
         if (current != NULL) {
@@ -174,7 +174,7 @@ char *encode_map(obj_t *map) {
 // Converts a list to JSON file format
 char *encode_list(array_t *list) {
     if (list == NULL) {
-        return "A-NULL";
+        return NULL;
     }
     unsigned int buffersize = 3; // 3 for [ and ] and null terminator
     array_t *current;
@@ -196,7 +196,7 @@ char *encode_list(array_t *list) {
             case LDBL: buffersize += LDBL_STR_LEN; break;
             case LIST: buffersize += list_size(current->value); break;
             case NMAP: buffersize += map_size(current->value); break;
-            default: return "VT-NULL";
+            default: return NULL;
         }
         current = current->next;
         if (current != NULL)  {
@@ -206,7 +206,7 @@ char *encode_list(array_t *list) {
     current = list;
     char *buffer = malloc(buffersize);
     if (buffer == NULL) {
-        return "M-NULL";
+        return NULL;
     }
     buffer[0] = '[';
     buffer[1] = '\0';
@@ -249,7 +249,7 @@ char *encode_list(array_t *list) {
                       sprintf(srep, "%s", encode_map(current->value));
                       strcat(buffer, srep);
                       break;}
-            default: return "VT-NULL";
+            default: return NULL;
         }
         current = current->next;
         if (current != NULL) {
