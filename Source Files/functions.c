@@ -296,16 +296,16 @@ int r_lastH(obj_t *map) {
     if (map == NULL) {
         return 1;
     }
-    if (map->next != NULL) {
-        map->next = NULL;
+    if (map->next == NULL) {
+        free_pair(map);
         return 0;
     }
     obj_t *current = map;
-    while (current->next != NULL) {
+    while (current->next->next != NULL) {
         current = current->next;
     }
-    free_pair(current);
-    current = NULL;
+    free_pair(current->next);
+    current->next = NULL;
     return 0;
 }
 
@@ -316,15 +316,14 @@ int r_lastL(array_t *list) {
     }
     if (list->next == NULL) {
         free_element(list);
-        list = NULL;
         return 0;
     }
     array_t *current = list;
-    while (current->next != NULL) {
+    while (current->next->next != NULL) {
         current = current->next;
     }
-    free_element(current);
-    current = NULL;
+    free_element(current->next);
+    current->next = NULL;
     return 0;
 }
 
