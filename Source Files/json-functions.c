@@ -2,10 +2,16 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <errno.h>
 
 // Formats a pair to JSON file format
 char *encode_pair(obj_t *pair) {
+    if (pair == NULL) {
+        errno = EINVAL;
+        return NULL;
+    }
     if (pair->key == NULL) {
+        errno = EINVAL;
         return NULL;
     }
     if (pair->value == NULL) {
@@ -25,10 +31,11 @@ char *encode_pair(obj_t *pair) {
         case LDBL: buffersize += LDBL_STR_LEN; break;
         case LIST: buffersize += list_size(pair->value); break; // updated
         case NMAP: buffersize += map_size(pair->value); break; // updated
-        default: return NULL;
+        default: errno = EINVAL; return NULL;
     }
     char *buffer = malloc(buffersize);
     if (buffer == NULL) {
+        errno = ENOMEM;
         return NULL;
     }
     buffer[0] = '{';
@@ -75,17 +82,20 @@ char *encode_pair(obj_t *pair) {
                   sprintf(srep, "%s", encode_map(pair->value));
                   strcat(buffer, srep);
                   break;}
-        default: return NULL;
+        default: errno = EINVAL; free(buffer); return NULL;
     }
     strcat(buffer, "}");
     return buffer;
 }
 
-// Note that encode_map() function cannot encode hashmaps nested to lists that are nested to hashmaps (according to my experience)
+/* Note that functions encode_map(), encode_pair() and encode_list() have not the ability to encode very nested object or lists (due to stack overflow)
+   But in that case you can turn an encoded object or an array to string and then set an object or element type to raw and then set the value to the string.
+*/
 
 // Convert a hash map structure to a JSON string
 char *encode_map(obj_t *map) {
     if (map == NULL) {
+        errno = EINVAL;
         return NULL;
     }
     unsigned int buffersize = 2;
@@ -103,7 +113,7 @@ char *encode_map(obj_t *map) {
             case LDBL: buffersize += LDBL_STR_LEN; break;
             case LIST: buffersize += list_size(current->value); break; // updated
             case NMAP: buffersize += map_size(current->value); break; // updated
-            default: return NULL;
+            default: errno = EINVAL; return NULL;
         }
         current = current->next;
         if (current != NULL) {
@@ -112,6 +122,7 @@ char *encode_map(obj_t *map) {
     }
     char *buffer = malloc(buffersize + 1);
     if (buffer == NULL) {
+        errno = ENOMEM;
         return NULL;
     }
     buffer[0] = '{';
@@ -160,7 +171,7 @@ char *encode_map(obj_t *map) {
                       sprintf(srep, "%s", encode_map(current->value));
                       strcat(buffer, srep);
                       break;}
-            default: return NULL;
+            default: errno = EINVAL; free(buffer); return NULL;
         }
         current = current->next;
         if (current != NULL) {
@@ -174,6 +185,7 @@ char *encode_map(obj_t *map) {
 // Converts a list to JSON file format
 char *encode_list(array_t *list) {
     if (list == NULL) {
+        errno = EINVAL;
         return NULL;
     }
     unsigned int buffersize = 3; // 3 for [ and ] and null terminator
@@ -196,7 +208,7 @@ char *encode_list(array_t *list) {
             case LDBL: buffersize += LDBL_STR_LEN; break;
             case LIST: buffersize += list_size(current->value); break;
             case NMAP: buffersize += map_size(current->value); break;
-            default: return NULL;
+            default: errno = EINVAL; return NULL;
         }
         current = current->next;
         if (current != NULL)  {
@@ -206,6 +218,7 @@ char *encode_list(array_t *list) {
     current = list;
     char *buffer = malloc(buffersize);
     if (buffer == NULL) {
+        errno = ENOMEM;
         return NULL;
     }
     buffer[0] = '[';
@@ -249,7 +262,7 @@ char *encode_list(array_t *list) {
                       sprintf(srep, "%s", encode_map(current->value));
                       strcat(buffer, srep);
                       break;}
-            default: return NULL;
+            default: errno = EINVAL; free(buffer); return NULL;
         }
         current = current->next;
         if (current != NULL) {
