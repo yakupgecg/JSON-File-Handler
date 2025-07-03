@@ -11,5 +11,6 @@ I made made functions seperately from functions.h since they serve a purpose for
 char *encode_pair(obj_t*);
 char *encode_map(obj_t*);
 char *encode_list(array_t*);
+obj_t *decode_map(char*);
 
 #endif

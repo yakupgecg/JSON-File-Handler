@@ -272,3 +272,19 @@ char *encode_list(array_t *list) {
     strcat(buffer, "]");
     return buffer;
 }
+
+obj_t *decode_map(char *json) {
+    if (json == NULL) {
+        errno = ENIVAL;
+        return NULL;
+    }
+    /* Sorry that this has been so long but making a decoder was way harder than i anticipated not to mention
+    i was on a vacation (2025 June 4 --- 2025 July 2), which just makes the decoder making way harder, because i couldn't do anything there.
+    So this might actually be a really hard mission if i dont get help from a copilot or some AI
+    The reason why i dont use copilot is because it really doesn't make the program completely made by me,
+    but i only use copilot for checking errors like typing errors (since they are really hard to spot on large codebases)
+    or some things that seem suspicious or seem to not work correctly.
+    But still, most of the time i just do this on my own.
+    Forgot to mention the working is in progress...
+    */
+}
