@@ -4,6 +4,10 @@
 #include <stdlib.h>
 #include <errno.h>
 
+/* Note that functions encode_map(), encode_pair() and encode_list() have not the ability to encode very nested object or lists (due to stack overflow)
+   But in that case you can turn an encoded object or an array to string and then set an object or element type to raw and then set the value to the string.
+*/
+
 // Formats a pair to JSON file format
 char *encode_pair(obj_t *pair) {
     if (pair == NULL) {
@@ -87,10 +91,6 @@ char *encode_pair(obj_t *pair) {
     strcat(buffer, "}");
     return buffer;
 }
-
-/* Note that functions encode_map(), encode_pair() and encode_list() have not the ability to encode very nested object or lists (due to stack overflow)
-   But in that case you can turn an encoded object or an array to string and then set an object or element type to raw and then set the value to the string.
-*/
 
 // Convert a hash map structure to a JSON string
 char *encode_map(obj_t *map) {
