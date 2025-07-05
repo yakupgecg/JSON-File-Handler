@@ -1,5 +1,7 @@
 #include "..\Headers\structure.h"
 
+// Remember to change the values to higher of lower if needed.
+
 unsigned int SHR_STR_LEN = 6;
 unsigned int INT_STR_LEN = 11;
 unsigned int FLT_STR_LEN = 47;
