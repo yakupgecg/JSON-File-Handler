@@ -33,8 +33,8 @@ char *encode_pair(obj_t *pair) {
         case LONG: buffersize += LONG_STR_LEN; break;
         case LL: buffersize += LL_STR_LEN; break;
         case LDBL: buffersize += LDBL_STR_LEN; break;
-        case LIST: buffersize += list_size(pair->value); break; // updated
-        case NMAP: buffersize += map_size(pair->value); break; // updated
+        case LIST: buffersize += list_size(pair->value); break;
+        case NMAP: buffersize += map_size(pair->value); break;
         default: errno = EINVAL; return NULL;
     }
     char *buffer = malloc(buffersize);
@@ -111,8 +111,8 @@ char *encode_map(obj_t *map) {
             case LONG: buffersize += LONG_STR_LEN; break;
             case LL: buffersize += LL_STR_LEN; break;
             case LDBL: buffersize += LDBL_STR_LEN; break;
-            case LIST: buffersize += list_size(current->value); break; // updated
-            case NMAP: buffersize += map_size(current->value); break; // updated
+            case LIST: buffersize += list_size(current->value); break;
+            case NMAP: buffersize += map_size(current->value); break;
             default: errno = EINVAL; return NULL;
         }
         current = current->next;
