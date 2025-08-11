@@ -275,7 +275,7 @@ char *encode_list(array_t *list) {
 
 obj_t *decode_map(char *json) {
     if (json == NULL) {
-        errno = ENIVAL;
+        errno = EINVAL;
         return NULL;
     }
     /* Sorry that this has been so long but making a decoder was way harder than i anticipated not to mention
