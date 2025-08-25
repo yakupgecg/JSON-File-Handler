@@ -63,7 +63,7 @@ typedef struct Hmap {
 typedef struct Linkedlist {
     void *value;
     int valuetype;
-    struct LinkedList *next;
+    struct Linkedlist *next;
 } array_t;
 
 #endif // HASHMAP_STRUCT_H
