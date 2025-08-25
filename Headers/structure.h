@@ -45,13 +45,13 @@
 #define NMAP 9 // Nested objects
 #endif
 
-unsigned int SHR_STR_LEN;
-unsigned int INT_STR_LEN;
-unsigned int FLT_STR_LEN;
-unsigned int DBL_STR_LEN;
-unsigned int LONG_STR_LEN;
-unsigned int LL_STR_LEN;
-unsigned int LDBL_STR_LEN;
+extern unsigned int SHR_STR_LEN;
+extern unsigned int INT_STR_LEN;
+extern unsigned int FLT_STR_LEN;
+extern unsigned int DBL_STR_LEN;
+extern unsigned int LONG_STR_LEN;
+extern unsigned int LL_STR_LEN;
+extern unsigned int LDBL_STR_LEN;
 
 typedef struct Hmap {
     char *key;
