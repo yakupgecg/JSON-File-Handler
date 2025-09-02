@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
 
 // Returns the length of the hashmap, but if the pair is not the root of the hashmap, it will start from pair
 unsigned int map_len(obj_t *map) {
@@ -28,6 +29,7 @@ unsigned int list_len(array_t *list) {
 // Calculates the length of the given array
 int list_size(array_t *root) {
     if (root == NULL) {
+        errno = EINVAL;
         return -1;
     }
     int bsize = 0;
@@ -43,7 +45,7 @@ int list_size(array_t *root) {
             case LL: bsize += LL_STR_LEN; break;
             case LDBL: bsize += LDBL_STR_LEN; break;
             case LIST: bsize += list_size(current->value); break;
-            default: return -2;
+            default: errno = EINVAL; return -2;
         }
         current = current->next;
     }
@@ -53,7 +55,8 @@ int list_size(array_t *root) {
 // Returns the size of the hash map
 int map_size(obj_t *root) {
     if (root == NULL) {
-        return 1;
+        errno = EINVAL;
+        return -1;
     }
     int bsize = 0;
     obj_t *current = root;
@@ -70,7 +73,7 @@ int map_size(obj_t *root) {
             case LDBL: bsize += LDBL_STR_LEN; break;
             case LIST: bsize += list_size(current->value); break;
             case NMAP: bsize += map_size(current->value); break;
-            default: return -2;
+            default: errno = EINVAL; return -2;
         }
         current = current->next;
     }
