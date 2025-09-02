@@ -9,7 +9,7 @@
 
 ctr_t *init_ctr(char);
 ctrm_t *init_ctrm(ctr_t *, ctr_t *);
-void free_ctr(ctrm_t *);
+void free_ctrm(ctrm_t *);
 unsigned int length_ctr(ctrm_t *);
 ctrm_t *to_ctr(char *);
 char *ctr_to_string(ctrm_t *);
