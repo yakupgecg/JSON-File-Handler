@@ -46,11 +46,13 @@ unsigned int length_ctr(ctrm_t *ctrm) {
     if (ctrm == NULL) return 0;
     unsigned int len = 0;
     ctr_t *current = ctrm->head;
-    while (current != NULL) {
-        len++;
-        current = current->n;
+    if (ctrm->tail != NULL) {
+        while (current != ctrm->tail) {
+            len++;
+            current = current->n;
+        }
     }
-    return len;
+    return len+1; // +1 for the extra ctrm->tail
 }
 
 // Converts a normal string to a ctr_t type string
