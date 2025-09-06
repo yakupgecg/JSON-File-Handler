@@ -45,6 +45,10 @@
 #define NMAP 9 // Nested objects
 #endif
 
+#ifndef EJSON
+#define EJSON 200 // For errors with json strings
+#endif
+
 extern unsigned int SHR_STR_LEN;
 extern unsigned int INT_STR_LEN;
 extern unsigned int FLT_STR_LEN;

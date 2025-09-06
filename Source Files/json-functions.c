@@ -319,6 +319,10 @@ char *indent_json(char *json, unsigned int indent) {
             }
         } else if (c->c == '}' || c->c == ']') {
             if (!is_string) {
+                if (indent_len < 1) {
+                    errno = EJSON;
+                    return NULL;
+                }
                 nest_index--;
                 indent_len--;
                 add_ctr_e(newctrm, '\n');
@@ -352,7 +356,7 @@ char *indent_json(char *json, unsigned int indent) {
     if (nest_index != 0) {
         free_ctrm(newctrm);
         free_ctrm(new_json);
-        errno = EINVAL;
+        errno = EJSON;
         return NULL;
     }
     char *result = ctr_to_string(newctrm);
