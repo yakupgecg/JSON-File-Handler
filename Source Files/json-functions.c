@@ -1,10 +1,12 @@
 #include "..\Headers\json-functions.h"
+#include "..\String-C\Headers\STRING.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <stdbool.h>
 
-/* Note that functions encode_map(), encode_pair() and encode_list() have not the ability to encode very nested object or lists (due to stack overflow)
+/* Note that functions encode_map(), encode_pair() and encode_list() have not the ability to encode very nested object or lists (due to stack overflow and recursion)
    But in that case you can turn an encoded object or an array to string and then set an object or element type to raw and then set the value to the string.
 */
 
@@ -273,18 +275,88 @@ char *encode_list(array_t *list) {
     return buffer;
 }
 
-obj_t *decode_map(char *json) {
+// Indents a json string
+char *indent_json(char *json, unsigned int indent) {
     if (json == NULL) {
         errno = EINVAL;
         return NULL;
     }
-    /* Sorry that this has been so long but making a decoder was way harder than i anticipated not to mention
-    i was on a vacation (2025 June 4 --- 2025 July 2), which just makes the decoder making way harder, because i couldn't do anything there.
-    So this might actually be a really hard mission if i dont get help from a copilot or some AI
-    The reason why i dont use copilot is because it really doesn't make the program completely made by me,
-    but i only use copilot for checking errors like typing errors (since they are really hard to spot on large codebases)
-    or some things that seem suspicious or seem to not work correctly.
-    But still, most of the time i just do this on my own.
-    Forgot to mention the working is in progress...
-    */
+    ctrm_t *new_json = to_ctr(json);
+    ctr_t *newctr = init_ctr(get_ctr_byindex(new_json, 0)->c);
+    ctrm_t *newctrm = init_ctrm(newctr, newctr);
+    unsigned int indent_len = 1;
+    unsigned int len = length_ctr(new_json);
+    unsigned int nest_index = 1;
+    bool is_string = false;
+    bool is_obj = false;
+    add_ctr_e(newctrm, '\n');
+    for (int k = 0; k < indent; k++) {
+        add_ctr_e(newctrm, ' ');
+    }
+    for (int i = 1; i < len+1; i++) { // Starts at 1 because newctr got added first
+        is_obj = false;
+        ctr_t *c = get_ctr_byindex(new_json, i);
+        if (c->c == '"') {
+            if (get_ctr_byindex(new_json, i-1)->c != '\\') {
+                if (is_string) {
+                    is_string = false;
+                } else {
+                    is_string = true;
+                }
+            }
+        } else if (c->c == ' ') {
+            if (!is_string) {
+                continue;
+            }
+        } else if (c->c == '{' || c->c == '[') {
+            if (!is_string) {
+                nest_index++;
+                is_obj = true;
+                add_ctr_e(newctrm, '\n');
+                for (int j = 0; j < indent * indent_len; j++) {
+                    add_ctr_e(newctrm, ' ');
+                }
+            }
+        } else if (c->c == '}' || c->c == ']') {
+            if (!is_string) {
+                nest_index--;
+                indent_len--;
+                add_ctr_e(newctrm, '\n');
+                for (int j = 0; j < indent * indent_len; j++) {
+                    add_ctr_e(newctrm, ' ');
+                }
+            }
+        }
+        add_ctr_e(newctrm, c->c);
+        if (c->c == ',') {
+            if (!is_string) {
+                add_ctr_e(newctrm, '\n');
+                for (int j = 0; j < indent * indent_len; j++) {
+                    add_ctr_e(newctrm, ' ');
+                }
+            }
+        }
+        if (c->c == ':') {
+            if (!is_string) {
+                add_ctr_e(newctrm, ' ');
+            }
+        }
+        if (is_obj) {
+            indent_len++;
+            add_ctr_e(newctrm, '\n');
+            for (int j = 0; j < indent * indent_len; j++) {
+                add_ctr_e(newctrm, ' ');
+            }
+        }
+    }
+    if (nest_index != 0) {
+        free_ctrm(newctrm);
+        free_ctrm(new_json);
+        errno = EINVAL;
+        return NULL;
+    }
+    char *result = ctr_to_string(newctrm);
+    free_ctrm(newctrm);
+    free_ctrm(new_json);
+    return result;
 }
