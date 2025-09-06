@@ -21,7 +21,7 @@ int main() {
     
     if (strcmp(goalstring, json) == 0) {
         printf("Successful\n");
-        fputs(json, file);
+        fputs(indent_json(json, 4), file);
     } else {
         printf("Unsuccessful\n\nExpected: %s\nResult: %s\n", goalstring, json);
         free_map(root);

@@ -36,7 +36,7 @@ int main() {
 
 	if (strcmp(json, goalstring) == 0) {
 		printf("Success!");
-		fputs(json, file);
+		fputs(indent_json(json, 4), file);
 	} else {
 		printf("Unsuccess!");
 	}
