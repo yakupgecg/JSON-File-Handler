@@ -20,10 +20,6 @@ char *encode_pair(obj_t *pair) {
         errno = EINVAL;
         return NULL;
     }
-    if (pair->value == NULL) {
-        pair->valuetype = RAW;
-        pair->value = "null";
-    }
     unsigned int buffersize = strlen(pair->key);  
     buffersize += 6; // For the curly braces, ": " and the keys double quotes
     switch (pair->valuetype) {
