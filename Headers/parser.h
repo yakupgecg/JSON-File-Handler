@@ -3,15 +3,22 @@
 #ifndef PARSER_H
 #define PARSER_H
 
+// Don't confuse this file with decoding or parsing json strings
+
 /* This header file defines functions that parses integer and floating point types to
 string representations. For example:
 
-intparse(8) returns "8"
+parseInt(8) returns "8" (strings)
+Even though you can use set (like setint or setdouble) functions other than setraw, parsing approach is mostly better, 
+since the encoder calculates the string's length manually.
+So instead of typing like
 
-Even though we have value types (like SHR, FLT, LONG), We strongly recommend using parsers because the
-buffer sizer in the encoder calculates the needed buffer size using value types, since the buffer sizer can
-never know the values string representation length, but if it's raw data (valuetype RAW), the buffer sizer can simply
-just calculate the string length. */
+setintH(obj, 8);
+
+you can type
+
+setrawH(obj, parseInt(8));
+*/
 
 char *parseShort(short);
 char *parseInt(int);
