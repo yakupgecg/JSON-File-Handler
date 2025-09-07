@@ -4,6 +4,8 @@
 #include <string.h>
 #include <errno.h>
 
+//TODO: Use errno for each function in this file, and in other files
+
 // Returns the length of the hashmap, but if the pair is not the root of the hashmap, it will start from pair
 unsigned int map_len(obj_t *map) {
     unsigned int len = 0;
@@ -83,6 +85,7 @@ int map_size(obj_t *root) {
 // Forcefully frees a pair
 int free_pair(obj_t *pair) {
     if (pair == NULL) {
+        errno = EINVAL;
         return 1;
     }
     if (pair->key != NULL) {
@@ -98,6 +101,7 @@ int free_pair(obj_t *pair) {
 // Forcefully frees an element
 int free_element(array_t *element) {
     if (element == NULL) {
+        errno = EINVAL;
         return 1;
     }
     if (element->value != NULL) {
@@ -110,6 +114,7 @@ int free_element(array_t *element) {
 // Frees all the pairs after map and itself
 int free_map(obj_t* map) {
     if (map == NULL) {
+        errno = EINVAL;
         return 1;
     }
     obj_t *current = map;
@@ -125,6 +130,7 @@ int free_map(obj_t* map) {
 // Frees the list (or frees every element after the given element)
 int free_list(array_t *list) {
     if (list == NULL) {
+        errno = EINVAL;
         return 1;
     }
     array_t *current = list;
@@ -140,6 +146,7 @@ int free_list(array_t *list) {
 // Returns the hash map, which has the key to find
 obj_t *pairbykey(obj_t *root, char *key) {
     if (root == NULL) {
+        errno = EINVAL;
         return NULL;
     }
     obj_t *current = root;
@@ -155,11 +162,10 @@ obj_t *pairbykey(obj_t *root, char *key) {
 // Returns the element by index. For example if index is 1 it returns root->next
 array_t *getelementbyindex(array_t *root, unsigned int index) {
     if (root == NULL) {
+        errno = EINVAL;
         return NULL;
     }
-    if (index > list_len(root)) {
-        return NULL;
-    }
+    if (index > list_len(root)) index = list_len(root);
     array_t *current = root;
     int i;
     for (i = 0; i < index; i++) {
@@ -171,6 +177,7 @@ array_t *getelementbyindex(array_t *root, unsigned int index) {
 // Returns the previous pair before the pair that has the key to find, if found
 obj_t *pr_pairbykey(obj_t *root, char *key) {
     if (root == NULL) {
+        errno = EINVAL;
         return NULL;
     }
     obj_t *prev = root;
@@ -192,10 +199,20 @@ obj_t *pr_pairbykey(obj_t *root, char *key) {
 obj_t *initM() {
     obj_t* map = malloc(sizeof(obj_t));
     if (map == NULL) {
+        errno = ENOMEM;
         return NULL;
     }
     map->key = malloc(sizeof(char));
+    if (map->key == NULL) {
+        errno = ENOMEM;
+        return NULL;
+    }
     map->value = malloc(sizeof(int));
+    if (map->value == NULL) {
+        errno = ENOMEM;
+        return NULL;
+    }
+    map->valuetype = RAW;
     map->next = NULL;
     return map;
 }
@@ -203,6 +220,7 @@ obj_t *initM() {
 // Returns the last pair in a hash map
 obj_t *last_pair(obj_t *root) {
     if (root == NULL) {
+        errno = EINVAL;
         return NULL;
     }
     obj_t *current = root;
@@ -215,6 +233,7 @@ obj_t *last_pair(obj_t *root) {
 // Returns the last element in a list
 array_t *last_element(array_t *root) {
     if (root == NULL) {
+        errno = EINVAL;
         return NULL;
     }
     array_t *current = root;
@@ -228,9 +247,14 @@ array_t *last_element(array_t *root) {
 array_t *initL() {
     array_t *list = malloc(sizeof(array_t));
     if (list == NULL) {
+        errno = ENOMEM;
         return NULL;
     }
     list->value = malloc(sizeof(int));
+    if (list->value == NULL) {
+        errno = ENOMEM;
+        return NULL;
+    }
     list->valuetype = RAW;
     list->next = NULL;
     return list;
@@ -239,6 +263,7 @@ array_t *initL() {
 // Adds a pair to the end of the given map and returns it
 obj_t *appendH(obj_t *map) {
     if (map == NULL) {
+        errno = EINVAL;
         return NULL;
     }
     obj_t *current = map;
@@ -247,6 +272,7 @@ obj_t *appendH(obj_t *map) {
     }
     current->next = initM();
     if (current->next == NULL) {
+        errno = ENOMEM;
         return NULL;
     }
     return current->next;
@@ -255,6 +281,7 @@ obj_t *appendH(obj_t *map) {
 // Adds an element to the end of the given list and returns it
 array_t *appendL(array_t *list) {
     if (list == NULL) {
+        errno = EINVAL;
         return NULL;
     }
     array_t *current = list;
@@ -263,6 +290,7 @@ array_t *appendL(array_t *list) {
     }
     current->next = initL();
     if (current->next == NULL) {
+        errno = ENOMEM;
         return NULL;
     }
     return current->next;
@@ -271,6 +299,7 @@ array_t *appendL(array_t *list) {
 // Adds another pair after the given pair and returns it
 obj_t *insertH(obj_t *pair) {
     if (pair == NULL) {
+        errno = EINVAL;
         return NULL;
     }
     obj_t *new = initM();
@@ -284,6 +313,7 @@ obj_t *insertH(obj_t *pair) {
 // Adds another element after the given element and returns it
 array_t *insertL(array_t *element) {
     if (element == NULL) {
+        errno = EINVAL;
         return NULL;
     }
     array_t *new = initL();
@@ -297,6 +327,7 @@ array_t *insertL(array_t *element) {
 // Removes the last pair in a hashmap
 int r_lastH(obj_t *map) {
     if (map == NULL) {
+        errno = EINVAL;
         return 1;
     }
     if (map->next == NULL) {
@@ -315,6 +346,7 @@ int r_lastH(obj_t *map) {
 // Removes the last element in a list
 int r_lastL(array_t *list) {
     if (list == NULL) {
+        errno = EINVAL;
         return 1;
     }
     if (list->next == NULL) {
@@ -333,6 +365,7 @@ int r_lastL(array_t *list) {
 // Removes the given map and then reassigns the next pointed the pair before the given map to pair after the given map
 int r_afterH(obj_t *root, obj_t *pairtormv) {
     if (root == NULL) {
+        errno = EINVAL;
         return 1;
     }
     obj_t *current = root;
@@ -350,6 +383,7 @@ int r_afterH(obj_t *root, obj_t *pairtormv) {
 // Removes an element after the given element
 int r_afterL(array_t *root) {
     if (root == NULL) {
+        errno = EINVAL;
         return 1;
     }
     if (root->next == NULL) {
@@ -367,11 +401,13 @@ int r_afterL(array_t *root) {
 // Resets pairs key to the given string
 obj_t *resetkey(obj_t *pair, char *key, unsigned int str_len) {
     if (pair == NULL) {
+        errno = EINVAL;
         return NULL;
     }
     free(pair->key);
     pair->key = malloc(str_len + 1);
     if (pair->key == NULL) {
+        errno = ENOMEM;
         return NULL;
     }
     strncpy(pair->key, key, str_len);
@@ -386,11 +422,13 @@ obj_t *resetkey(obj_t *pair, char *key, unsigned int str_len) {
 // Resets pairs value to the given integer
 int setintH(obj_t *pair, int value) {
     if (pair == NULL) {
+        errno = EINVAL;
         return 1;
     }
     free(pair->value);
     pair->value = malloc(sizeof(int));
     if (pair->value == NULL) {
+        errno = ENOMEM;
         return 2;
     }
     *(int*)pair->value = value;
@@ -400,11 +438,13 @@ int setintH(obj_t *pair, int value) {
 
 int setintL(array_t *element, int value) {
     if (element == NULL) {
+        errno = EINVAL;
         return 1;
     }
     free(element->value);
     element->value = malloc(sizeof(int));
     if (element->value == NULL) {
+        errno = ENOMEM;
         return 2;
     }
     *(int*)element->value = value;
@@ -415,11 +455,13 @@ int setintL(array_t *element, int value) {
 // Resets pairs value to the given short
 int setshortH(obj_t *pair, short value) {
     if (pair == NULL) {
+        errno = EINVAL;
         return 1;
     }
     free(pair->value);
     pair->value = malloc(sizeof(short));
     if (pair->value == NULL) {
+        errno = ENOMEM;
         return 2;
     }
     *(short*)pair->value = value;
@@ -429,11 +471,13 @@ int setshortH(obj_t *pair, short value) {
 
 int setshortL(array_t *element, short value) {
     if (element == NULL) {
+        errno = EINVAL;
         return 1;
     }
     free(element->value);
     element->value = malloc(sizeof(short));
     if (element->value == NULL) {
+        errno = ENOMEM;
         return 2;
     }
     *(short*)element->value = value;
@@ -444,11 +488,13 @@ int setshortL(array_t *element, short value) {
 // Resets pairs value to the given float
 int setfloatH(obj_t *pair, float value) {
     if (pair == NULL) {
+        errno = EINVAL;
         return 1;
     }
     free(pair->value);
     pair->value = malloc(sizeof(float));
     if (pair->value == NULL) {
+        errno = ENOMEM;
         return 2;
     }
     *(float*)pair->value = value;
@@ -458,11 +504,13 @@ int setfloatH(obj_t *pair, float value) {
 
 int setfloatL(array_t *element, float value) {
     if (element == NULL) {
+        errno = EINVAL;
         return 1;
     }
     free(element->value);
     element->value = malloc(sizeof(float));
     if (element->value == NULL) {
+        errno = ENOMEM;
         return 2;
     }
     *(float*)element->value = value;
@@ -473,11 +521,13 @@ int setfloatL(array_t *element, float value) {
 // Resets pairs value to the given string
 int setrawH(obj_t *pair, char *val_ptr, int str_len) {
     if (pair == NULL) {
+        errno = EINVAL;
         return 1;
     }
     free(pair->value);
     pair->value = malloc(str_len + 1);
     if (pair->value == NULL) {
+        errno = ENOMEM;
         return 2;
     }
     strncpy(pair->value, val_ptr, str_len);
@@ -488,11 +538,13 @@ int setrawH(obj_t *pair, char *val_ptr, int str_len) {
 
 int setrawL(array_t *element, char *val_ptr, unsigned int str_len) {
     if (element == NULL) {
+        errno = EINVAL;
         return 1;
     }
     free(element->value);
     element->value = malloc(str_len + 1);
     if (element->value == NULL) {
+        errno = ENOMEM;
         return 2;
     }
     strncpy(element->value, val_ptr, str_len);
@@ -504,11 +556,13 @@ int setrawL(array_t *element, char *val_ptr, unsigned int str_len) {
 // Resets pairs value to the given double
 int setdoubleH(obj_t *pair, double value) {
     if (pair == NULL) {
+        errno = EINVAL;
         return 1;
     }
     free(pair->value);
     pair->value = malloc(sizeof(double));
     if (pair->value == NULL) {
+        errno = ENOMEM;
         return 2;
     }
     *(double*)pair->value = value;
@@ -518,11 +572,13 @@ int setdoubleH(obj_t *pair, double value) {
 
 int setdoubleL(array_t *element, double value) {
     if (element == NULL) {
+        errno = EINVAL;
         return 1;
     }
     free(element->value);
     element->value = malloc(sizeof(value));
     if (element->value == NULL) {
+        errno = ENOMEM;
         return 2;
     }
     *(double*)element->value = value;
@@ -533,11 +589,13 @@ int setdoubleL(array_t *element, double value) {
 // Resets pairs value to the given long
 int setlongH(obj_t *pair, long value) {
     if (pair == NULL) {
+        errno = EINVAL;
         return 1;
     }
     free(pair->value);
     pair->value = malloc(sizeof(long));
     if (pair->value == NULL) {
+        errno = ENOMEM;
         return 2;
     }
     *(long*)pair->value = value;
@@ -547,11 +605,13 @@ int setlongH(obj_t *pair, long value) {
 
 int setlongL(array_t *element, long value) {
     if (element == NULL) {
+        errno = EINVAL;
         return 1;
     }
     free(element->value);
     element->value = malloc(sizeof(long));
     if (element->value == NULL) {
+        errno = ENOMEM;
         return 2;
     }
     *(long*)element->value = value;
@@ -562,11 +622,13 @@ int setlongL(array_t *element, long value) {
 // Resets pairs value to the given long long
 int setlonglongH(obj_t *pair, long long value) {
     if (pair == NULL) {
+        errno = EINVAL;
         return 1;
     }
     free(pair->value);
     pair->value = malloc(sizeof(long long));
     if (pair->value == NULL) {
+        errno = ENOMEM;
         return 2;
     }
     *(long long*)pair->value = value;
@@ -576,11 +638,13 @@ int setlonglongH(obj_t *pair, long long value) {
 
 int setlonglongL(array_t *element, long long value) {
     if (element == NULL) {
+        errno = EINVAL;
         return 1;
     }
     free(element->value);
     element->value = malloc(sizeof(long long));
     if (element->value == NULL) {
+        errno = ENOMEM;
         return 2;
     }
     *(long long*)element->value = value;
@@ -592,11 +656,13 @@ int setlonglongL(array_t *element, long long value) {
 // Resets pairs value to the given long double
 int setlongdoubleH(obj_t *pair, long double value) {
     if (pair == NULL) {
+        errno = EINVAL;
         return 1;
     }
     free(pair->value);
     pair->value = malloc(sizeof(long double));
     if (pair->value == NULL) {
+        errno = ENOMEM;
         return 2;
     }
     *(long double*)pair->value = value;
@@ -606,11 +672,13 @@ int setlongdoubleH(obj_t *pair, long double value) {
 
 int setlongdoubleL(array_t *element, long double value) {
     if (element == NULL) {
+        errno = EINVAL;
         return 1;
     }
     free(element->value);
     element->value = malloc(sizeof(long double));
     if (element->value == NULL) {
+        errno = ENOMEM;
         return 2;
     }
     *(long double*)element->value = value;
@@ -621,6 +689,7 @@ int setlongdoubleL(array_t *element, long double value) {
 // Resets pairs value to the given list
 int setlistH(obj_t *pair, array_t *element) {
     if (pair == NULL || element == NULL) {
+        errno = EINVAL;
         return 1;
     }
     free(pair->value);
@@ -631,7 +700,8 @@ int setlistH(obj_t *pair, array_t *element) {
 
 
 int setlistL(array_t *element, array_t *e2) {
-    if (element == NULL) {
+    if (element == NULL || e2 == NULL) {
+        errno = EINVAL;
         return 1;
     }
     free(element->value);
@@ -643,6 +713,7 @@ int setlistL(array_t *element, array_t *e2) {
 // Resets pairs value to the given hashmap
 int setmapH(obj_t *pair, obj_t *p2) {
     if (pair == NULL || p2 == NULL) {
+        errno = EINVAL;
         return 1;
     }
     free(pair->value);
@@ -653,6 +724,7 @@ int setmapH(obj_t *pair, obj_t *p2) {
 
 int setmapL(array_t *element, obj_t *map) {
     if (element == NULL || map == NULL) {
+        errno = EINVAL;
         return 1;
     }
     free(element->value);
