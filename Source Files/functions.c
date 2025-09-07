@@ -4,8 +4,6 @@
 #include <string.h>
 #include <errno.h>
 
-//TODO: Use errno for each function in this file, and in other files
-
 // Returns the length of the hashmap, but if the pair is not the root of the hashmap, it will start from pair
 unsigned int map_len(obj_t *map) {
     unsigned int len = 0;
