@@ -3,21 +3,33 @@
 #ifndef HASHMAP_STRUCT_H
 #define HASHMAP_STRUCT_H
 
-/* This header defines structs, macros and variables */
+/* This header defines structs, valuetypes, macros and variables */
 
-enum valuetype {RAW, SHR, INT, FLT, DBL, LONG, LL, LDBL, LIST, NMAP};
+enum valuetype {
+    RAW, // Raw data (string)
+    SHR, // Short
+    INT, // Integer
+    FLT, // Float
+    DBL, // Double
+    LONG, // Long
+    LL, // Long Long
+    LDBL, // Long double
+    LIST, // Nested list
+    NMAP // Nested map
+};
 
 #ifndef EJSON
 #define EJSON 200 // For errors with json strings
 #endif
 
-extern unsigned int SHR_STR_LEN;
-extern unsigned int INT_STR_LEN;
-extern unsigned int FLT_STR_LEN;
-extern unsigned int DBL_STR_LEN;
-extern unsigned int LONG_STR_LEN;
-extern unsigned int LL_STR_LEN;
-extern unsigned int LDBL_STR_LEN;
+// These variables below are for encoding functions to allocate enough memory for each type
+extern unsigned int SHR_STR_LEN; // The maximum length of a string made from a Short
+extern unsigned int INT_STR_LEN; // The maximum length of a string made from an Integer
+extern unsigned int FLT_STR_LEN; // The maximum length of a string made from a Float
+extern unsigned int DBL_STR_LEN; // The maximum length of a string made from a Double
+extern unsigned int LONG_STR_LEN; // The maximum length of a string made from a Long
+extern unsigned int LL_STR_LEN;  // The maximum length of a string made from a Long long
+extern unsigned int LDBL_STR_LEN; // The maximum length of a string made from a Long double
 
 typedef struct Hmap {
     char *key;
@@ -30,6 +42,6 @@ typedef struct Linkedlist {
     void *value;
     enum valuetype valuetype;
     struct Linkedlist *next;
-} array_t;
+} array_t; // Array
 
 #endif // HASHMAP_STRUCT_H
