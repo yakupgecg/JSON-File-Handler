@@ -100,6 +100,10 @@ char *encode_map(obj_t *map) {
         errno = EINVAL;
         return NULL;
     }
+    if (map->key == NULL) {
+        errno = EINVAL;
+        return NULL;
+    }
     unsigned int buffersize = 2;
     obj_t *current = map;
     while (current != NULL) {
