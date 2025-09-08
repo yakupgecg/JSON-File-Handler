@@ -1,20 +1,7 @@
 {
     "JSON-File-Handler": 
     {
-        "Headers": 
-        [
-            "structure.h",
-            "parser.h",
-            "json-encoder.h",
-            "functions.h",
-            "JSON.h"
-        ],
-        "Source Files": 
-        [
-            "structure.c",
-            "parser.c",
-            "json-encoder.c",
-            "functions.c"
-        ]
+        "Headers": ["structure.h", "parser.h", "json-encoder.h", "functions.h", "JSON.h"], 
+        "Source Files": ["structure.c", "parser.c", "json-encoder.c", "functions.c"]
     }
 }
