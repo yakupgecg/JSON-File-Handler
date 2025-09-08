@@ -29,29 +29,6 @@ Time to do some math my fellow JSON'ers
 
 Here is a list of all the features coming soon
     -Function that could find any errors on JSON strings or files
-    -Function that indents a JSON string: [
-    From:
-
-    {"JSON-File-Handler": {"Headers": ["structure.h", "parser.h", "json-encoder.h", "functions.h", "JSON.h"], "Source Files": ["structure.c", "parser.c", "json-encoder.c", "functions.c"]}}
-
-    To:
-
-    {"JSON-File-Handler":
-        {"Headers": 
-            ["structure.h", 
-            "parser.h", 
-            "json-encoder.h", 
-            "functions.h", 
-            "JSON.h"], 
-        "Source Files": 
-            ["structure.c", 
-            "parser.c", 
-            "json-encoder.c", 
-            "functions.c"]
-        }
-    }
-
-    ]
     -JSON decoder
     -More advanced indent function that will indent based on a setting.json file (only when JSON decoder is done)
     -Finish the project by fixing bugs and ensuring memory management is safe
