@@ -287,6 +287,7 @@ char *indent_json(char *json, unsigned int indent) {
     unsigned int indent_len = 1;
     unsigned int len = length_ctr(new_json);
     unsigned int nest_index = 1;
+    unsigned int list_index = 0;
     bool is_string = false;
     bool is_obj = false;
     add_ctr_e(newctrm, '\n');
@@ -294,6 +295,7 @@ char *indent_json(char *json, unsigned int indent) {
         add_ctr_e(newctrm, ' ');
     }
     for (int i = 1; i < len+1; i++) { // Starts at 1 because newctr got added first
+        //TODO: make this function indent lists like [] not [\n] by creating a var list_index that increases every [ and if it is larger than 1, indentation is disabled.
         is_obj = false;
         ctr_t *c = get_ctr_byindex(new_json, i);
         if (c->c == '"') {
@@ -308,35 +310,52 @@ char *indent_json(char *json, unsigned int indent) {
             if (!is_string) {
                 continue;
             }
-        } else if (c->c == '{' || c->c == '[') {
+        } else if (c->c == '{') {
             if (!is_string) {
-                nest_index++;
-                is_obj = true;
-                add_ctr_e(newctrm, '\n');
-                for (int j = 0; j < indent * indent_len; j++) {
-                    add_ctr_e(newctrm, ' ');
+                if (list_index < 1) {
+                    nest_index++;
+                    is_obj = true;
+                    add_ctr_e(newctrm, '\n');
+                    for (int j = 0; j < indent * indent_len; j++) {
+                        add_ctr_e(newctrm, ' ');
+                    }
                 }
             }
-        } else if (c->c == '}' || c->c == ']') {
+        } else if (c->c == '}') {
             if (!is_string) {
-                if (indent_len < 1) {
-                    errno = EJSON;
-                    return NULL;
+                if (list_index < 1) {
+                    if (indent_len < 1) {
+                        errno = EJSON;
+                        return NULL;
+                    }
+                    nest_index--;
+                    indent_len--;
+                    add_ctr_e(newctrm, '\n');
+                    for (int j = 0; j < indent * indent_len; j++) {
+                        add_ctr_e(newctrm, ' ');
+                    }
                 }
+            }
+        } else if (c->c == '[') {
+            if (!is_string) {
+                list_index++;
+                nest_index++;
+            }
+        } else if (c->c == ']') {
+            if (!is_string) {
+                list_index--;
                 nest_index--;
-                indent_len--;
-                add_ctr_e(newctrm, '\n');
-                for (int j = 0; j < indent * indent_len; j++) {
-                    add_ctr_e(newctrm, ' ');
-                }
             }
         }
         add_ctr_e(newctrm, c->c);
         if (c->c == ',') {
             if (!is_string) {
-                add_ctr_e(newctrm, '\n');
-                for (int j = 0; j < indent * indent_len; j++) {
-                    add_ctr_e(newctrm, ' ');
+                add_ctr_e(newctrm, ' ');
+                if (list_index < 1) {
+                    add_ctr_e(newctrm, '\n');
+                    for (int j = 0; j < indent * indent_len; j++) {
+                        add_ctr_e(newctrm, ' ');
+                    }
                 }
             }
         }
@@ -353,7 +372,7 @@ char *indent_json(char *json, unsigned int indent) {
             }
         }
     }
-    if (nest_index != 0) {
+    if (nest_index != 0 || list_index != 0) {
         free_ctrm(newctrm);
         free_ctrm(new_json);
         errno = EJSON;
