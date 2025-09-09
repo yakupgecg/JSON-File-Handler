@@ -285,7 +285,7 @@ char *indent_json(char *json, unsigned int indent) {
     ctr_t *newctr = init_ctr(get_ctr_byindex(new_json, 0)->c);
     ctrm_t *newctrm = init_ctrm(newctr, newctr);
     unsigned int indent_len = 1;
-    unsigned int len = length_ctr(new_json);
+    unsigned int len = length_ctr(new_json)+1;
     unsigned int nest_index = 1;
     unsigned int list_index = 0;
     bool is_string = false;
@@ -294,8 +294,7 @@ char *indent_json(char *json, unsigned int indent) {
     for (int k = 0; k < indent; k++) {
         add_ctr_e(newctrm, ' ');
     }
-    for (int i = 1; i < len+1; i++) { // Starts at 1 because newctr got added first
-        //TODO: make this function indent lists like [] not [\n] by creating a var list_index that increases every [ and if it is larger than 1, indentation is disabled.
+    for (int i = 1; i < len; i++) { // Starts at 1 because newctr got added first
         is_obj = false;
         ctr_t *c = get_ctr_byindex(new_json, i);
         if (c->c == '"') {
