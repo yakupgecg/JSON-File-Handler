@@ -1,4 +1,4 @@
-#include "..\Headers\functions.h"
+#include "..\Headers\utils.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

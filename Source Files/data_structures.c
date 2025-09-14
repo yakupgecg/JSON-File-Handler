@@ -1,4 +1,4 @@
-#include "..\Headers\structure.h"
+#include "..\Headers\data_structures.h"
 
 // Remember to change the values to higher of lower if needed.
 

@@ -20,10 +20,10 @@ and very much time for you to do other stuff than to stupidly type four headers
 Time to do some math my fellow JSON'ers
 */
 
-#include "parser.h"
-#include "structure.h"
-#include "json-functions.h"
-#include "functions.h"
+#include "numtostr.h"
+#include "data_structures.h"
+#include "json_format.h"
+#include "utils.h"
 
 /*
 

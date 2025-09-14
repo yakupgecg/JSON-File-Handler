@@ -3,7 +3,7 @@
 #ifndef HASHMAP_FUNCS_H
 #define HASHMAP_FUNCS_H
 
-#include "structure.h"
+#include "data_structures.h"
 
 /* This header defines functions for handling hash maps and lists */
 
