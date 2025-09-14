@@ -11,6 +11,6 @@ I made made functions seperately from functions.h since they serve a purpose for
 char *encode_pair(obj_t*);
 char *encode_map(obj_t*);
 char *encode_list(array_t*);
-char *indent_json(char *, unsigned int);
+char *indent_json(char *, unsigned int, unsigned int);
 
 #endif

@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <stdbool.h>
+#include <string.h>
 
 /* Note that functions encode_map(), encode_pair() and encode_list() have not the ability to encode very nested object or lists (due to stack overflow and recursion)
    But in that case you can turn an encoded object or an array to string and then set an object or element type to raw and then set the value to the string.
@@ -276,109 +277,121 @@ char *encode_list(array_t *list) {
 }
 
 // Indents a json string
-char *indent_json(char *json, unsigned int indent) {
+char *indent_json(char *json, unsigned int indent, unsigned int alc_i) {
     if (json == NULL) {
         errno = EINVAL;
         return NULL;
     }
-    ctrm_t *new_json = to_ctr(json);
-    ctr_t *newctr = init_ctr(get_ctr_byindex(new_json, 0)->c);
-    ctrm_t *newctrm = init_ctrm(newctr, newctr);
+    char *new_str = malloc(alc_i);
+    char *new_ch = new_str;
     unsigned int indent_len = 1;
-    unsigned int len = length_ctr(new_json)+1;
     unsigned int nest_index = 1;
     unsigned int list_index = 0;
+    unsigned int len = strlen(json)+1;
     bool is_string = false;
     bool is_obj = false;
-    add_ctr_e(newctrm, '\n');
-    for (int k = 0; k < indent; k++) {
-        add_ctr_e(newctrm, ' ');
+    *new_ch = *json;
+    new_ch++;
+    *new_ch = '\n';
+    new_ch++;
+    for (int i = 0; i < indent; i++) {
+        *new_ch = ' ';
+        new_ch++;
     }
-    for (int i = 1; i < len; i++) { // Starts at 1 because newctr got added first
+    char *cur_ch = json;
+    for (int i = 1; i < len; i++) {
         is_obj = false;
-        ctr_t *c = get_ctr_byindex(new_json, i);
-        if (c->c == '"') {
-            if (get_ctr_byindex(new_json, i-1)->c != '\\') {
+        cur_ch++;
+        if (*cur_ch == '"') {
+            if (*--cur_ch != '\\') {
                 if (is_string) {
                     is_string = false;
                 } else {
                     is_string = true;
                 }
             }
-        } else if (c->c == ' ') {
+            cur_ch++;
+        } else if (*cur_ch == ' ') {
             if (!is_string) {
                 continue;
             }
-        } else if (c->c == '{') {
+        } else if (*cur_ch == '{') {
             if (!is_string) {
                 if (list_index < 1) {
                     nest_index++;
                     is_obj = true;
-                    add_ctr_e(newctrm, '\n');
-                    for (int j = 0; j < indent * indent_len; j++) {
-                        add_ctr_e(newctrm, ' ');
+                    *new_ch = '\n';
+                    new_ch++;
+                    for (int i = 0; i < indent * indent_len; i++) {
+                        *new_ch = ' ';
+                        new_ch++;
                     }
                 }
             }
-        } else if (c->c == '}') {
+        } else if (*cur_ch == '}') {
             if (!is_string) {
                 if (list_index < 1) {
                     if (indent_len < 1) {
-                        errno = EJSON;
+                        free(new_str);
+                        errno  = EJSON;
                         return NULL;
                     }
                     nest_index--;
                     indent_len--;
-                    add_ctr_e(newctrm, '\n');
-                    for (int j = 0; j < indent * indent_len; j++) {
-                        add_ctr_e(newctrm, ' ');
+                    *new_ch = '\n';
+                    new_ch++;
+                    for (int i = 0; i < indent * indent_len; i++) {
+                        *new_ch = ' ';
+                        new_ch++;
                     }
                 }
             }
-        } else if (c->c == '[') {
+        } else if (*cur_ch == '[') {
             if (!is_string) {
                 list_index++;
                 nest_index++;
             }
-        } else if (c->c == ']') {
+        } else if (*cur_ch == ']') {
             if (!is_string) {
                 list_index--;
                 nest_index--;
             }
         }
-        add_ctr_e(newctrm, c->c);
-        if (c->c == ',') {
+        *new_ch = *cur_ch;
+        new_ch++;
+        if (*cur_ch == ',') {
             if (!is_string) {
-                add_ctr_e(newctrm, ' ');
+               *new_ch = ' ';
+                new_ch++;
                 if (list_index < 1) {
-                    add_ctr_e(newctrm, '\n');
+                    *new_ch = '\n';
+                    new_ch++;
                     for (int j = 0; j < indent * indent_len; j++) {
-                        add_ctr_e(newctrm, ' ');
+                        *new_ch = ' ';
+                        new_ch++;
                     }
                 }
             }
-        }
-        if (c->c == ':') {
+        } else if (*cur_ch == ':') {
             if (!is_string) {
-                add_ctr_e(newctrm, ' ');
+                *new_ch = ' ';
+                new_ch++;
             }
-        }
-        if (is_obj) {
+        } else if (is_obj) {
             indent_len++;
-            add_ctr_e(newctrm, '\n');
+            *new_ch = '\n';
+            new_ch++;
             for (int j = 0; j < indent * indent_len; j++) {
-                add_ctr_e(newctrm, ' ');
+                *new_ch = ' ';
+                new_ch++;
             }
         }
     }
     if (nest_index != 0 || list_index != 0) {
-        free_ctrm(newctrm);
-        free_ctrm(new_json);
+        free(new_str);
         errno = EJSON;
         return NULL;
     }
-    char *result = ctr_to_string(newctrm);
-    free_ctrm(newctrm);
-    free_ctrm(new_json);
-    return result;
+    *new_ch = '\0';
+    return new_str;
 }
