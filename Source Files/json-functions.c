@@ -1,5 +1,4 @@
 #include "..\Headers\json-functions.h"
-#include "..\String-C\Headers\STRING.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -282,21 +281,21 @@ char *indent_json(char *json, unsigned int indent, unsigned int alc_i) {
         errno = EINVAL;
         return NULL;
     }
-    char *new_str = malloc(alc_i);
-    char *new_ch = new_str;
+    char *newstr = malloc(alc_i);
+    char *newch = newstr;
     unsigned int indent_len = 1;
     unsigned int nest_index = 1;
     unsigned int list_index = 0;
     unsigned int len = strlen(json)+1;
     bool is_string = false;
     bool is_obj = false;
-    *new_ch = *json;
-    new_ch++;
-    *new_ch = '\n';
-    new_ch++;
+    *newch = *json;
+    newch++;
+    *newch = '\n';
+    newch++;
     for (int i = 0; i < indent; i++) {
-        *new_ch = ' ';
-        new_ch++;
+        *newch = ' ';
+        newch++;
     }
     char *cur_ch = json;
     for (int i = 1; i < len; i++) {
@@ -320,11 +319,11 @@ char *indent_json(char *json, unsigned int indent, unsigned int alc_i) {
                 if (list_index < 1) {
                     nest_index++;
                     is_obj = true;
-                    *new_ch = '\n';
-                    new_ch++;
+                    *newch = '\n';
+                    newch++;
                     for (int i = 0; i < indent * indent_len; i++) {
-                        *new_ch = ' ';
-                        new_ch++;
+                        *newch = ' ';
+                        newch++;
                     }
                 }
             }
@@ -332,17 +331,17 @@ char *indent_json(char *json, unsigned int indent, unsigned int alc_i) {
             if (!is_string) {
                 if (list_index < 1) {
                     if (indent_len < 1) {
-                        free(new_str);
+                        free(newstr);
                         errno  = EJSON;
                         return NULL;
                     }
                     nest_index--;
                     indent_len--;
-                    *new_ch = '\n';
-                    new_ch++;
+                    *newch = '\n';
+                    newch++;
                     for (int i = 0; i < indent * indent_len; i++) {
-                        *new_ch = ' ';
-                        new_ch++;
+                        *newch = ' ';
+                        newch++;
                     }
                 }
             }
@@ -357,41 +356,41 @@ char *indent_json(char *json, unsigned int indent, unsigned int alc_i) {
                 nest_index--;
             }
         }
-        *new_ch = *cur_ch;
-        new_ch++;
+        *newch = *cur_ch;
+        newch++;
         if (*cur_ch == ',') {
             if (!is_string) {
-               *new_ch = ' ';
-                new_ch++;
+               *newch = ' ';
+                newch++;
                 if (list_index < 1) {
-                    *new_ch = '\n';
-                    new_ch++;
-                    for (int j = 0; j < indent * indent_len; j++) {
-                        *new_ch = ' ';
-                        new_ch++;
+                    *newch = '\n';
+                    newch++;
+                    for (int i = 0; i < indent * indent_len; i++) {
+                        *newch = ' ';
+                        newch++;
                     }
                 }
             }
         } else if (*cur_ch == ':') {
             if (!is_string) {
-                *new_ch = ' ';
-                new_ch++;
+                *newch = ' ';
+                newch++;
             }
         } else if (is_obj) {
             indent_len++;
-            *new_ch = '\n';
-            new_ch++;
-            for (int j = 0; j < indent * indent_len; j++) {
-                *new_ch = ' ';
-                new_ch++;
+            *newch = '\n';
+            newch++;
+            for (int i = 0; i < indent * indent_len; i++) {
+                *newch = ' ';
+                newch++;
             }
         }
     }
     if (nest_index != 0 || list_index != 0) {
-        free(new_str);
+        free(newstr);
         errno = EJSON;
         return NULL;
     }
-    *new_ch = '\0';
-    return new_str;
+    *newch = '\0';
+    return newstr;
 }
