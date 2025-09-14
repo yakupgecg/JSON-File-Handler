@@ -33,10 +33,11 @@ int main() {
 	setrawH(resetkey(root, "JSON-File-Handler", 17), json, strlen(json));
 
 	json = encode_map(root);
-
+	char *i_json = indent_json(json, 4, 300);
+	
 	if (strcmp(json, goalstring) == 0) {
 		printf("Success!");
-		fputs(indent_json(json, 4), file);
+		fputs(i_json, file);
 	} else {
 		printf("Unsuccess!");
 	}

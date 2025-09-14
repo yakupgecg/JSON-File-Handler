@@ -18,10 +18,11 @@ int main() {
     setrawH(pairbykey(root, "Fahrenheit"), parseInt(fahrnt), strlen(parseInt(fahrnt)));
 
     char *json = encode_map(root);
+    char *i_json = indent_json(json, 4, 50);
     
     if (strcmp(goalstring, json) == 0) {
         printf("Successful\n");
-        fputs(indent_json(json, 4), file);
+        fputs(i_json, file);
     } else {
         printf("Unsuccessful\n\nExpected: %s\nResult: %s\n", goalstring, json);
         free_map(root);
@@ -30,6 +31,7 @@ int main() {
     }
 
     free_map(root);
+    free(i_json);
     fclose(file);
     return 0;
 }

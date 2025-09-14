@@ -13,7 +13,9 @@ int main() {
     setrawH(resetkey(appendH(map), "isFinished", 10), "false", 5);
 
     char *json = encode_map(map);
-    fputs(indent_json(json, 4), file);
+    char *i_json = indent_json(json, 4, 120);
+    
+    fputs(i_json, file);
     free(json);
     free_map(map);
     fclose(file);
