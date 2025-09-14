@@ -43,6 +43,7 @@ int main() {
 	}
 
 	free(json);
+	free(i_json);
 	free(header_Files_json);
 	free(source_Files_json);
 	free_list(header_Files);

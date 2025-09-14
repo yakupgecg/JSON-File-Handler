@@ -31,6 +31,7 @@ int main() {
     }
 
     free_map(root);
+    free(json);
     free(i_json);
     fclose(file);
     return 0;

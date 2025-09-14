@@ -17,6 +17,7 @@ int main() {
     
     fputs(i_json, file);
     free(json);
+    free(i_json);
     free_map(map);
     fclose(file);
     return 0;
