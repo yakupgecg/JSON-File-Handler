@@ -92,6 +92,11 @@ int free_pair(obj_t *pair) {
     if (pair->value != NULL) {
         free(pair->value);
     }
+    if (pair->valuetype == NMAP) {
+        free_map(pair->value);
+    } else if (pair->valuetype == LIST) {
+        free_list(pair->value);
+    }
     free(pair);
     return 0;
 }
@@ -104,6 +109,11 @@ int free_element(array_t *element) {
     }
     if (element->value != NULL) {
         free(element->value);
+    }
+    if (element->valuetype == NMAP) {
+        free_map(element->value);
+    } else if (element->valuetype == LIST) {
+        free_list(element->value);
     }
     free(element);
     return 0;
