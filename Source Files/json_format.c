@@ -393,4 +393,180 @@ char *indent_json(char *json, unsigned int indent, unsigned int alc_i) {
     }
     *newch = '\0';
     return newstr;
+} 
+
+// Decodes a json string that represents a pair
+obj_t *decode_pair(char *str) {
+    // Check for invalid args
+    if (str == NULL) {
+        errno = EINVAL;
+        return NULL;
+    }
+
+    // Create a test (so no need to return NULL)
+    obj_t *newobj = initM();
+    if (newobj == NULL) {
+        errno = ENOMEM;
+        return NULL;
+    }
+
+    char *cur = str;
+    size_t alc_i = 1;
+    bool is_string = false;
+
+    // Get the needed size for the string
+    while (*cur != '\0') {
+        if (*cur == '\"') {
+            if (*--cur != '\\') {
+                if (is_string) is_string = false; else is_string = true; 
+            }
+            cur++;
+        }
+        if (is_string || *cur != ' ') {
+            alc_i++;
+        }
+        cur++;
+    }
+    cur = str;
+    char *newstr = malloc(alc_i);
+    if (newstr == NULL) {
+        errno = ENOMEM;
+        return NULL;
+    }
+    char *newcur = newstr;
+
+    // Copy the string without spaces
+    while (*cur != '\0') {
+        if (*cur == '\"') {
+            if (is_string) is_string = false; else is_string = true; 
+        } else if (*cur == ' ' && !is_string) {
+            cur++;
+            continue;
+        }
+        *newcur = *cur;
+        cur++;
+        newcur++;
+    }
+    *newcur = '\0';
+    newcur = newstr;
+    if (*newcur != '{') {
+        errno = EJSON;
+        free(newstr);
+        free_map(newobj);
+        return NULL;
+    }
+
+    //Check that there are right amount of brackets
+    is_string = false;
+    newcur = newstr;
+    int nest = 0;
+    while (*newcur != '\0') {
+        if (*newcur == '\"') {
+            if (*--newcur != '\\') {
+                if (is_string) is_string = false; else is_string = true;
+                newcur++;
+            }
+            newcur++;
+        }
+        if (!is_string) {
+            if (*newcur == '{') nest++;
+            else if (*newcur == '}') nest--;
+        }
+        newcur++;
+    }
+    if (nest != 0) {
+        errno = EJSON;
+        free_map(newobj);
+        free(newstr);
+        return NULL;
+    }
+
+    // Check the appropriate quotation marks
+    newcur = newstr;
+    size_t quots = 0;
+    while (*++newcur != '\0') {
+        if (*newcur == '\"') {
+            if (*--newcur != '\\') {
+                quots++;
+            }
+            newcur++;
+        }
+    }
+    if (quots % 2 != 0) {
+        free(newstr);
+        free_map(newobj);
+        errno = EJSON;
+        return NULL;
+    }
+
+    // Key evaluation
+    newcur = newstr;
+    alc_i = 0;
+    size_t key_i = 0;
+    while (*newcur != '\"') newcur++;
+    while (*++newcur != '\0') {
+        if (*newcur == '\"') {
+            if (*--newcur != '\\') break;
+            newcur++;
+        }
+        alc_i++;
+    }
+    char *key = malloc(alc_i);
+    if (key == NULL) {
+        errno = ENOMEM;
+        return NULL;
+    }
+    char *keycur = key;
+    newcur = newstr;
+    while (*newcur != '\"') newcur++;
+    newcur++;
+    while (key_i < alc_i) {
+        *keycur = *newcur;
+        keycur++;
+        newcur++;
+        key_i++;
+    }
+    *keycur = '\0';
+    resetkey(newobj, key, alc_i);
+
+    // Value evaluation
+    alc_i = 0;
+    while (*newcur != ':') newcur++;
+    newcur++;
+    char *temp = newcur;
+    while (*newcur != '\0') {
+        if (*newcur == '\"') {
+            if (*--newcur != '\\') {
+                if (is_string) {
+                    is_string = false;
+                } else {
+                    is_string = true;
+                }
+            }
+            newcur++;
+        }
+        if (*newcur == '}' && !is_string) {
+            break;
+        }
+        alc_i++;
+        newcur++;
+    }
+    char *val = malloc(alc_i);
+    if (val == NULL) {
+        errno = ENOMEM;
+        return NULL;
+    }
+    char *valcur = val;
+    size_t val_i = 0;
+    newcur = temp;
+    while (val_i < alc_i) {
+        *valcur = *newcur;
+        valcur++;
+        newcur++;
+        val_i++;
+    }
+    *valcur = '\0';
+    setrawH(newobj, val, alc_i);
+    free(newstr);
+    return newobj;
 }
