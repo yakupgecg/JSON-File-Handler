@@ -422,7 +422,7 @@ obj_t *decode_pair(char *str) {
             }
             cur++;
         }
-        if (is_string || *cur != ' ') {
+       if (is_string || (*cur != ' ' && *cur != '\t' && *cur != '\n')) {
             alc_i++;
         }
         cur++;
@@ -439,7 +439,7 @@ obj_t *decode_pair(char *str) {
     while (*cur != '\0') {
         if (*cur == '\"') {
             if (is_string) is_string = false; else is_string = true; 
-        } else if (*cur == ' ' && !is_string) {
+        } else if ((*cur == ' ' || *cur == '\n' || *cur == '\t') && !is_string) {
             cur++;
             continue;
         }
@@ -545,7 +545,8 @@ obj_t *decode_pair(char *str) {
             }
             newcur++;
         }
-        if (*newcur == '}' && !is_string) {
+        if (*newcur == '\"' && !is_string) {
+            alc_i++;
             break;
         }
         alc_i++;
