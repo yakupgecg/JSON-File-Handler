@@ -700,7 +700,9 @@ int setlistH(obj_t *pair, array_t *element) {
         errno = EINVAL;
         return 1;
     }
-    free(pair->value);
+    if (pair->valuetype == NMAP) free_map(pair->value);
+    else if (pair->valuetype == LIST) free_list(pair->value);
+    else free(pair->value);
     pair->value = element;
     pair->valuetype = LIST;
     return 0;
@@ -712,7 +714,9 @@ int setlistL(array_t *element, array_t *e2) {
         errno = EINVAL;
         return 1;
     }
-    free(element->value);
+    if (element->valuetype == NMAP) free_map(element->value);
+    else if (element->valuetype == LIST) free_list(element->value);
+    else free(element->value);
     element->value = e2;
     element->valuetype = LIST;
     return 0;
@@ -724,7 +728,9 @@ int setmapH(obj_t *pair, obj_t *p2) {
         errno = EINVAL;
         return 1;
     }
-    free(pair->value);
+    if (pair->valuetype == NMAP) free_map(pair->value);
+    else if (pair->valuetype == LIST) free_list(pair->value);
+    else free(pair->value);
     pair->value = p2;
     pair->valuetype = NMAP;
     return 0;
@@ -735,7 +741,9 @@ int setmapL(array_t *element, obj_t *map) {
         errno = EINVAL;
         return 1;
     }
-    free(element->value);
+    if (element->valuetype == NMAP) free_map(element->value);
+    else if (element->valuetype == LIST) free_list(element->value);
+    else free(element->value);
     element->value = map;
     element->valuetype = NMAP;
     return 0;
