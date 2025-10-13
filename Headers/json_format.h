@@ -12,5 +12,6 @@ char *encode_pair(obj_t*);
 char *encode_map(obj_t*);
 char *encode_list(array_t*);
 char *indent_json(char *, unsigned int, unsigned int);
+obj_t *decode_pair(char*);
 
 #endif
