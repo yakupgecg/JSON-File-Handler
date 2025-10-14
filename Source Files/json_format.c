@@ -403,7 +403,7 @@ obj_t *decode_pair(char *str) {
         return NULL;
     }
 
-    // Create a test (so no need to return NULL)
+    // Create object
     obj_t *newobj = initM();
     if (newobj == NULL) {
         errno = ENOMEM;
@@ -456,7 +456,7 @@ obj_t *decode_pair(char *str) {
         return NULL;
     }
 
-    //Check that there are right amount of brackets
+    // Check that there are right amount of brackets
     is_string = false;
     newcur = newstr;
     int nest = 0;
