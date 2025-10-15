@@ -17,7 +17,7 @@ setintH(obj, 8);
 
 you can type
 
-setrawH(obj, parseInt(8));
+setrawH(obj, parseInt("8"));
 */
 
 char *parseShort(short);
