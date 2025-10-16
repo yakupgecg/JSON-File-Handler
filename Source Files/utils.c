@@ -4,7 +4,7 @@
 #include <string.h>
 #include <errno.h>
 
-// Returns the length of the hashmap, but if the pair is not the root of the hashmap, it will start from pair
+// Returns the length of the map, but if the pair is not the root of the map, it will start from pair
 unsigned int map_len(obj_t *map) {
     unsigned int len = 0;
     obj_t *current = map;
@@ -52,7 +52,7 @@ int list_size(array_t *root) {
     return bsize;
 }
 
-// Returns the size of the hash map
+// Returns the size of the map
 int map_size(obj_t *root) {
     if (root == NULL) {
         errno = EINVAL;
@@ -151,8 +151,8 @@ int free_list(array_t *list) {
     return 0;
 }
 
-// Returns the hash map, which has the key to find
-obj_t *pairbykey(obj_t *root, char *key) {
+// Returns the map, which has the key to find
+obj_t *getpairbykey(obj_t *root, char *key) {
     if (root == NULL) {
         errno = EINVAL;
         return NULL;
@@ -182,28 +182,7 @@ array_t *getelementbyindex(array_t *root, unsigned int index) {
     return current;
 }
 
-// Returns the previous pair before the pair that has the key to find, if found
-obj_t *pr_pairbykey(obj_t *root, char *key) {
-    if (root == NULL) {
-        errno = EINVAL;
-        return NULL;
-    }
-    obj_t *prev = root;
-    if (strcmp(prev->key, key) == 0) {
-        return prev;
-    }
-    obj_t *current = root->next;
-    while (current != NULL) {
-        if (strcmp(current->key, key) == 0) {
-            return prev;
-        }
-        prev = current;
-        current = current->next;
-    }
-    return NULL;
-}
-
-// This will initalize a hashmap and then return a pointer to it
+// This will initalize a map and then return a pointer to it
 obj_t *initM() {
     obj_t* map = malloc(sizeof(obj_t));
     if (map == NULL) {
@@ -225,7 +204,7 @@ obj_t *initM() {
     return map;
 }
 
-// Returns the last pair in a hash map
+// Returns the last pair in a map
 obj_t *last_pair(obj_t *root) {
     if (root == NULL) {
         errno = EINVAL;
@@ -302,108 +281,6 @@ array_t *appendL(array_t *list) {
         return NULL;
     }
     return current->next;
-}
-
-// Adds another pair after the given pair and returns it
-obj_t *insertH(obj_t *pair) {
-    if (pair == NULL) {
-        errno = EINVAL;
-        return NULL;
-    }
-    obj_t *new = initM();
-    if (pair->next != NULL) {
-        new->next = pair->next;
-    }
-    pair->next = new;
-    return new;
-}
-
-// Adds another element after the given element and returns it
-array_t *insertL(array_t *element) {
-    if (element == NULL) {
-        errno = EINVAL;
-        return NULL;
-    }
-    array_t *new = initL();
-    if (element->next != NULL) {
-        new->next = element->next;
-    }
-    element->next = new;
-    return new;
-} 
-
-// Removes the last pair in a hashmap
-int r_lastH(obj_t *map) {
-    if (map == NULL) {
-        errno = EINVAL;
-        return 1;
-    }
-    if (map->next == NULL) {
-        free_pair(map);
-        return 0;
-    }
-    obj_t *current = map;
-    while (current->next->next != NULL) {
-        current = current->next;
-    }
-    free_pair(current->next);
-    current->next = NULL;
-    return 0;
-}
-
-// Removes the last element in a list
-int r_lastL(array_t *list) {
-    if (list == NULL) {
-        errno = EINVAL;
-        return 1;
-    }
-    if (list->next == NULL) {
-        free_element(list);
-        return 0;
-    }
-    array_t *current = list;
-    while (current->next->next != NULL) {
-        current = current->next;
-    }
-    free_element(current->next);
-    current->next = NULL;
-    return 0;
-}
-
-// Removes the given map and then reassigns the next pointed the pair before the given map to pair after the given map
-int r_afterH(obj_t *root, obj_t *pairtormv) {
-    if (root == NULL) {
-        errno = EINVAL;
-        return 1;
-    }
-    obj_t *current = root;
-    while (current != NULL) {
-        if (strcmp(current->key, pairtormv->key) == 0) {
-            pr_pairbykey(root, pairtormv->key)->next = current->next;
-            free_pair(current);
-            return 0;
-        }
-        current = current->next;
-    }
-    return 0;
-}
-
-// Removes an element after the given element
-int r_afterL(array_t *root) {
-    if (root == NULL) {
-        errno = EINVAL;
-        return 1;
-    }
-    if (root->next == NULL) {
-        free_element(root);
-        root = NULL;
-        return 0;
-    } else {
-        array_t *temp = root->next;
-        root->next = temp->next;
-        free_element(temp);
-        return 0;
-    }
 }
 
 // Resets pairs key to the given string
@@ -750,7 +627,7 @@ int setlistL(array_t *element, array_t *e2) {
     return 0;
 }
 
-// Resets pairs value to the given hashmap
+// Resets pairs value to the given map
 int setmapH(obj_t *pair, obj_t *p2) {
     if (pair == NULL || p2 == NULL) {
         errno = EINVAL;
