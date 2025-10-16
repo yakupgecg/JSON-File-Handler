@@ -433,7 +433,9 @@ int setintH(obj_t *pair, int value) {
         errno = EINVAL;
         return 1;
     }
-    free(pair->value);
+    if (pair->valuetype == NMAP) free_map(pair->value);
+    else if (pair->valuetype == LIST) free_list(pair->value);
+    else free(pair->value);
     pair->value = malloc(sizeof(int));
     if (pair->value == NULL) {
         errno = ENOMEM;
@@ -449,7 +451,9 @@ int setintL(array_t *element, int value) {
         errno = EINVAL;
         return 1;
     }
-    free(element->value);
+    if (element->valuetype == NMAP) free_map(element->value);
+    else if (element->valuetype == LIST) free_list(element->value);
+    else free(element->value);
     element->value = malloc(sizeof(int));
     if (element->value == NULL) {
         errno = ENOMEM;
@@ -466,7 +470,9 @@ int setshortH(obj_t *pair, short value) {
         errno = EINVAL;
         return 1;
     }
-    free(pair->value);
+    if (pair->valuetype == NMAP) free_map(pair->value);
+    else if (pair->valuetype == LIST) free_list(pair->value);
+    else free(pair->value);
     pair->value = malloc(sizeof(short));
     if (pair->value == NULL) {
         errno = ENOMEM;
@@ -482,7 +488,9 @@ int setshortL(array_t *element, short value) {
         errno = EINVAL;
         return 1;
     }
-    free(element->value);
+    if (element->valuetype == NMAP) free_map(element->value);
+    else if (element->valuetype == LIST) free_list(element->value);
+    else free(element->value);
     element->value = malloc(sizeof(short));
     if (element->value == NULL) {
         errno = ENOMEM;
@@ -499,7 +507,9 @@ int setfloatH(obj_t *pair, float value) {
         errno = EINVAL;
         return 1;
     }
-    free(pair->value);
+    if (pair->valuetype == NMAP) free_map(pair->value);
+    else if (pair->valuetype == LIST) free_list(pair->value);
+    else free(pair->value);
     pair->value = malloc(sizeof(float));
     if (pair->value == NULL) {
         errno = ENOMEM;
@@ -515,7 +525,9 @@ int setfloatL(array_t *element, float value) {
         errno = EINVAL;
         return 1;
     }
-    free(element->value);
+    if (element->valuetype == NMAP) free_map(element->value);
+    else if (element->valuetype == LIST) free_list(element->value);
+    else free(element->value);
     element->value = malloc(sizeof(float));
     if (element->value == NULL) {
         errno = ENOMEM;
@@ -532,7 +544,9 @@ int setrawH(obj_t *pair, char *val_ptr, int str_len) {
         errno = EINVAL;
         return 1;
     }
-    free(pair->value);
+    if (pair->valuetype == NMAP) free_map(pair->value);
+    else if (pair->valuetype == LIST) free_list(pair->value);
+    else free(pair->value);
     pair->value = malloc(str_len + 1);
     if (pair->value == NULL) {
         errno = ENOMEM;
@@ -549,7 +563,9 @@ int setrawL(array_t *element, char *val_ptr, unsigned int str_len) {
         errno = EINVAL;
         return 1;
     }
-    free(element->value);
+    if (element->valuetype == NMAP) free_map(element->value);
+    else if (element->valuetype == LIST) free_list(element->value);
+    else free(element->value);
     element->value = malloc(str_len + 1);
     if (element->value == NULL) {
         errno = ENOMEM;
@@ -567,7 +583,9 @@ int setdoubleH(obj_t *pair, double value) {
         errno = EINVAL;
         return 1;
     }
-    free(pair->value);
+    if (pair->valuetype == NMAP) free_map(pair->value);
+    else if (pair->valuetype == LIST) free_list(pair->value);
+    else free(pair->value);
     pair->value = malloc(sizeof(double));
     if (pair->value == NULL) {
         errno = ENOMEM;
@@ -583,7 +601,9 @@ int setdoubleL(array_t *element, double value) {
         errno = EINVAL;
         return 1;
     }
-    free(element->value);
+    if (element->valuetype == NMAP) free_map(element->value);
+    else if (element->valuetype == LIST) free_list(element->value);
+    else free(element->value);
     element->value = malloc(sizeof(value));
     if (element->value == NULL) {
         errno = ENOMEM;
@@ -600,7 +620,9 @@ int setlongH(obj_t *pair, long value) {
         errno = EINVAL;
         return 1;
     }
-    free(pair->value);
+    if (pair->valuetype == NMAP) free_map(pair->value);
+    else if (pair->valuetype == LIST) free_list(pair->value);
+    else free(pair->value);
     pair->value = malloc(sizeof(long));
     if (pair->value == NULL) {
         errno = ENOMEM;
@@ -616,7 +638,9 @@ int setlongL(array_t *element, long value) {
         errno = EINVAL;
         return 1;
     }
-    free(element->value);
+    if (element->valuetype == NMAP) free_map(element->value);
+    else if (element->valuetype == LIST) free_list(element->value);
+    else free(element->value);
     element->value = malloc(sizeof(long));
     if (element->value == NULL) {
         errno = ENOMEM;
@@ -633,7 +657,9 @@ int setlonglongH(obj_t *pair, long long value) {
         errno = EINVAL;
         return 1;
     }
-    free(pair->value);
+    if (pair->valuetype == NMAP) free_map(pair->value);
+    else if (pair->valuetype == LIST) free_list(pair->value);
+    else free(pair->value);
     pair->value = malloc(sizeof(long long));
     if (pair->value == NULL) {
         errno = ENOMEM;
@@ -649,7 +675,9 @@ int setlonglongL(array_t *element, long long value) {
         errno = EINVAL;
         return 1;
     }
-    free(element->value);
+    if (element->valuetype == NMAP) free_map(element->value);
+    else if (element->valuetype == LIST) free_list(element->value);
+    else free(element->value);
     element->value = malloc(sizeof(long long));
     if (element->value == NULL) {
         errno = ENOMEM;
@@ -667,7 +695,9 @@ int setlongdoubleH(obj_t *pair, long double value) {
         errno = EINVAL;
         return 1;
     }
-    free(pair->value);
+    if (pair->valuetype == NMAP) free_map(pair->value);
+    else if (pair->valuetype == LIST) free_list(pair->value);
+    else free(pair->value);
     pair->value = malloc(sizeof(long double));
     if (pair->value == NULL) {
         errno = ENOMEM;
@@ -683,7 +713,9 @@ int setlongdoubleL(array_t *element, long double value) {
         errno = EINVAL;
         return 1;
     }
-    free(element->value);
+    if (element->valuetype == NMAP) free_map(element->value);
+    else if (element->valuetype == LIST) free_list(element->value);
+    else free(element->value);
     element->value = malloc(sizeof(long double));
     if (element->value == NULL) {
         errno = ENOMEM;
