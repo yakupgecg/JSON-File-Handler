@@ -423,10 +423,6 @@ obj_t *resetkey(obj_t *pair, char *key, unsigned int str_len) {
     return pair;
 }
 
-/* Note about the last functions: 1 return value represents NULL error, indicates if obj_t or array_t is null &
-   2 return value represents memory allocation error
-*/
-
 // Resets pairs value to the given integer
 int setintH(obj_t *pair, int value) {
     if (pair == NULL) {
