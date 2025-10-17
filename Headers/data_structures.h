@@ -31,23 +31,15 @@ extern unsigned int LONG_STR_LEN;  // The maximum length of a string made from a
 extern unsigned int LL_STR_LEN;    // The maximum length of a string made from a Long long
 extern unsigned int LDBL_STR_LEN;  // The maximum length of a string made from a Long double
 
-typedef struct Hmap {
-    char *key;
-    json_value_t value;
-    struct Hmap *next;
-} obj_t; // Object
-
-typedef struct Linkedlist {
-    json_value_t value;
-    struct Linkedlist *next;
-} array_t; // Array
+typedef struct Hmap obj_t;
+typedef struct Linkedlist array_t;
 
 typedef struct {
     enum valuetype vt;
     union {
         struct {
             char *str;
-            size_t len;
+            unsigned int len;
         } str;
         short s;
         int i;
@@ -60,5 +52,16 @@ typedef struct {
         array_t *arr;
     } value;
 } json_value_t;
+
+typedef struct Hmap {
+    char *key;
+    json_value_t value;
+    struct Hmap *next;
+} obj_t; // Object
+
+typedef struct Linkedlist {
+    json_value_t value;
+    struct Linkedlist *next;
+} array_t; // Array
 
 #endif // HASHMAP_STRUCT_H
