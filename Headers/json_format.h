@@ -8,7 +8,8 @@
 /*  Includes basically every function that are larger than normal utility
     functions and includes string handling */
 
-char *indent_json(char *, unsigned int, unsigned int);
+static char *remove_whitespace(char *);
+char *indent_json(char *, size_t);
 obj_t *decode_pair(char*);
 
 #endif
