@@ -4,6 +4,10 @@
 #define HASHMAP_FUNCS_H
 
 #include "data_structures.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
 
 /* This header defines functions for handling hash maps and lists */
 

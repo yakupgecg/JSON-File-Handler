@@ -4,6 +4,12 @@
 #define JSONENCODER_H
 
 #include "utils.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <stdbool.h>
+#include <string.h>
 
 /*  Includes basically every function that are larger than normal utility
     functions and includes string handling */

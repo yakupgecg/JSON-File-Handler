@@ -3,6 +3,10 @@
 #ifndef PARSER_H
 #define PARSER_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+
 // Don't confuse this file with decoding or parsing json strings
 
 /* This header file defines functions that parses integer and floating point types to

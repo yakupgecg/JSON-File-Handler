@@ -1,7 +1,4 @@
 #include "..\Headers\numtostr.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
 
 char *parseShort(short value) {
     size_t size = snprintf(NULL, 0, "%hd", value);

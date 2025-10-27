@@ -1,8 +1,4 @@
 #include "..\Headers\utils.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
 
 // Returns the length of the map, but if the pair is not the root of the map, it will start from pair
 unsigned int map_len(obj_t *map) {

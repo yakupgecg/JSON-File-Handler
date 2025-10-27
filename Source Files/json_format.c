@@ -1,10 +1,4 @@
 #include "..\Headers\json_format.h"
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <stdbool.h>
-#include <string.h>
 
 static char *remove_whitespace(char *str) {
     if (str == NULL) {
