@@ -1,6 +1,6 @@
 #include "..\Headers\numtostr.h"
 
-char *parseShort(short value) {
+char *str_Short(short value) {
     size_t size = snprintf(NULL, 0, "%hd", value);
     char *buffer = malloc(size + 1);
     if (!buffer) {
@@ -11,7 +11,7 @@ char *parseShort(short value) {
     return buffer;
 }
 
-char *parseInt(int value) {
+char *str_Int(int value) {
     size_t size = snprintf(NULL, 0, "%d", value);
     char *buffer = malloc(size + 1);
     if (!buffer) {
@@ -22,7 +22,7 @@ char *parseInt(int value) {
     return buffer;
 }
 
-char *parseFloat(float value) {
+char *str_Float(float value) {
     size_t size = snprintf(NULL, 0, "%g", value);
     char *buffer = malloc(size + 1);
     if (!buffer) {
@@ -33,7 +33,7 @@ char *parseFloat(float value) {
     return buffer;
 }
 
-char *parseDouble(double value) {
+char *str_Double(double value) {
     size_t size = snprintf(NULL, 0, "%lf", value);
     char *buffer = malloc(size + 1);
     if (!buffer) {
@@ -44,7 +44,7 @@ char *parseDouble(double value) {
     return buffer;
 }
 
-char *parseLong(long value) {
+char *str_Long(long value) {
     size_t size = snprintf(NULL, 0, "%ld", value);
     char *buffer = malloc(size + 1);
     if (!buffer) {
@@ -55,7 +55,7 @@ char *parseLong(long value) {
     return buffer;
 }
 
-char *parseLl(long long value) {
+char *str_Ll(long long value) {
     size_t size = snprintf(NULL, 0, "%lld", value);
     char *buffer = malloc(size + 1);
     if (!buffer) {
@@ -66,7 +66,7 @@ char *parseLl(long long value) {
     return buffer;
 }
 
-char *parseLd(long double value) {
+char *str_Ld(long double value) {
     size_t size = snprintf(NULL, 0, "%Lf", value);
     char *buffer = malloc(size + 1);
     if (!buffer) {
