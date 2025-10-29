@@ -104,7 +104,7 @@ char *indent_json(char *ajson, size_t indent_len) {
         while (len_i + nmem >= alc_n) {
             alc_n *= 2;
             char *temp = realloc(newjson, alc_n);
-            if (alc_n > 4294967295) {
+            if (alc_n > 1073741824) {
                 fprintf(stderr, "Memory limit (1073741824 bytes) reached\n");
                 free(newjson);
                 return NULL;
