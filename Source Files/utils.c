@@ -267,18 +267,19 @@ array_t *appendL(array_t *list) {
 }
 
 // Resets pairs key to the given string
-obj_t *resetkey(obj_t *pair, char *key, unsigned int str_len) {
-    if (pair == NULL) {
+obj_t *resetkey(obj_t *pair, char *key) {
+    if (pair == NULL || key == NULL) {
         errno = EINVAL;
         return NULL;
     }
+    int str_len = strlen(key);
     free(pair->key);
     pair->key = malloc(str_len + 1);
     if (pair->key == NULL) {
         errno = ENOMEM;
         return NULL;
     }
-    strncpy(pair->key, key, str_len);
+    memcpy(pair->key, key, str_len);
     pair->key[str_len] = '\0';
     return pair;
 }
@@ -365,32 +366,34 @@ int setfloatL(array_t *element, float value) {
 }
 
 // Resets pairs value to the given string
-int setrawH(obj_t *pair, char *val_ptr, int str_len) {
+int setrawH(obj_t *pair, char *val_ptr) {
     if (pair == NULL) {
         errno = EINVAL;
         return 1;
     }
+    int str_len = strlen(val_ptr) + 1;
     if (pair->value.vt == NMAP) free_map(pair->value.value.obj);
     else if (pair->value.vt == LIST) free_list(pair->value.value.arr);
     else if (pair->value.vt == RAW) free(pair->value.value.str.str);
     pair->value.value.str.str = malloc(str_len + 1);
     pair->value.value.str.len = str_len;
-    strncpy(pair->value.value.str.str, val_ptr, str_len + 1);
+    memcpy(pair->value.value.str.str, val_ptr, str_len + 1);
     pair->value.vt = RAW;
     return 0;
 }
 
-int setrawL(array_t *element, char *val_ptr, unsigned int str_len) {
+int setrawL(array_t *element, char *val_ptr) {
     if (element == NULL) {
         errno = EINVAL;
         return 1;
     }
+    int str_len = strlen(val_ptr);
     if (element->value.vt == NMAP) free_map(element->value.value.obj);
     else if (element->value.vt == LIST) free_list(element->value.value.arr);
     else if (element->value.vt == RAW) free(element->value.value.str.str);
     element->value.value.str.str = malloc(str_len + 1);
     element->value.value.str.len = str_len;
-    strncpy(element->value.value.str.str, val_ptr, str_len + 1);
+    memcpy(element->value.value.str.str, val_ptr, str_len + 1);
     element->value.vt = RAW;
     return 0;
 }

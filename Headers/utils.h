@@ -81,7 +81,7 @@ int r_afterH(obj_t *, obj_t *);
 int r_afterL(array_t *);
 
 // Resets pairs key to the given string
-obj_t *resetkey(obj_t *, char *, unsigned int);
+obj_t *resetkey(obj_t *, char *);
 
 // Resets pairs value to the given integer
 int setintH(obj_t *, int);
@@ -99,9 +99,9 @@ int setfloatH(obj_t *, float);
 int setfloatL(array_t *, float);
 
 // Resets pairs value to the given string
-int setrawH(obj_t *, char *, int);
+int setrawH(obj_t *, char *);
 
-int setrawL(array_t *, char *, unsigned int);
+int setrawL(array_t *, char *);
 
 // Resets pairs value to the given double
 int setdoubleH(obj_t *, double);
