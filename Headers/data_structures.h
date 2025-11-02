@@ -6,7 +6,7 @@
 /* This header defines structs, valuetypes, macros and variables */
 
 enum valuetype {
-    RAW,   // Raw data (string)
+    RAW,   // Raw data (string, bool, any value)
     SHR,   // Short
     INT,   // Integer
     FLT,   // Float
