@@ -77,6 +77,18 @@ int map_size(obj_t *root) {
     return bsize;
 }
 
+//Frees a json value
+int free_json_value(json_value_t val) {
+    if (val.vt == NMAP) {
+        free_map(val.value.obj);
+    } else if (val.vt == LIST) {
+        free_list(val.value.arr);
+    } else if (val.vt == RAW) {
+        free(val.value.str.str);
+    }
+    return 0;
+}
+
 // Forcefully frees a pair
 int free_pair(obj_t *pair) {
     if (pair == NULL) {
@@ -86,12 +98,10 @@ int free_pair(obj_t *pair) {
     if (pair->key != NULL) {
         free(pair->key);
     }
-    if (pair->value.vt == NMAP) {
-        free_map(pair->value.value.obj);
-    } else if (pair->value.vt == LIST) {
-        free_list(pair->value.value.arr);
-    } else if (pair->value.vt == RAW) {
-        free(pair->value.value.str.str);
+    if (free_json_value(pair->value) == 1) {
+        free(pair);
+        errno = EINVAL;
+        return 1;
     }
     free(pair);
     return 0;
@@ -103,12 +113,10 @@ int free_element(array_t *element) {
         errno = EINVAL;
         return 1;
     }
-    if (element->value.vt == NMAP) {
-        free_map(element->value.value.obj);
-    } else if (element->value.vt == LIST) {
-        free_list(element->value.value.arr);
-    } else if (element->value.vt == RAW) {
-        free(element->value.value.str.str);
+    if (free_json_value(element->value) == 1) {
+        free(element);
+        errno = EINVAL;
+        return 1;
     }
     free(element);
     return 0;

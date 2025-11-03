@@ -23,6 +23,9 @@ int list_size(array_t *);
 // Counts the length of the given hashmap
 int map_size(obj_t *);
 
+//Frees a json value
+int free_json_value(json_value_t);
+
 // Forcefully frees a pair
 int free_pair(obj_t *);
 
