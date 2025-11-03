@@ -11,6 +11,9 @@
 
 /* This header defines functions for handling hash maps and lists */
 
+//Returns the valuetype as string representation.
+char *get_vt(enum valuetype);
+
 // Returns the length of the hashmap, but if the pair is not the root of the hashmap, it will start from pair
 unsigned int map_len(obj_t *);
 

@@ -1,5 +1,21 @@
 #include "..\Headers\utils.h"
 
+char *get_vt(enum valuetype vt) {
+    switch (vt) {
+        case RAW: return "RAW";
+        case SHR: return "SHR";
+        case INT: return "INT";
+        case FLT: return "FLT";
+        case DBL: return "DBL";
+        case LONG: return "LONG";
+        case LL: return "LL";
+        case LDBL: return "LDBL";
+        case LIST: return "LIST";
+        case NMAP: return "NMAP";
+        default: return "NULL";
+    }
+}
+
 // Returns the length of the map, but if the pair is not the root of the map, it will start from pair
 unsigned int map_len(obj_t *map) {
     unsigned int len = 0;
