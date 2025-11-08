@@ -89,6 +89,8 @@ int r_afterL(array_t *);
 // Resets pairs key to the given string
 obj_t *resetkey(obj_t *, char *);
 
-void setval(json_value_t*, void *, enum valuetype);
+// Sets the value of the object to void * (be cautious with void *)
+void setvalH(obj_t*, void *, enum valuetype);
+void setvalL(array_t *, void*, enum valuetype);
 
 #endif

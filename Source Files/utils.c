@@ -324,29 +324,57 @@ obj_t *resetkey(obj_t *pair, char *key) {
     return pair;
 }
 
-void setval(json_value_t *val, void *src, enum valuetype vt) {
-    if (val == NULL) {
+void setvalH(obj_t *obj, void *src, enum valuetype vt) {
+    if (obj == NULL) {
         errno = EINVAL;
         return;
     }
 
-    free_json_value(*val);
+    free_json_value(obj->value);
 
     switch (vt) {
         case RAW: {
-            val->value.str.str = str_dup((char*)src);
-            val->value.str.len = strlen((char*)src);
+            obj->value.value.str.str = str_dup((char*)src);
+            obj->value.value.str.len = strlen((char*)src);
+            obj->value.vt = RAW;
             break;
         }
-        case INT: val->value.i = *(int*)src; break;
-        case SHR: val->value.s = *(short*)src; break;
-        case FLT: val->value.f = *(float*)src; break;
-        case DBL: val->value.dbl = *(double*)src; break;
-        case LONG: val->value.lg = *(long*)src; break;
-        case LL: val->value.lgl = *(long long*)src; break;
-        case LDBL: val->value.ldbl = *(long double*)src; break;
-        case NMAP: val->value.obj = (obj_t*)src; break;
-        case LIST: val->value.arr = (array_t*)src; break;
+        case INT: obj->value.value.i = *(int*)src; obj->value.vt = INT; break;
+        case SHR: obj->value.value.s = *(short*)src; obj->value.vt = SHR; break;
+        case FLT: obj->value.value.f = *(float*)src; obj->value.vt = FLT; break;
+        case DBL: obj->value.value.dbl = *(double*)src; obj->value.vt = DBL; break;
+        case LONG: obj->value.value.lg = *(long*)src; obj->value.vt = LONG; break;
+        case LL: obj->value.value.lgl = *(long long*)src; obj->value.vt = LL; break;
+        case LDBL: obj->value.value.ldbl = *(long double*)src; obj->value.vt = LDBL; break;
+        case NMAP: obj->value.value.obj = (obj_t*)src;  obj->value.vt = NMAP; break;
+        case LIST: obj->value.value.arr = (array_t*)src; obj->value.vt = LIST; break;
+        default: errno = EINVAL; return;
+    }
+}
+void setvalL(array_t *arr, void *src, enum valuetype vt) {
+    if (arr == NULL) {
+        errno = EINVAL;
+        return;
+    }
+
+    free_json_value(arr->value);
+
+    switch (vt) {
+        case RAW: {
+            arr->value.value.str.str = str_dup((char*)src);
+            arr->value.value.str.len = strlen((char*)src);
+            arr->value.vt = RAW;
+            break;
+        }
+        case INT: arr->value.value.i = *(int*)src; arr->value.vt = INT; break;
+        case SHR: arr->value.value.s = *(short*)src; arr->value.vt = SHR; break;
+        case FLT: arr->value.value.f = *(float*)src; arr->value.vt = FLT; break;
+        case DBL: arr->value.value.dbl = *(double*)src; arr->value.vt = DBL; break;
+        case LONG: arr->value.value.lg = *(long*)src; arr->value.vt = LONG; break;
+        case LL: arr->value.value.lgl = *(long long*)src; arr->value.vt = LL; break;
+        case LDBL: arr->value.value.ldbl = *(long double*)src; arr->value.vt = LDBL; break;
+        case NMAP: arr->value.value.obj = (obj_t*)src;  arr->value.vt = NMAP; break;
+        case LIST: arr->value.value.arr = (array_t*)src; arr->value.vt = LIST; break;
         default: errno = EINVAL; return;
     }
 }
