@@ -95,11 +95,11 @@ int map_size(obj_t *root) {
 
 //Frees a json value
 int free_json_value(json_value_t val) {
-    if (val.vt == NMAP) {
+    if (val.vt == NMAP && val.vt != NULL) {
         free_map(val.value.obj);
-    } else if (val.vt == LIST) {
+    } else if (val.vt == LIST && val.vt != NULL) {
         free_list(val.value.arr);
-    } else if (val.vt == RAW) {
+    } else if (val.vt == RAW && val.vt != NULL) {
         free(val.value.str.str);
     }
     return 0;
