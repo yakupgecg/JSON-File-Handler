@@ -1,5 +1,21 @@
 #include "..\Headers\utils.h"
 
+// This is a helper function since I am on windows and cannot use normal stdup()
+static char *str_dup(char *str) {
+    if (str == NULL) {
+        errno = EINVAL;
+        return NULL;
+    }
+    int keylen = strlen(str) + 1;
+    char *newstr = malloc(keylen * sizeof(char));
+    if (newstr == NULL) {
+        errno = ENOMEM;
+        return NULL;
+    }
+    memcpy(newstr, str, keylen);
+    return newstr;
+}
+
 char *get_vt(enum valuetype vt) {
     switch (vt) {
         case RAW: return "RAW";
@@ -95,11 +111,11 @@ int map_size(obj_t *root) {
 
 //Frees a json value
 int free_json_value(json_value_t val) {
-    if (val.vt == NMAP && val.vt != NULL) {
+    if (val.vt == NMAP && val.value.obj != NULL) {
         free_map(val.value.obj);
-    } else if (val.vt == LIST && val.vt != NULL) {
+    } else if (val.vt == LIST && val.value.arr != NULL) {
         free_list(val.value.arr);
-    } else if (val.vt == RAW && val.vt != NULL) {
+    } else if (val.vt == RAW && val.value.str.str != NULL) {
         free(val.value.str.str);
     }
     return 0;
@@ -308,280 +324,29 @@ obj_t *resetkey(obj_t *pair, char *key) {
     return pair;
 }
 
-// Resets pairs value to the given integer
-int setintH(obj_t *pair, int value) {
-    if (pair == NULL) {
+void setval(json_value_t *val, void *src, enum valuetype vt) {
+    if (val == NULL) {
         errno = EINVAL;
-        return 1;
+        return;
     }
-    if (pair->value.vt == NMAP) free_map(pair->value.value.obj);
-    else if (pair->value.vt == LIST) free_list(pair->value.value.arr);
-    else if (pair->value.vt == RAW) free(pair->value.value.str.str);
-    pair->value.value.i = value;
-    pair->value.vt = INT;
-    return 0;
-}
 
-int setintL(array_t *element, int value) {
-    if (element == NULL) {
-        errno = EINVAL;
-        return 1;
+    free_json_value(*val);
+
+    switch (vt) {
+        case RAW: {
+            val->value.str.str = str_dup((char*)src);
+            val->value.str.len = strlen((char*)src);
+            break;
+        }
+        case INT: val->value.i = *(int*)src; break;
+        case SHR: val->value.s = *(short*)src; break;
+        case FLT: val->value.f = *(float*)src; break;
+        case DBL: val->value.dbl = *(double*)src; break;
+        case LONG: val->value.lg = *(long*)src; break;
+        case LL: val->value.lgl = *(long long*)src; break;
+        case LDBL: val->value.ldbl = *(long double*)src; break;
+        case NMAP: val->value.obj = (obj_t*)src; break;
+        case LIST: val->value.arr = (array_t*)src; break;
+        default: errno = EINVAL; return;
     }
-    if (element->value.vt == NMAP) free_map(element->value.value.obj);
-    else if (element->value.vt == LIST) free_list(element->value.value.arr);
-    else if (element->value.vt == RAW) free(element->value.value.str.str);
-    element->value.value.i = value;
-    element->value.vt = INT;
-    return 0;
-}
-
-// Resets pairs value to the given short
-int setshortH(obj_t *pair, short value) {
-    if (pair == NULL) {
-        errno = EINVAL;
-        return 1;
-    }
-    if (pair->value.vt == NMAP) free_map(pair->value.value.obj);
-    else if (pair->value.vt == LIST) free_list(pair->value.value.arr);
-    else if (pair->value.vt == RAW) free(pair->value.value.str.str);
-    pair->value.value.s = value;
-    pair->value.vt = SHR;
-    return 0;
-}
-
-int setshortL(array_t *element, short value) {
-    if (element == NULL) {
-        errno = EINVAL;
-        return 1;
-    }
-    if (element->value.vt == NMAP) free_map(element->value.value.obj);
-    else if (element->value.vt == LIST) free_list(element->value.value.arr);
-    else if (element->value.vt == RAW) free(element->value.value.str.str);
-    element->value.value.s = value;
-    element->value.vt = SHR;
-    return 0;
-}
-
-// Resets pairs value to the given float
-int setfloatH(obj_t *pair, float value) {
-    if (pair == NULL) {
-        errno = EINVAL;
-        return 1;
-    }
-    if (pair->value.vt == NMAP) free_map(pair->value.value.obj);
-    else if (pair->value.vt == LIST) free_list(pair->value.value.arr);
-    else if (pair->value.vt == RAW) free(pair->value.value.str.str);
-    pair->value.value.f = value;
-    pair->value.vt = FLT;
-    return 0;
-}
-
-int setfloatL(array_t *element, float value) {
-    if (element == NULL) {
-        errno = EINVAL;
-        return 1;
-    }
-    if (element->value.vt == NMAP) free_map(element->value.value.obj);
-    else if (element->value.vt == LIST) free_list(element->value.value.arr);
-    else if (element->value.vt == RAW) free(element->value.value.str.str);
-    element->value.value.f = value;
-    element->value.vt = FLT;
-    return 0;
-}
-
-// Resets pairs value to the given string
-int setrawH(obj_t *pair, char *val_ptr) {
-    if (pair == NULL) {
-        errno = EINVAL;
-        return 1;
-    }
-    int str_len = strlen(val_ptr) + 1;
-    if (pair->value.vt == NMAP) free_map(pair->value.value.obj);
-    else if (pair->value.vt == LIST) free_list(pair->value.value.arr);
-    else if (pair->value.vt == RAW) free(pair->value.value.str.str);
-    pair->value.value.str.str = malloc(str_len + 1);
-    pair->value.value.str.len = str_len;
-    memcpy(pair->value.value.str.str, val_ptr, str_len + 1);
-    pair->value.vt = RAW;
-    return 0;
-}
-
-int setrawL(array_t *element, char *val_ptr) {
-    if (element == NULL) {
-        errno = EINVAL;
-        return 1;
-    }
-    int str_len = strlen(val_ptr);
-    if (element->value.vt == NMAP) free_map(element->value.value.obj);
-    else if (element->value.vt == LIST) free_list(element->value.value.arr);
-    else if (element->value.vt == RAW) free(element->value.value.str.str);
-    element->value.value.str.str = malloc(str_len + 1);
-    element->value.value.str.len = str_len;
-    memcpy(element->value.value.str.str, val_ptr, str_len + 1);
-    element->value.vt = RAW;
-    return 0;
-}
-
-// Resets pairs value to the given double
-int setdoubleH(obj_t *pair, double value) {
-    if (pair == NULL) {
-        errno = EINVAL;
-        return 1;
-    }
-    if (pair->value.vt == NMAP) free_map(pair->value.value.obj);
-    else if (pair->value.vt == LIST) free_list(pair->value.value.arr);
-    else if (pair->value.vt == RAW) free(pair->value.value.str.str);
-    pair->value.value.dbl = value;
-    pair->value.vt = DBL;
-    return 0;
-}
-
-int setdoubleL(array_t *element, double value) {
-    if (element == NULL) {
-        errno = EINVAL;
-        return 1;
-    }
-    if (element->value.vt == NMAP) free_map(element->value.value.obj);
-    else if (element->value.vt == LIST) free_list(element->value.value.arr);
-    else if (element->value.vt == RAW) free(element->value.value.str.str);
-    element->value.value.dbl = value;
-    element->value.vt = DBL;
-    return 0;
-}
-
-// Resets pairs value to the given long
-int setlongH(obj_t *pair, long value) {
-    if (pair == NULL) {
-        errno = EINVAL;
-        return 1;
-    }
-    if (pair->value.vt == NMAP) free_map(pair->value.value.obj);
-    else if (pair->value.vt == LIST) free_list(pair->value.value.arr);
-    else if (pair->value.vt == RAW) free(pair->value.value.str.str);
-    pair->value.value.lg = value;
-    pair->value.vt = LONG;
-    return 0;
-}
-
-int setlongL(array_t *element, long value) {
-    if (element == NULL) {
-        errno = EINVAL;
-        return 1;
-    }
-    if (element->value.vt == NMAP) free_map(element->value.value.obj);
-    else if (element->value.vt == LIST) free_list(element->value.value.arr);
-    else if (element->value.vt == RAW) free(element->value.value.str.str);
-    element->value.value.lg = value;
-    element->value.vt = LONG;
-    return 0;
-}
-
-// Resets pairs value to the given long long
-int setlonglongH(obj_t *pair, long long value) {
-    if (pair == NULL) {
-        errno = EINVAL;
-        return 1;
-    }
-    if (pair->value.vt == NMAP) free_map(pair->value.value.obj);
-    else if (pair->value.vt == LIST) free_list(pair->value.value.arr);
-    else if (pair->value.vt == RAW) free(pair->value.value.str.str);
-    pair->value.value.lgl = value;
-    pair->value.vt = LL;
-    return 0;
-}
-
-int setlonglongL(array_t *element, long long value) {
-    if (element == NULL) {
-        errno = EINVAL;
-        return 1;
-    }
-    if (element->value.vt == NMAP) free_map(element->value.value.obj);
-    else if (element->value.vt == LIST) free_list(element->value.value.arr);
-    else if (element->value.vt == RAW) free(element->value.value.str.str);
-    element->value.value.lgl = value;
-    element->value.vt = LL;
-    return 0;
-}
-
-
-// Resets pairs value to the given long double
-int setlongdoubleH(obj_t *pair, long double value) {
-    if (pair == NULL) {
-        errno = EINVAL;
-        return 1;
-    }
-    if (pair->value.vt == NMAP) free_map(pair->value.value.obj);
-    else if (pair->value.vt == LIST) free_list(pair->value.value.arr);
-    else if (pair->value.vt == RAW) free(pair->value.value.str.str);
-    pair->value.value.ldbl = value;
-    pair->value.vt = LDBL;
-    return 0;
-}
-
-int setlongdoubleL(array_t *element, long double value) {
-    if (element == NULL) {
-        errno = EINVAL;
-        return 1;
-    }
-    if (element->value.vt == NMAP) free_map(element->value.value.obj);
-    else if (element->value.vt == LIST) free_list(element->value.value.arr);
-    else if (element->value.vt == RAW) free(element->value.value.str.str);
-    element->value.value.lgl = value;
-    element->value.vt = LL;
-    return 0;
-}
-
-// Resets pairs value to the given list
-int setlistH(obj_t *pair, array_t *element) {
-    if (pair == NULL || element == NULL) {
-        errno = EINVAL;
-        return 1;
-    }
-    if (pair->value.vt == NMAP) free_map(pair->value.value.obj);
-    else if (pair->value.vt == LIST) free_list(pair->value.value.arr);
-    else if (pair->value.vt == RAW) free(pair->value.value.str.str);
-    pair->value.value.arr = element;
-    pair->value.vt = LIST;
-    return 0;
-}
-
-
-int setlistL(array_t *element, array_t *e2) {
-    if (element == NULL || e2 == NULL) {
-        errno = EINVAL;
-        return 1;
-    }
-    if (element->value.vt == NMAP) free_map(element->value.value.obj);
-    else if (element->value.vt == LIST) free_list(element->value.value.arr);
-    else if (element->value.vt == RAW) free(element->value.value.str.str);
-    element->value.value.arr = e2;
-    element->value.vt = LIST;
-    return 0;
-}
-
-// Resets pairs value to the given map
-int setmapH(obj_t *pair, obj_t *p2) {
-    if (pair == NULL || p2 == NULL) {
-        errno = EINVAL;
-        return 1;
-    }
-    if (pair->value.vt == NMAP) free_map(pair->value.value.obj);
-    else if (pair->value.vt == LIST) free_list(pair->value.value.arr);
-    else if (pair->value.vt == RAW) free(pair->value.value.str.str);
-    pair->value.value.obj = p2;
-    pair->value.vt = NMAP;
-    return 0;
-}
-
-int setmapL(array_t *element, obj_t *pair) {
-    if (element == NULL || pair == NULL) {
-        errno = EINVAL;
-        return 1;
-    }
-    if (element->value.vt == NMAP) free_map(element->value.value.obj);
-    else if (element->value.vt == LIST) free_list(element->value.value.arr);
-    else if (element->value.vt == RAW) free(element->value.value.str.str);
-    element->value.value.obj = pair;
-    element->value.vt = NMAP;
-    return 0;
 }

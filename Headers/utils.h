@@ -89,54 +89,6 @@ int r_afterL(array_t *);
 // Resets pairs key to the given string
 obj_t *resetkey(obj_t *, char *);
 
-// Resets pairs value to the given integer
-int setintH(obj_t *, int);
-
-int setintL(array_t *, int);
-
-// Resets pairs value to the given short
-int setshortH(obj_t *, short);
-
-int setshortL(array_t *, short);
-
-// Resets pairs value to the given float
-int setfloatH(obj_t *, float);
-
-int setfloatL(array_t *, float);
-
-// Resets pairs value to the given string
-int setrawH(obj_t *, char *);
-
-int setrawL(array_t *, char *);
-
-// Resets pairs value to the given double
-int setdoubleH(obj_t *, double);
-
-int setdoubleL(array_t *, double);
-
-// Resets pairs value to the given long
-int setlongH(obj_t *, long);
-
-int setlongL(array_t *, long);
-
-// Resets pairs value to the given long long
-int setlonglongH(obj_t *, long long);
-
-int setlonglongL(array_t *, long long);
-
-// Resets pairs value to the given long double
-int setlongdoubleH(obj_t *, long double);
-
-int setlongdoubleL(array_t *, long double);
-
-// Resets pairs value to the given list
-int setlistH(obj_t *, array_t *);
-
-int setlistL(array_t *, array_t *);
-
-// Resets pairs value to the given hashmap
-int setmapH(obj_t *, obj_t *);
-
-int setmapL(array_t *, obj_t *);
+void setval(json_value_t*, void *, enum valuetype);
 
 #endif
