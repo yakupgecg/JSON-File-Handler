@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+//This example cannot be used as some of the functions are in progress
+
 int main() {
     FILE *file = fopen("Test.json", "w");
     obj_t *map = initM();
