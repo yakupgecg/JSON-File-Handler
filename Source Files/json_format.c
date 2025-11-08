@@ -296,7 +296,7 @@ obj_t *decode_pair(char *str) {
         key_i++;
     }
     *keycur = '\0';
-    resetkey(newobj, key, alc_i);
+    resetkey(newobj, key);
 
     // Value evaluation
     alc_i = 0;
@@ -336,7 +336,7 @@ obj_t *decode_pair(char *str) {
         val_i++;
     }
     *valcur = '\0';
-    setrawH(newobj, val, alc_i);
+    setrawH(newobj, val);
     free(newstr);
     return newobj;
 }
