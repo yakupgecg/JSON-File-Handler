@@ -27,7 +27,7 @@ char *get_vt(enum valuetype vt) {
         case LL: return "LL";
         case LDBL: return "LDBL";
         case LIST: return "LIST";
-        case NMAP: return "NMAP";
+        case OBJ: return "OBJ";
         default: return "NULL";
     }
 }
@@ -73,7 +73,7 @@ int list_size(array_t *root) {
             case LL: bsize += LL_STR_LEN; break;
             case LDBL: bsize += LDBL_STR_LEN; break;
             case LIST: bsize += list_size(current->value.value.arr); break;
-            case NMAP: bsize += map_size(current->value.value.obj); break;
+            case OBJ: bsize += map_size(current->value.value.obj); break;
             default: errno = EINVAL; return -2;
         }
         current = current->next;
@@ -101,7 +101,7 @@ int map_size(obj_t *root) {
             case LL: bsize += LL_STR_LEN; break;
             case LDBL: bsize += LDBL_STR_LEN; break;
             case LIST: bsize += list_size(current->value.value.arr); break;
-            case NMAP: bsize += map_size(current->value.value.obj); break;
+            case OBJ: bsize += map_size(current->value.value.obj); break;
             default: errno = EINVAL; return -2;
         }
         current = current->next;
@@ -111,7 +111,7 @@ int map_size(obj_t *root) {
 
 //Frees a json value
 int free_json_value(json_value_t val) {
-    if (val.vt == NMAP && val.value.obj != NULL) {
+    if (val.vt == OBJ && val.value.obj != NULL) {
         free_map(val.value.obj);
     } else if (val.vt == LIST && val.value.arr != NULL) {
         free_list(val.value.arr);
@@ -346,7 +346,7 @@ void setvalH(obj_t *obj, void *src, enum valuetype vt) {
         case LONG: obj->value.value.lg = *(long*)src; obj->value.vt = LONG; break;
         case LL: obj->value.value.lgl = *(long long*)src; obj->value.vt = LL; break;
         case LDBL: obj->value.value.ldbl = *(long double*)src; obj->value.vt = LDBL; break;
-        case NMAP: obj->value.value.obj = (obj_t*)src;  obj->value.vt = NMAP; break;
+        case OBJ: obj->value.value.obj = (obj_t*)src;  obj->value.vt = OBJ; break;
         case LIST: obj->value.value.arr = (array_t*)src; obj->value.vt = LIST; break;
         default: errno = EINVAL; return;
     }
@@ -373,7 +373,7 @@ void setvalL(array_t *arr, void *src, enum valuetype vt) {
         case LONG: arr->value.value.lg = *(long*)src; arr->value.vt = LONG; break;
         case LL: arr->value.value.lgl = *(long long*)src; arr->value.vt = LL; break;
         case LDBL: arr->value.value.ldbl = *(long double*)src; arr->value.vt = LDBL; break;
-        case NMAP: arr->value.value.obj = (obj_t*)src;  arr->value.vt = NMAP; break;
+        case OBJ: arr->value.value.obj = (obj_t*)src;  arr->value.vt = OBJ; break;
         case LIST: arr->value.value.arr = (array_t*)src; arr->value.vt = LIST; break;
         default: errno = EINVAL; return;
     }

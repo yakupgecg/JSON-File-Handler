@@ -15,7 +15,7 @@ enum valuetype {
     LL,    // Long Long
     LDBL,  // Long double
     LIST,  // Nested list
-    NMAP   // Nested map
+    OBJ   // Nested map
 };
 
 #ifndef EJSON
