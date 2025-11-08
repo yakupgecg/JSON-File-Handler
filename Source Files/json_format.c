@@ -154,7 +154,12 @@ char *indent_json(char *ajson, size_t indent_len) {
 	    newcur++;
 	    cur++;
 	    len_i++;
-    }          
+    }
+    if (list_index != 0 || nest_index != 0) {
+        free(newjson);
+        errno = EJSON;
+        return NULL;
+    }
     *newcur = '\0';
     return newjson;
 }
