@@ -20,12 +20,6 @@ unsigned int map_len(obj_t *);
 // Returns the length of the list
 unsigned int list_len(array_t *);
 
-// Counts the length of the given array
-int list_size(array_t *);
-
-// Counts the length of the given hashmap
-int map_size(obj_t *);
-
 //Frees a json value
 int free_json_value(json_value_t);
 
