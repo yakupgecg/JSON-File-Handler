@@ -16,6 +16,7 @@ static char *str_dup(char *str) {
     return newstr;
 }
 
+// Returns a string representation of vt
 char *get_vt(enum valuetype vt) {
     switch (vt) {
         case RAW: return "RAW";
@@ -351,6 +352,7 @@ void setvalH(obj_t *obj, void *src, enum valuetype vt) {
         default: errno = EINVAL; return;
     }
 }
+
 void setvalL(array_t *arr, void *src, enum valuetype vt) {
     if (arr == NULL) {
         errno = EINVAL;
