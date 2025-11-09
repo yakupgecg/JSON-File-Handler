@@ -90,7 +90,22 @@ int r_afterL(array_t *);
 obj_t *resetkey(obj_t *, char *);
 
 // Sets the value of the object to void * (be cautious with void *)
-void setvalH(obj_t*, void *, enum valuetype);
-void setvalL(array_t *, void*, enum valuetype);
+void setval(json_value_t*, void *, enum valuetype);
+
+
+obj_t *setstrH(obj_t *, char *);
+array_t *setstrL(array_t *, char *);
+
+obj_t *setintH(obj_t *, int);
+array_t *setintL(array_t *, int);
+
+obj_t *setdoubleH(obj_t *, double);
+array_t *setdoubleL(array_t *, double);
+
+obj_t *setobjH(obj_t *, obj_t *);
+array_t *setobjL(array_t *, obj_t *);
+
+obj_t *setarrH(obj_t *, array_t *);
+array_t *setarrL(array_t *, array_t *);
 
 #endif

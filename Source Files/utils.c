@@ -266,58 +266,125 @@ obj_t *resetkey(obj_t *pair, char *key) {
     return pair;
 }
 
-void setvalH(obj_t *obj, void *src, enum valuetype vt) {
-    if (obj == NULL) {
+void setval(json_value_t *value, void *src, enum valuetype vt) {
+    if (value == NULL) {
         errno = EINVAL;
         return;
     }
 
-    free_json_value(obj->value);
+    free_json_value(value);
 
     switch (vt) {
         case STR: {
-            obj->value.value.str.str = str_dup((char*)src);
-            obj->value.value.str.len = strlen((char*)src);
-            obj->value.vt = STR;
+            value->value.str.str = str_dup((char*)src);
+            value->value.str.len = strlen((char*)src);
+            value->vt = STR;
             break;
         }
-        case INT: obj->value.value.i = *(int*)src; obj->value.vt = INT; break;
-        case SHR: obj->value.value.s = *(short*)src; obj->value.vt = SHR; break;
-        case FLT: obj->value.value.f = *(float*)src; obj->value.vt = FLT; break;
-        case DBL: obj->value.value.dbl = *(double*)src; obj->value.vt = DBL; break;
-        case LONG: obj->value.value.lg = *(long*)src; obj->value.vt = LONG; break;
-        case LL: obj->value.value.lgl = *(long long*)src; obj->value.vt = LL; break;
-        case LDBL: obj->value.value.ldbl = *(long double*)src; obj->value.vt = LDBL; break;
-        case OBJ: obj->value.value.obj = (obj_t*)src;  obj->value.vt = OBJ; break;
-        case LIST: obj->value.value.arr = (array_t*)src; obj->value.vt = LIST; break;
+        case INT: value->value.i = *(int*)src; value->vt = INT; break;
+        case DBL: value->value.dbl = *(double*)src; value->vt = DBL; break;
+        case OBJ: value->value.obj = (obj_t*)src;  value->vt = OBJ; break;
+        case LIST: value->value.arr = (array_t*)src; value->vt = LIST; break;
         default: errno = EINVAL; return;
     }
 }
 
-void setvalL(array_t *arr, void *src, enum valuetype vt) {
+obj_t *setstrH(obj_t *obj, char *src) {
+    if (obj == NULL || src == NULL) {
+        errno = EINVAL;
+        return NULL;
+    }
+    
+    setval(&obj->value, src, STR);
+    return obj;
+}
+
+array_t *setstrL(array_t *arr, char *src) {
+    if (arr == NULL || src == NULL) {
+        errno = EINVAL;
+        return NULL;
+    }
+    
+    setval(&arr->value, src, STR);
+    return arr;
+}
+
+obj_t *setintH(obj_t *obj, int src) {
+    if (obj == NULL) {
+        errno = EINVAL;
+        return NULL;
+    }
+    
+    setval(&obj->value, &src, INT);
+    return obj;
+}
+
+array_t *setintL(array_t *arr, int src) {
     if (arr == NULL) {
         errno = EINVAL;
-        return;
+        return NULL;
     }
+    
+    setval(&arr->value, &src, INT);
+    return arr;
+}
 
-    free_json_value(arr->value);
-
-    switch (vt) {
-        case STR: {
-            arr->value.value.str.str = str_dup((char*)src);
-            arr->value.value.str.len = strlen((char*)src);
-            arr->value.vt = STR;
-            break;
-        }
-        case INT: arr->value.value.i = *(int*)src; arr->value.vt = INT; break;
-        case SHR: arr->value.value.s = *(short*)src; arr->value.vt = SHR; break;
-        case FLT: arr->value.value.f = *(float*)src; arr->value.vt = FLT; break;
-        case DBL: arr->value.value.dbl = *(double*)src; arr->value.vt = DBL; break;
-        case LONG: arr->value.value.lg = *(long*)src; arr->value.vt = LONG; break;
-        case LL: arr->value.value.lgl = *(long long*)src; arr->value.vt = LL; break;
-        case LDBL: arr->value.value.ldbl = *(long double*)src; arr->value.vt = LDBL; break;
-        case OBJ: arr->value.value.obj = (obj_t*)src;  arr->value.vt = OBJ; break;
-        case LIST: arr->value.value.arr = (array_t*)src; arr->value.vt = LIST; break;
-        default: errno = EINVAL; return;
+obj_t *setdoubleH(obj_t *obj, double src) {
+    if (obj == NULL) {
+        errno = EINVAL;
+        return NULL;
     }
+    
+    setval(&obj->value, &src, DBL);
+    return obj;
+}
+
+array_t *setdoubleL(array_t *arr, double src) {
+    if (arr == NULL) {
+        errno = EINVAL;
+        return NULL;
+    }
+    
+    setval(&arr->value, &src, DBL);
+    return arr;
+}
+
+obj_t *setobjH(obj_t *obj, obj_t *src) {
+    if (obj == NULL || src == NULL) {
+        errno = EINVAL;
+        return NULL;
+    }
+    
+    setval(&obj->value, src, OBJ);
+    return obj;
+}
+
+array_t *setobjL(array_t *arr, obj_t *src) {
+    if (arr == NULL || src == NULL) {
+        errno = EINVAL;
+        return NULL;
+    }
+    
+    setval(&arr->value, src, OBJ);
+    return arr;
+}
+
+obj_t *setarrH(obj_t *obj, array_t *src) {
+    if (obj == NULL || src == NULL) {
+        errno = EINVAL;
+        return NULL;
+    }
+    
+    setval(&obj->value, src, LIST);
+    return obj;
+}
+
+array_t *setarrL(array_t *arr, array_t *src) {
+    if (arr == NULL || src == NULL) {
+        errno = EINVAL;
+        return NULL;
+    }
+    
+    setval(&arr->value, src, LIST);
+    return arr;
 }
