@@ -20,13 +20,8 @@ static char *str_dup(char *str) {
 char *get_vt(enum valuetype vt) {
     switch (vt) {
         case STR: return "STR";
-        case SHR: return "SHR";
         case INT: return "INT";
-        case FLT: return "FLT";
         case DBL: return "DBL";
-        case LONG: return "LONG";
-        case LL: return "LL";
-        case LDBL: return "LDBL";
         case LIST: return "LIST";
         case OBJ: return "OBJ";
         default: return "NULL";
@@ -53,61 +48,6 @@ unsigned int list_len(array_t *list) {
         current = current->next;
     }
     return len;
-}
-
-// Calculates the length of the given array
-int list_size(array_t *root) {
-    if (root == NULL) {
-        errno = EINVAL;
-        return -1;
-    }
-    int bsize = 0;
-    array_t *current = root;
-    while (current != NULL) {
-        switch (current->value.vt) {
-            case STR: bsize += current->value.value.str.len; break;
-            case SHR: bsize += SHR_STR_LEN; break;
-            case INT: bsize += INT_STR_LEN; break;
-            case FLT: bsize += FLT_STR_LEN; break;
-            case DBL: bsize += DBL_STR_LEN; break;
-            case LONG: bsize += LONG_STR_LEN; break;
-            case LL: bsize += LL_STR_LEN; break;
-            case LDBL: bsize += LDBL_STR_LEN; break;
-            case LIST: bsize += list_size(current->value.value.arr); break;
-            case OBJ: bsize += map_size(current->value.value.obj); break;
-            default: errno = EINVAL; return -2;
-        }
-        current = current->next;
-    }
-    return bsize;
-}
-
-// Returns the size of the map
-int map_size(obj_t *root) {
-    if (root == NULL) {
-        errno = EINVAL;
-        return -1;
-    }
-    int bsize = 0;
-    obj_t *current = root;
-    while (current != NULL) {
-        bsize += strlen(current->key) + 2;
-        switch (current->value.vt) {
-            case STR: bsize += current->value.value.str.len; break;
-            case SHR: bsize += SHR_STR_LEN; break;
-            case INT: bsize += INT_STR_LEN; break;
-            case FLT: bsize += FLT_STR_LEN; break;
-            case DBL: bsize += DBL_STR_LEN; break;
-            case LONG: bsize += LONG_STR_LEN; break;
-            case LL: bsize += LL_STR_LEN; break;
-            case LDBL: bsize += LDBL_STR_LEN; break;
-            case LIST: bsize += list_size(current->value.value.arr); break;
-            case OBJ: bsize += map_size(current->value.value.obj); break;
-            default: errno = EINVAL; return -2;
-        }
-        current = current->next;
-    }
-    return bsize;
 }
 
 //Frees a json value
