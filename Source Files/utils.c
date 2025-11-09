@@ -51,14 +51,23 @@ unsigned int list_len(array_t *list) {
 }
 
 //Frees a json value
-int free_json_value(json_value_t val) {
-    if (val.vt == OBJ && val.value.obj != NULL) {
-        free_map(val.value.obj);
-    } else if (val.vt == LIST && val.value.arr != NULL) {
-        free_list(val.value.arr);
-    } else if (val.vt == STR && val.value.str.str != NULL) {
-        free(val.value.str.str);
+int free_json_value(json_value_t *val) {
+    if (val == NULL) {
+        errno = EINVAL;
+        return 1;
     }
+    if (val->vt == OBJ) {
+        if (val->value.obj != NULL) free_map(val->value.obj);
+        val->value.obj = NULL;
+    } else if (val->vt == LIST) {
+        if (val->value.arr != NULL) free_list(val->value.arr);
+        val->value.arr = NULL;
+    } else if (val->vt == STR) {
+        if (val->value.str.str != NULL) free(val->value.str.str);
+        val->value.str.str = NULL;
+        val->value.str.len = 0;
+    }
+    val->vt = 0;
     return 0;
 }
 
@@ -71,7 +80,7 @@ int free_pair(obj_t *pair) {
     if (pair->key != NULL) {
         free(pair->key);
     }
-    if (free_json_value(pair->value) == 1) {
+    if (free_json_value(&pair->value) == 1) {
         free(pair);
         errno = EINVAL;
         return 1;
@@ -86,7 +95,7 @@ int free_element(array_t *element) {
         errno = EINVAL;
         return 1;
     }
-    if (free_json_value(element->value) == 1) {
+    if (free_json_value(&element->value) == 1) {
         free(element);
         errno = EINVAL;
         return 1;
@@ -165,13 +174,14 @@ obj_t *initM() {
         errno = ENOMEM;
         return NULL;
     }
-    map->key = malloc(sizeof(char));
+    map->key = malloc(1);
     if (map->key == NULL) {
         errno = ENOMEM;
         return NULL;
     }
     map->next = NULL;
-    map->value.vt = STR;
+    map->value.value.str.str = NULL;
+    map->value.vt = 0;
     return map;
 }
 
@@ -209,6 +219,8 @@ array_t *initL() {
         return NULL;
     }
     list->next = NULL;
+    list->value.value.str.str = NULL;
+    list->value.vt = 0;
     return list;
 }
 

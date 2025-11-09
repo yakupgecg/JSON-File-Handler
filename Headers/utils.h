@@ -21,7 +21,7 @@ unsigned int map_len(obj_t *);
 unsigned int list_len(array_t *);
 
 //Frees a json value
-int free_json_value(json_value_t);
+int free_json_value(json_value_t *);
 
 // Forcefully frees a pair
 int free_pair(obj_t *);
