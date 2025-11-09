@@ -7,13 +7,8 @@
 
 enum valuetype {
     STR,   // String (can also be bool, null or any number)
-    SHR,   // Short
     INT,   // Integer
-    FLT,   // Float
     DBL,   // Double
-    LONG,  // Long
-    LL,    // Long Long
-    LDBL,  // Long double
     LIST,  // Nested list
     OBJ   // Nested map
 };
@@ -41,13 +36,8 @@ typedef struct {
             char *str;
             unsigned int len;
         } str;
-        short s;
         int i;
-        float f;
         double dbl;
-        long lg;
-        long long lgl;
-        long double ldbl;
         obj_t *obj;
         array_t *arr;
     } value;
