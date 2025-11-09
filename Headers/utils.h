@@ -87,19 +87,19 @@ obj_t *resetkey(obj_t *, char *);
 void setval(json_value_t*, void *, enum valuetype);
 
 
-obj_t *setstrH(obj_t *, char *);
+obj_t *setstrH(obj_t *, char *, char *);
 array_t *setstrL(array_t *, char *);
 
-obj_t *setintH(obj_t *, int);
+obj_t *setintH(obj_t *, char *, int);
 array_t *setintL(array_t *, int);
 
-obj_t *setdoubleH(obj_t *, double);
+obj_t *setdoubleH(obj_t *, char *, double);
 array_t *setdoubleL(array_t *, double);
 
-obj_t *setobjH(obj_t *, obj_t *);
+obj_t *setobjH(obj_t *, char *, obj_t *);
 array_t *setobjL(array_t *, obj_t *);
 
-obj_t *setarrH(obj_t *, array_t *);
+obj_t *setarrH(obj_t *, char *, array_t *);
 array_t *setarrL(array_t *, array_t *);
 
 #endif

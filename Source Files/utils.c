@@ -299,12 +299,17 @@ void setval(json_value_t *value, void *src, enum valuetype vt) {
     }
 }
 
-obj_t *setstrH(obj_t *obj, char *src) {
+obj_t *setstrH(obj_t *obj, char *key, char *src) {
     if (obj == NULL || src == NULL) {
         errno = EINVAL;
         return NULL;
     }
     
+    if (key != NULL) {
+        if (resetkey(obj, key) == NULL) {
+            return NULL;
+        }
+    }
     setval(&obj->value, src, STR);
     return obj;
 }
@@ -319,12 +324,16 @@ array_t *setstrL(array_t *arr, char *src) {
     return arr;
 }
 
-obj_t *setintH(obj_t *obj, int src) {
+obj_t *setintH(obj_t *obj, char *key, int src) {
     if (obj == NULL) {
         errno = EINVAL;
         return NULL;
     }
-    
+    if (key != NULL) {
+        if (resetkey(obj, key) == NULL) {
+            return NULL;
+        }
+    }
     setval(&obj->value, &src, INT);
     return obj;
 }
@@ -339,12 +348,16 @@ array_t *setintL(array_t *arr, int src) {
     return arr;
 }
 
-obj_t *setdoubleH(obj_t *obj, double src) {
+obj_t *setdoubleH(obj_t *obj, char *key, double src) {
     if (obj == NULL) {
         errno = EINVAL;
         return NULL;
     }
-    
+    if (key != NULL) {
+        if (resetkey(obj, key) == NULL) {
+            return NULL;
+        }
+    }
     setval(&obj->value, &src, DBL);
     return obj;
 }
@@ -359,12 +372,16 @@ array_t *setdoubleL(array_t *arr, double src) {
     return arr;
 }
 
-obj_t *setobjH(obj_t *obj, obj_t *src) {
+obj_t *setobjH(obj_t *obj, char *key, obj_t *src) {
     if (obj == NULL || src == NULL) {
         errno = EINVAL;
         return NULL;
     }
-    
+    if (key != NULL) {
+        if (resetkey(obj, key) == NULL) {
+            return NULL;
+        }
+    }
     setval(&obj->value, src, OBJ);
     return obj;
 }
@@ -379,12 +396,16 @@ array_t *setobjL(array_t *arr, obj_t *src) {
     return arr;
 }
 
-obj_t *setarrH(obj_t *obj, array_t *src) {
+obj_t *setarrH(obj_t *obj, char *key, array_t *src) {
     if (obj == NULL || src == NULL) {
         errno = EINVAL;
         return NULL;
     }
-    
+    if (key != NULL) {
+        if (resetkey(obj, key) == NULL) {
+            return NULL;
+        }
+    }
     setval(&obj->value, src, LIST);
     return obj;
 }

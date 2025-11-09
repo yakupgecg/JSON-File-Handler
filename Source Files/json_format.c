@@ -336,7 +336,7 @@ obj_t *decode_pair(char *str) {
         val_i++;
     }
     *valcur = '\0';
-    setvalH(newobj, val, RAW);
+    setstrH(newobj, NULL, val);
     free(newstr);
     return newobj;
 }
