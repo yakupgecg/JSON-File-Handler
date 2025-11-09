@@ -268,12 +268,10 @@ obj_t *resetkey(obj_t *pair, char *key) {
     }
     int str_len = strlen(key);
     free(pair->key);
-    pair->key = malloc(str_len + 1);
+    pair->key = str_dup(key);
     if (pair->key == NULL) {
-        errno = ENOMEM;
         return NULL;
     }
-    memcpy(pair->key, key, str_len);
     pair->key[str_len] = '\0';
     return pair;
 }
