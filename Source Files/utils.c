@@ -19,7 +19,7 @@ static char *str_dup(char *str) {
 // Returns a string representation of vt
 char *get_vt(enum valuetype vt) {
     switch (vt) {
-        case RAW: return "RAW";
+        case STR: return "STR";
         case SHR: return "SHR";
         case INT: return "INT";
         case FLT: return "FLT";
@@ -65,7 +65,7 @@ int list_size(array_t *root) {
     array_t *current = root;
     while (current != NULL) {
         switch (current->value.vt) {
-            case RAW: bsize += current->value.value.str.len; break;
+            case STR: bsize += current->value.value.str.len; break;
             case SHR: bsize += SHR_STR_LEN; break;
             case INT: bsize += INT_STR_LEN; break;
             case FLT: bsize += FLT_STR_LEN; break;
@@ -93,7 +93,7 @@ int map_size(obj_t *root) {
     while (current != NULL) {
         bsize += strlen(current->key) + 2;
         switch (current->value.vt) {
-            case RAW: bsize += current->value.value.str.len; break;
+            case STR: bsize += current->value.value.str.len; break;
             case SHR: bsize += SHR_STR_LEN; break;
             case INT: bsize += INT_STR_LEN; break;
             case FLT: bsize += FLT_STR_LEN; break;
@@ -116,7 +116,7 @@ int free_json_value(json_value_t val) {
         free_map(val.value.obj);
     } else if (val.vt == LIST && val.value.arr != NULL) {
         free_list(val.value.arr);
-    } else if (val.vt == RAW && val.value.str.str != NULL) {
+    } else if (val.vt == STR && val.value.str.str != NULL) {
         free(val.value.str.str);
     }
     return 0;
@@ -231,6 +231,7 @@ obj_t *initM() {
         return NULL;
     }
     map->next = NULL;
+    map->value.vt = STR;
     return map;
 }
 
@@ -334,10 +335,10 @@ void setvalH(obj_t *obj, void *src, enum valuetype vt) {
     free_json_value(obj->value);
 
     switch (vt) {
-        case RAW: {
+        case STR: {
             obj->value.value.str.str = str_dup((char*)src);
             obj->value.value.str.len = strlen((char*)src);
-            obj->value.vt = RAW;
+            obj->value.vt = STR;
             break;
         }
         case INT: obj->value.value.i = *(int*)src; obj->value.vt = INT; break;
@@ -362,10 +363,10 @@ void setvalL(array_t *arr, void *src, enum valuetype vt) {
     free_json_value(arr->value);
 
     switch (vt) {
-        case RAW: {
+        case STR: {
             arr->value.value.str.str = str_dup((char*)src);
             arr->value.value.str.len = strlen((char*)src);
-            arr->value.vt = RAW;
+            arr->value.vt = STR;
             break;
         }
         case INT: arr->value.value.i = *(int*)src; arr->value.vt = INT; break;
