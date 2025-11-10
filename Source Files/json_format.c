@@ -38,6 +38,191 @@ static char *remove_whitespace(char *str) {
     return newstr;
 }
 
+static int st_write(char **cur, char **str, size_t *pos, size_t *alc_n, const char *src) {
+    if (!cur || !str || !pos || !alc_n || !src) {
+        errno = EINVAL;
+        return 1;
+    }
+    size_t len = strlen(src);
+    while (*pos + len+1 > *alc_n) {
+        *alc_n *= 2;
+        if (*alc_n > 1073741824) {
+            fprintf(stderr, "Memory limit (1073741824 bytes) reached\n");
+            errno = ENOMEM;
+            return 1;
+        }
+        char *temp = realloc(*str, *alc_n);
+        if (!temp) {
+            free(*str);
+            *str = NULL;
+            errno = ENOMEM;
+            return 1;
+        }
+        *str = temp;
+        *cur = *str + *pos;
+    }
+    memcpy(*cur, src, len);
+    *cur += len;
+    *pos += len;
+    return 0;
+}
+
+static int stobj_encoder(obj_t *curobj, char **str, char **cur, size_t *pos, size_t *alc_n) {
+    if (!curobj) {
+        errno = EINVAL;
+        return 1;
+    }
+    if (st_write(cur, str, pos, alc_n, "{")) return 1;
+    while (curobj) {
+        if (
+            st_write(cur, str, pos, alc_n, "\"") ||
+            st_write(cur, str, pos, alc_n, curobj->key) ||
+            st_write(cur, str, pos, alc_n, "\"") ||
+            st_write(cur, str, pos, alc_n, ":")
+        ) return 1;
+        switch (curobj->value.vt) {
+            case STR: {   
+                if (st_write(cur, str, pos, alc_n, curobj->value.value.str.str)) return 1;
+                break;
+            } case INT: {
+                char *temp = str_Int(curobj->value.value.i);
+                if(!temp) {
+                    return 1;
+                }
+                if (st_write(cur, str, pos, alc_n, temp)) return 1;
+                free(temp);
+                break;
+            } case DBL: {
+                char *temp = str_Double(curobj->value.value.dbl);
+                if(!temp) {
+                    return 1;
+                }
+                if (st_write(cur, str, pos, alc_n, temp)) return 1;
+                free(temp);
+                break;
+            }
+            case OBJ:{
+                int r = stobj_encoder(curobj->value.value.obj, str, cur, pos, alc_n);
+                if (r) {
+                    return 1;
+                }
+                break;
+            }
+            case LIST: {
+                int r = starr_encoder(curobj->value.value.arr, str, cur, pos, alc_n);
+                if (r) {
+                    return 1;
+                }
+                break;
+            }
+            default: break;
+        }
+        curobj = curobj->next;
+        if (curobj) {
+            if (st_write(cur, str, pos, alc_n, ",")) return 1;
+        }
+    }
+    if (st_write(cur, str, pos, alc_n, "}")) return 1;
+    return 0;
+}
+
+static int starr_encoder(array_t *curarr, char **str, char **cur, size_t *pos, size_t *alc_n) {
+    if (!curarr) {
+        errno = EINVAL;
+        return 1;
+    }
+    if (st_write(cur, str, pos, alc_n, "[")) return 1;
+    while (curarr) {
+        switch (curarr->value.vt) {
+            case STR: {
+                if (st_write(cur, str, pos, alc_n, curarr->value.value.str.str)) return 1;
+                break;
+            } case INT: {
+                char *temp = str_Int(curarr->value.value.i);
+                if(!temp) {
+                    return 1;
+                }
+                if (st_write(cur, str, pos, alc_n, temp)) return 1;
+                free(temp);
+                break;
+            } case DBL: {
+                char *temp = str_Double(curarr->value.value.dbl);
+                if(!temp) {
+                    return 1;
+                }
+                if (st_write(cur, str, pos, alc_n, temp)) return 1;
+                free(temp);
+                break;
+            }
+            case OBJ: {
+                int r = stobj_encoder(curarr->value.value.obj, str, cur, pos, alc_n);
+                if (r) {
+                    return 1;
+                }
+                break;
+            }
+            case LIST: {
+                int r = starr_encoder(curarr->value.value.arr, str, cur, pos, alc_n);
+                if (r) {
+                    return 1;
+                }
+                break;
+            }
+            default: break;
+        }
+        curarr = curarr->next;
+        if (curarr) {
+            if (st_write(cur, str, pos, alc_n, ",")) return 1;
+        }
+    }
+    if (st_write(cur, str, pos, alc_n, "]")) return 1;
+    return 0;
+}
+
+char *encode_obj(obj_t *obj) {
+    if (!obj) {
+        errno = EINVAL;
+        return NULL;
+    }
+    size_t alc_n = 256;
+    size_t pos = 0;
+    char *str = malloc(alc_n);
+    if (!str) {
+        errno = ENOMEM;
+        return NULL;
+    }
+    char *cur = str;
+    obj_t *curobj = obj;
+    int r = stobj_encoder(curobj, &str, &cur, &pos, &alc_n);
+    if (r) {
+        return NULL;
+    }
+    if (st_write(&cur, &str, &pos, &alc_n, "\0")) return NULL;
+    return str;
+}
+
+char *encode_arr(array_t *arr) {
+    if (!arr) {
+        errno = EINVAL;
+        return NULL;
+    }
+    size_t alc_n = 256;
+    size_t pos = 0;
+    char *str = malloc(alc_n);
+    if (!str) {
+        errno = ENOMEM;
+        return NULL;
+    }
+    char *cur = str;
+    array_t *curarr = arr;
+    int r = starr_encoder(curarr, &str, &cur, &pos, &alc_n);
+    if (r) {
+        return NULL;
+    }
+    if (st_write(&cur, &str, &pos, &alc_n, "\0")) return NULL;
+    return str;
+}
+
 // Indents and formats a json string
 char *indent_json(char *ajson, size_t indent_len) {
     if (ajson == NULL) {
