@@ -83,7 +83,7 @@ int r_afterL(array_t *);
 // Resets pairs key to the given string
 obj_t *resetkey(obj_t *, char *);
 
-// Sets the value of the object to void * (be cautious with void *)
+// Sets the value of the json_value_t to void * depending on the valuetype (be cautious with void * and valuetype)
 void setval(json_value_t*, void *, enum valuetype);
 
 
