@@ -158,7 +158,7 @@ array_t *getelementbyindex(array_t *root, unsigned int index) {
         errno = EINVAL;
         return NULL;
     }
-    if (index > list_len(root)) index = list_len(root);
+    if (list_len(root) < index) return last_element(root);
     array_t *current = root;
     int i;
     for (i = 0; i < index; i++) {
