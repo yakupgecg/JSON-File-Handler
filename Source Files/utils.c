@@ -29,8 +29,8 @@ char *get_vt(enum valuetype vt) {
 }
 
 // Returns the length of the map, but if the pair is not the root of the map, it will start from pair
-unsigned int map_len(obj_t *map) {
-    unsigned int len = 0;
+size_t map_len(obj_t *map) {
+    size_t len = 0;
     obj_t *current = map;
     while (current != NULL) {
         len += 1;
@@ -40,8 +40,8 @@ unsigned int map_len(obj_t *map) {
 }
 
 // Returns the length of the list
-unsigned int list_len(array_t *list) {
-    unsigned int len = 0;
+size_t list_len(array_t *list) {
+    size_t len = 0;
     array_t *current = list;
     while (current != NULL) {
         len += 1;
@@ -153,7 +153,7 @@ obj_t *getpairbykey(obj_t *root, char *key) {
 }
 
 // Returns the element by index. For example if index is 1 it returns root->next
-array_t *getelementbyindex(array_t *root, unsigned int index) {
+array_t *getelementbyindex(array_t *root, size_t index) {
     if (root == NULL) {
         errno = EINVAL;
         return NULL;

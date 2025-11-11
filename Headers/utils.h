@@ -15,10 +15,10 @@
 char *get_vt(enum valuetype);
 
 // Returns the length of the hashmap, but if the pair is not the root of the hashmap, it will start from pair
-unsigned int map_len(obj_t *);
+size_t map_len(obj_t *);
 
 // Returns the length of the list
-unsigned int list_len(array_t *);
+size_t list_len(array_t *);
 
 //Frees a json value
 int free_json_value(json_value_t *);
@@ -39,7 +39,7 @@ int free_list(array_t *);
 obj_t *pairbykey(obj_t *, char *);
 
 // Returns the element by index in the given list
-array_t *getelementbyindex(array_t *, unsigned int);
+array_t *getelementbyindex(array_t *, size_t);
 
 // Returns the pair before the given pair that has the given key, if found
 obj_t *pr_pairbykey(obj_t *, char *);
