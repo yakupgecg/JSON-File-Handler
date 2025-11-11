@@ -313,30 +313,30 @@ char *indent_json(char *ajson, size_t indent_len) {
             }
         }
 	    *newcur = *cur;
+        newcur++;
         if (*cur == ':' && !is_string) {
+            *newcur = ' ';
             newcur++;
-	        *newcur = ' ';
 	        len_i++;
 	    } else if (*cur == ',' && !is_string) {
-            newcur++;
             *newcur = '\n';
+            newcur++;
             len_i++;
             for (k = 0; k < indentation * indent_len; k++) {
-                newcur++;
                 *newcur = ' ';
+                newcur++;
                 len_i++;
             }
         } else if ((*cur == '{' || *cur == '[') && !is_string) {
-            newcur++;
             *newcur = '\n';
+            newcur++;
             len_i++;
             for (k = 0; k < indentation * indent_len; k++) {
-                newcur++;
                 *newcur = ' ';
+                newcur++;
                 len_i++;
             }
         }
-	    newcur++;
 	    cur++;
 	    len_i++;
     }
