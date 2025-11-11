@@ -197,7 +197,22 @@ char *encode_obj(obj_t *obj) {
     if (r) {
         return NULL;
     }
-    if (st_write(&cur, &str, &pos, &alc_n, "\0")) return NULL;
+    while (pos >= alc_n) {
+        alc_n *= 2;
+        if (alc_n > 1073741824) {
+            fprintf(stderr, "Memory limit (1073741824 bytes) reached\n");
+            errno = ENOMEM;
+            return NULL;
+        }
+        char *temp = realloc(str, alc_n);
+        if (!temp) {
+            errno = ENOMEM;
+            return NULL;
+        }
+        str = temp;
+        cur += *str + pos;
+    }
+    *cur = '\0';
     return str;
 }
 
@@ -219,7 +234,22 @@ char *encode_arr(array_t *arr) {
     if (r) {
         return NULL;
     }
-    if (st_write(&cur, &str, &pos, &alc_n, "\0")) return NULL;
+    while (pos >= alc_n) {
+        alc_n *= 2;
+        if (alc_n > 1073741824) {
+            fprintf(stderr, "Memory limit (1073741824 bytes) reached\n");
+            errno = ENOMEM;
+            return NULL;
+        }
+        char *temp = realloc(str, alc_n);
+        if (!temp) {
+            errno = ENOMEM;
+            return NULL;
+        }
+        str = temp;
+        cur += *str + pos;
+    }
+    *cur = '\0';
     return str;
 }
 
