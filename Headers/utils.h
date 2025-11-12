@@ -62,24 +62,6 @@ obj_t *appendH(obj_t *);
 // Adds an element to the end of the given list and returns it
 array_t *appendL(array_t *);
 
-// Adds another pair after the given pair and returns it
-obj_t *insertH(obj_t *);
-
-// Adds another element after the given element and returns it
-array_t *insertL(array_t *);
-
-// Removes the last pair in a hashmap
-int r_lastH(obj_t *);
-
-// Removes the last element in a list
-int r_lastL(array_t *);
-
-// Removes the given map and then reassigns the next pointed the pair before the given map to pair after the given map
-int r_afterH(obj_t *, obj_t *);
-
-// Removes the element after the given element
-int r_afterL(array_t *);
-
 // Resets pairs key to the given string
 obj_t *resetkey(obj_t *, char *);
 
