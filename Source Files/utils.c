@@ -271,8 +271,9 @@ obj_t *insertH(obj_t *obj) {
         errno = ENOMEM;
 		return NULL;
 	}
-	if (obj->next != NULL) newobj->next = obj->next;
+	newobj->next = obj->next;
 	obj->next = newobj;
+	newobj->next = NULL;
 	return newobj;
 }
 
@@ -287,8 +288,9 @@ array_t *insertL(array_t *element) {
         errno = ENOMEM;
 		return NULL;
 	}
-	if (element->next != NULL) newelement->next = element->next;
+	newelement->next = element->next;
 	element->next = newelement;
+	newelement->next = NULL;
 	return newelement;
 }
 
