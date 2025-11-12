@@ -71,19 +71,23 @@ obj_t *resetkey(obj_t *, char *);
 // Sets the value of the json_value_t to void * depending on the valuetype (be cautious with void * and valuetype)
 void setval(json_value_t*, void *, enum valuetype);
 
-
+// Sets the object's or element's value to a string
 obj_t *setstrH(obj_t *, char *, char *);
 array_t *setstrL(array_t *, char *);
 
+// Sets the object's or element's value to an integer
 obj_t *setintH(obj_t *, char *, int);
 array_t *setintL(array_t *, int);
 
+// Sets the object's or element's to a double
 obj_t *setdoubleH(obj_t *, char *, double);
 array_t *setdoubleL(array_t *, double);
 
+// Sets the object's or element's to an object
 obj_t *setobjH(obj_t *, char *, obj_t *);
 array_t *setobjL(array_t *, obj_t *);
 
+// Sets the object's or element's to an array
 obj_t *setarrH(obj_t *, char *, array_t *);
 array_t *setarrL(array_t *, array_t *);
 

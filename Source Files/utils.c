@@ -333,6 +333,7 @@ void setval(json_value_t *value, void *src, enum valuetype vt) {
     }
 }
 
+// Sets the object's or element's value to a string
 obj_t *setstrH(obj_t *obj, char *key, char *src) {
     if (obj == NULL || src == NULL) {
         errno = EINVAL;
@@ -358,6 +359,7 @@ array_t *setstrL(array_t *arr, char *src) {
     return arr;
 }
 
+// Sets the object's or element's value to an integer
 obj_t *setintH(obj_t *obj, char *key, int src) {
     if (obj == NULL) {
         errno = EINVAL;
@@ -382,6 +384,7 @@ array_t *setintL(array_t *arr, int src) {
     return arr;
 }
 
+// Sets the object's or element's to a double
 obj_t *setdoubleH(obj_t *obj, char *key, double src) {
     if (obj == NULL) {
         errno = EINVAL;
@@ -406,6 +409,7 @@ array_t *setdoubleL(array_t *arr, double src) {
     return arr;
 }
 
+// Sets the object's or element's to an object
 obj_t *setobjH(obj_t *obj, char *key, obj_t *src) {
     if (obj == NULL || src == NULL) {
         errno = EINVAL;
@@ -430,6 +434,7 @@ array_t *setobjL(array_t *arr, obj_t *src) {
     return arr;
 }
 
+// Sets the object's or element's to an array
 obj_t *setarrH(obj_t *obj, char *key, array_t *src) {
     if (obj == NULL || src == NULL) {
         errno = EINVAL;
