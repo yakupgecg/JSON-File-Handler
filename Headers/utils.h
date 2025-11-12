@@ -62,6 +62,12 @@ obj_t *appendH(obj_t *);
 // Adds an element to the end of the given list and returns it
 array_t *appendL(array_t *);
 
+//Adds an object after the given obj
+obj_t *insertH(obj_t *);
+
+//Adds an element after the given element
+array_t *insertL(array_t *);
+
 // Resets pairs key to the given string
 obj_t *resetkey(obj_t *, char *);
 

@@ -260,6 +260,38 @@ array_t *appendL(array_t *list) {
     return current->next;
 }
 
+// Adds an object after the given obj
+obj_t *insertH(obj_t *obj) {
+	if (!obj) {
+		errno = EINVAL;
+		return NULL;
+	}
+	obj_t *newobj = initM();
+    if (!newobj) {
+        errno = ENOMEM;
+		return NULL;
+	}
+	if (obj->next != NULL) newobj->next = obj->next;
+	obj->next = newobj;
+	return newobj;
+}
+
+//Adds an element after the given element
+array_t *insertL(array_t *element) {
+	if (!element) {
+		errno = EINVAL;
+		return NULL;
+	}
+	array_t *newelement = initL();
+	if (!newelement) {
+        errno = ENOMEM;
+		return NULL;
+	}
+	if (element->next != NULL) newelement->next = element->next;
+	element->next = newelement;
+	return newelement;
+}
+
 // Resets pairs key to the given string
 obj_t *resetkey(obj_t *pair, char *key) {
     if (pair == NULL || key == NULL) {
