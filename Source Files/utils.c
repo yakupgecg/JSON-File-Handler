@@ -180,6 +180,7 @@ obj_t *initM() {
         return NULL;
     }
     map->next = NULL;
+    map->prev = NULL;
     map->value.value.str.str = NULL;
     map->value.vt = 0;
     return map;
@@ -219,6 +220,7 @@ array_t *initL() {
         return NULL;
     }
     list->next = NULL;
+    list->prev = NULL;
     list->value.value.str.str = NULL;
     list->value.vt = 0;
     return list;
@@ -235,6 +237,7 @@ obj_t *appendH(obj_t *map) {
         current = current->next;
     }
     current->next = initM();
+    current->next->prev = current;
     if (current->next == NULL) {
         errno = ENOMEM;
         return NULL;
@@ -253,6 +256,7 @@ array_t *appendL(array_t *list) {
         current = current->next;
     }
     current->next = initL();
+    current->next->prev = current;
     if (current->next == NULL) {
         errno = ENOMEM;
         return NULL;
@@ -262,36 +266,42 @@ array_t *appendL(array_t *list) {
 
 // Adds an object after the given obj
 obj_t *insertH(obj_t *obj) {
-	if (!obj) {
-		errno = EINVAL;
-		return NULL;
-	}
-	obj_t *newobj = initM();
+    if (!obj) {
+        errno = EINVAL;
+        return NULL;
+    }
+    obj_t *newobj = initM();
     if (!newobj) {
         errno = ENOMEM;
-		return NULL;
-	}
-	newobj->next = obj->next;
-	obj->next = newobj;
-	newobj->next = NULL;
-	return newobj;
+        return NULL;
+    }
+    newobj->next = obj->next;
+    newobj->prev = obj;
+    if (obj->next != NULL) {
+        obj->next->prev = newobj;
+    }
+    obj->next = newobj;
+    return newobj;
 }
 
 //Adds an element after the given element
 array_t *insertL(array_t *element) {
-	if (!element) {
-		errno = EINVAL;
-		return NULL;
-	}
-	array_t *newelement = initL();
-	if (!newelement) {
+    if (!element) {
+        errno = EINVAL;
+        return NULL;
+    }
+    array_t *newelement = initL();
+    if (!newelement) {
         errno = ENOMEM;
-		return NULL;
-	}
-	newelement->next = element->next;
-	element->next = newelement;
-	newelement->next = NULL;
-	return newelement;
+        return NULL;
+    }
+    newelement->next = element->next;
+    newelement->prev = element;
+    if (element->next != NULL) {
+        element->next->prev = newelement;
+    }
+    element->next = newelement;
+    return newelement;
 }
 
 // Resets pairs key to the given string
