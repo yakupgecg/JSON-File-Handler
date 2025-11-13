@@ -47,11 +47,13 @@ typedef struct Hmap {
     char *key;
     json_value_t value;
     struct Hmap *next;
+    struct Hmap *prev;
 } obj_t; // Object
 
 typedef struct Linkedlist {
     json_value_t value;
     struct Linkedlist *next;
+    struct Linkedlist *prev;
 } array_t; // Array
 
 #endif // HASHMAP_STRUCT_H
