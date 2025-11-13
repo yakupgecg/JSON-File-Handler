@@ -304,6 +304,29 @@ array_t *insertL(array_t *element) {
     return newelement;
 }
 
+// Removes the last object and returns it
+obj_t *popH(obj_t *obj) {
+    if (!obj) {
+        errno = EINVAL;
+        return NULL;
+    }
+    obj_t *last = last_pair(obj);
+    last->prev->next = NULL;
+    return last;
+}
+
+// Removes the last element and returns it
+array_t *popL(array_t *element) {
+    if (!element) {
+        errno = EINVAL;
+        return NULL;
+    }
+    array_t *last = last_element(element);
+    last->prev->next = NULL;
+    return last;
+}
+
+
 // Resets pairs key to the given string
 obj_t *resetkey(obj_t *pair, char *key) {
     if (pair == NULL || key == NULL) {

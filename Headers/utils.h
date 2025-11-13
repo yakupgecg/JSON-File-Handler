@@ -65,6 +65,12 @@ obj_t *insertH(obj_t *);
 //Adds an element after the given element
 array_t *insertL(array_t *);
 
+// Removes the last object and returns it
+obj_t *popH(obj_t *);
+
+// Removes the last element and returns it
+array_t *popL(array_t *);
+
 // Resets pairs key to the given string
 obj_t *resetkey(obj_t *, char *);
 
