@@ -497,6 +497,16 @@ obj_t *copy_obj(obj_t *obj, obj_t *cobj) {
         errno = EINVAL;
         return NULL;
     }
+    if (cobj != NULL) {
+        switch (obj->value.vt) {
+            case STR: setstrH(cobj, obj->key, obj->value.value.str.str); break;
+            case INT: setintH(cobj, obj->key, obj->value.value.i); break;
+            case DBL: setdoubleH(cobj, obj->key, obj->value.value.dbl); break;
+            case OBJ: setobjH(cobj, obj->key, obj->value.value.obj); break;
+            case LIST: setarrH(cobj, obj->key, obj->value.value.arr); break;
+        }
+        return cobj;
+    }
     obj_t *newobj = initM();
     if (!newobj) {
         errno = ENOMEM;
@@ -509,16 +519,6 @@ obj_t *copy_obj(obj_t *obj, obj_t *cobj) {
         case OBJ: setobjH(newobj, obj->key, obj->value.value.obj); break;
         case LIST: setarrH(newobj, obj->key, obj->value.value.arr); break;
     }
-    if (cobj != NULL) {
-        switch (obj->value.vt) {
-            case STR: setstrH(cobj, obj->key, obj->value.value.str.str); break;
-            case INT: setintH(cobj, obj->key, obj->value.value.i); break;
-            case DBL: setdoubleH(cobj, obj->key, obj->value.value.dbl); break;
-            case OBJ: setobjH(cobj, obj->key, obj->value.value.obj); break;
-            case LIST: setarrH(cobj, obj->key, obj->value.value.arr); break;
-        }
-        return cobj;
-    }
     return newobj;
 }
 
@@ -527,6 +527,16 @@ array_t *copy_element(array_t *element, array_t *celement) {
     if (!element) {
         errno = EINVAL;
         return NULL;
+    }
+    if (celement != NULL) {
+        switch (element->value.vt) {
+            case STR: setstrL(celement, element->value.value.str.str); break;
+            case INT: setintL(celement, element->value.value.i); break;
+            case DBL: setdoubleL(celement, element->value.value.dbl); break;
+            case OBJ: setobjL(celement, element->value.value.obj); break;
+            case LIST: setarrL(celement, element->value.value.arr); break;
+        }
+        return celement;
     }
     array_t *newelement = initL();
     if (!newelement) {
@@ -539,16 +549,6 @@ array_t *copy_element(array_t *element, array_t *celement) {
         case DBL: setdoubleL(newelement, element->value.value.dbl); break;
         case OBJ: setobjL(newelement, element->value.value.obj); break;
         case LIST: setarrL(newelement, element->value.value.arr); break;
-    }
-    if (celement != NULL) {
-        switch (element->value.vt) {
-            case STR: setstrL(celement, element->value.value.str.str); break;
-            case INT: setintL(celement, element->value.value.i); break;
-            case DBL: setdoubleL(celement, element->value.value.dbl); break;
-            case OBJ: setobjL(celement, element->value.value.obj); break;
-            case LIST: setarrL(celement, element->value.value.arr); break;
-        }
-        return celement;
     }
     return newelement;
 }
