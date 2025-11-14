@@ -326,7 +326,6 @@ array_t *popL(array_t *element) {
     return last;
 }
 
-
 // Resets pairs key to the given string
 obj_t *resetkey(obj_t *pair, char *key) {
     if (pair == NULL || key == NULL) {
@@ -490,4 +489,66 @@ array_t *setarrL(array_t *arr, array_t *src) {
     
     setval(&arr->value, src, LIST);
     return arr;
+}
+
+// Copies the given object, either returns the copy or copies to another object.
+obj_t *copy_obj(obj_t *obj, obj_t *cobj) {
+    if (!obj) {
+        errno = EINVAL;
+        return NULL;
+    }
+    obj_t *newobj = initM();
+    if (!newobj) {
+        errno = ENOMEM;
+        return NULL;
+    }
+    switch (obj->value.vt) {
+        case STR: setstrH(newobj, obj->key, obj->value.value.str.str); break;
+        case INT: setintH(newobj, obj->key, obj->value.value.i); break;
+        case DBL: setdoubleH(newobj, obj->key, obj->value.value.dbl); break;
+        case OBJ: setobjH(newobj, obj->key, obj->value.value.obj); break;
+        case LIST: setarrH(newobj, obj->key, obj->value.value.arr); break;
+    }
+    if (cobj != NULL) {
+        switch (obj->value.vt) {
+            case STR: setstrH(cobj, obj->key, obj->value.value.str.str); break;
+            case INT: setintH(cobj, obj->key, obj->value.value.i); break;
+            case DBL: setdoubleH(cobj, obj->key, obj->value.value.dbl); break;
+            case OBJ: setobjH(cobj, obj->key, obj->value.value.obj); break;
+            case LIST: setarrH(cobj, obj->key, obj->value.value.arr); break;
+        }
+        return cobj;
+    }
+    return newobj;
+}
+
+// Copies the given element, either returns the copy or copies to another element.
+array_t *copy_element(array_t *element, array_t *celement) {
+    if (!element) {
+        errno = EINVAL;
+        return NULL;
+    }
+    array_t *newelement = initL();
+    if (!newelement) {
+        errno = ENOMEM;
+        return NULL;
+    }
+    switch (element->value.vt) {
+        case STR: setstrL(newelement, element->value.value.str.str); break;
+        case INT: setintL(newelement, element->value.value.i); break;
+        case DBL: setdoubleL(newelement, element->value.value.dbl); break;
+        case OBJ: setobjL(newelement, element->value.value.obj); break;
+        case LIST: setarrL(newelement, element->value.value.arr); break;
+    }
+    if (celement != NULL) {
+        switch (element->value.vt) {
+            case STR: setstrL(celement, element->value.value.str.str); break;
+            case INT: setintL(celement, element->value.value.i); break;
+            case DBL: setdoubleL(celement, element->value.value.dbl); break;
+            case OBJ: setobjL(celement, element->value.value.obj); break;
+            case LIST: setarrL(celement, element->value.value.arr); break;
+        }
+        return celement;
+    }
+    return newelement;
 }

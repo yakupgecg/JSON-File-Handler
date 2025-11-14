@@ -97,4 +97,10 @@ array_t *setobjL(array_t *, obj_t *);
 obj_t *setarrH(obj_t *, char *, array_t *);
 array_t *setarrL(array_t *, array_t *);
 
+// Copies the given object, either returns the copy or copies to another object.
+obj_t *copy_obj(obj_t *, obj_t *);
+
+// Copies the given element, either returns the copy or copies to another element.
+array_t *copy_element(array_t *, array_t *);
+
 #endif
