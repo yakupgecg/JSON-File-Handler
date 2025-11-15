@@ -103,4 +103,10 @@ obj_t *copy_obj(obj_t *, obj_t *);
 // Copies the given element, either returns the copy or copies to another element.
 array_t *copy_element(array_t *, array_t *);
 
+// Copies the given map, either returns the copy or copies the whole map to another map.
+obj_t *copy_map(obj_t *);
+
+// Copies the given list, either returns the copy or copies the whole list to another list.
+array_t *copy_list(array_t *);
+
 #endif
