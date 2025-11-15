@@ -502,8 +502,8 @@ obj_t *copy_obj(obj_t *obj, obj_t *cobj) {
             case STR: setstrH(cobj, obj->key, obj->value.value.str.str); break;
             case INT: setintH(cobj, obj->key, obj->value.value.i); break;
             case DBL: setdoubleH(cobj, obj->key, obj->value.value.dbl); break;
-            case OBJ: setobjH(cobj, obj->key, obj->value.value.obj); break;
-            case LIST: setarrH(cobj, obj->key, obj->value.value.arr); break;
+            case OBJ: setobjH(cobj, obj->key, copy_map(obj->value.value.obj, NULL)); break;
+            case LIST: setarrH(cobj, obj->key, copy_list(obj->value.value.arr, NULL)); break;
             default: errno = EINVAL; return NULL;
         }
         return cobj;
@@ -517,8 +517,8 @@ obj_t *copy_obj(obj_t *obj, obj_t *cobj) {
         case STR: setstrH(newobj, obj->key, obj->value.value.str.str); break;
         case INT: setintH(newobj, obj->key, obj->value.value.i); break;
         case DBL: setdoubleH(newobj, obj->key, obj->value.value.dbl); break;
-        case OBJ: setobjH(newobj, obj->key, obj->value.value.obj); break;
-        case LIST: setarrH(newobj, obj->key, obj->value.value.arr); break;
+        case OBJ: setobjH(newobj, obj->key, copy_map(obj->value.value.obj, NULL)); break;
+        case LIST: setarrH(newobj, obj->key, copy_list(obj->value.value.arr, NULL)); break;
         default: errno = EINVAL; return NULL;
     }
     return newobj;
@@ -535,8 +535,8 @@ array_t *copy_element(array_t *element, array_t *celement) {
             case STR: setstrL(celement, element->value.value.str.str); break;
             case INT: setintL(celement, element->value.value.i); break;
             case DBL: setdoubleL(celement, element->value.value.dbl); break;
-            case OBJ: setobjL(celement, element->value.value.obj); break;
-            case LIST: setarrL(celement, element->value.value.arr); break;
+            case OBJ: setobjL(celement, copy_map(element->value.value.obj, NULL)); break;
+            case LIST: setarrL(celement, copy_list(element->value.value.arr, NULL)); break;
             default: errno = EINVAL; return NULL;
         }
         return celement;
@@ -550,30 +550,55 @@ array_t *copy_element(array_t *element, array_t *celement) {
         case STR: setstrL(newelement, element->value.value.str.str); break;
         case INT: setintL(newelement, element->value.value.i); break;
         case DBL: setdoubleL(newelement, element->value.value.dbl); break;
-        case OBJ: setobjL(celement, element->value.value.obj); break;
-        case LIST: setarrL(celement, element->value.value.arr); break;
+        case OBJ: setobjL(newelement, copy_map(element->value.value.obj, NULL)); break;
+        case LIST: setarrL(newelement, copy_list(element->value.value.arr, NULL)); break;
         default: errno = EINVAL; return NULL;
     }
     return newelement;
 }
 
 // Copies the given map, either returns the copy or copies the whole map to another map.
-obj_t *copy_map(obj_t *map) {
+obj_t *copy_map(obj_t *map, obj_t *cmap) {
     if (!map) {
         errno = EINVAL;
         return NULL;
     }
+    obj_t *cur = map;
+    if (cmap) {
+        obj_t *ccur = cmap;
+        free_pair(ccur);
+        ccur = initM();
+        while (cur) {
+            switch (cur->value.vt) {
+                case STR: setstrH(ccur, cur->key, cur->value.value.str.str); break;
+                case INT: setintH(ccur, cur->key, cur->value.value.i); break;
+                case DBL: setdoubleH(ccur, cur->key, cur->value.value.dbl); break;
+                case OBJ: setobjH(ccur, cur->key, copy_map(cur->value.value.obj, NULL)); break;
+                case LIST: setarrH(ccur, cur->key, copy_list(cur->value.value.arr, NULL)); break;
+            }
+            if (cur->next) {
+                free_pair(ccur->next);
+                ccur->next = initM();
+                if (!ccur->next) {
+                    return NULL;
+                }
+                ccur->next->prev = ccur;
+                ccur = ccur->next;
+            }
+            cur = cur->next;
+        }
+        return cmap;
+    }
     obj_t *newmap = initM();
     if (!newmap) return NULL;
     obj_t *newcur = newmap;
-    obj_t *cur = map;
     while (cur) {
         switch (cur->value.vt) {
             case STR: setstrH(newcur, cur->key, cur->value.value.str.str); break;
             case INT: setintH(newcur, cur->key, cur->value.value.i); break;
             case DBL: setdoubleH(newcur, cur->key, cur->value.value.dbl); break;
-            case OBJ: setobjH(newcur, cur->key, copy_map(cur->value.value.obj)); break;
-            case LIST: setarrH(newcur, cur->key, copy_list(cur->value.value.arr)); break;
+            case OBJ: setobjH(newcur, cur->key, copy_map(cur->value.value.obj, NULL)); break;
+            case LIST: setarrH(newcur, cur->key, copy_list(cur->value.value.arr, NULL)); break;
         }
         if (cur->next) {
             newcur->next = initM();
@@ -589,22 +614,47 @@ obj_t *copy_map(obj_t *map) {
 }
 
 // Copies the given list, either returns the copy or copies the whole list to another list.
-array_t *copy_list(array_t *list) {
+array_t *copy_list(array_t *list, array_t *clist) {
     if (!list) {
         errno = EINVAL;
         return NULL;
     }
+    array_t *cur = list;
+    if (clist) {
+        array_t *ccur = clist;
+        free_element(ccur);
+        ccur = initL();
+        while (cur) {
+            switch (cur->value.vt) {
+                case STR: setstrL(ccur, cur->value.value.str.str); break;
+                case INT: setintL(ccur, cur->value.value.i); break;
+                case DBL: setdoubleL(ccur, cur->value.value.dbl); break;
+                case OBJ: setobjL(ccur, copy_map(cur->value.value.obj, NULL)); break;
+                case LIST: setarrL(ccur, copy_list(cur->value.value.arr, NULL)); break;
+            }
+            if (cur->next) {
+                free_element(ccur->next);
+                ccur->next = initL();
+                if (!ccur->next) {
+                    return NULL;
+                }
+                ccur->next->prev = ccur;
+                ccur = ccur->next;
+            }
+            cur = cur->next;
+        }
+        return clist;
+    }
     array_t *newlist = initL();
     if (!newlist) return NULL;
     array_t *newcur = newlist;
-    array_t *cur = list;
     while (cur) {
         switch (cur->value.vt) {
             case STR: setstrL(newcur, cur->value.value.str.str); break;
             case INT: setintL(newcur, cur->value.value.i); break;
             case DBL: setdoubleL(newcur, cur->value.value.dbl); break;
-            case OBJ: setobjL(newcur, copy_map(cur->value.value.obj)); break;
-            case LIST: setarrL(newcur, copy_list(cur->value.value.arr)); break;
+            case OBJ: setobjL(newcur, copy_map(cur->value.value.obj, NULL)); break;
+            case LIST: setarrL(newcur, copy_list(cur->value.value.arr, NULL)); break;
         }
         if (cur->next) {
             newcur->next = initL();
