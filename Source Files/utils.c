@@ -668,3 +668,45 @@ jfh_array_t *JFH_copy_list(jfh_array_t *list, jfh_array_t *clist) {
     }
     return newlist;
 }
+
+// Copies the given json value, either returns the copy or copies the json value to 2nd parameter json value
+jfh_json_value_t *JFH_copy_json_value(jfh_json_value_t *val, jfh_json_value_t *cval) {
+    if (!val || !cval) {
+        errno = EINVAL;
+        return NULL;
+    }
+    JFH_free_json_value(cval);
+    switch (val->vt) {
+        case JFH_STR: {
+            cval->value.str.str = str_dup(val->value.str.str);
+            if (!cval->value.str.str) {errno = ENOMEM; return NULL;}
+            cval->value.str.len = val->value.str.len;
+            cval->vt = JFH_STR;
+            break;
+        }
+        case JFH_INT: {
+            cval->value.i = val->value.i;
+            cval->vt = JFH_INT;
+            break;
+        }
+        case JFH_DBL: {
+            cval->value.dbl = val->value.dbl;
+            cval->vt = JFH_DBL;
+            break;
+        }
+        case JFH_OBJ: {
+            cval->value.obj = JFH_copy_map(val->value.obj, NULL);
+            if (!cval->value.obj) {errno = ENOMEM; return NULL;}
+            cval->vt = JFH_OBJ;
+            break;
+        }
+        case JFH_LIST: {
+            cval->value.arr = JFH_copy_list(val->value.arr, NULL);
+            if (!cval->value.arr) {errno = ENOMEM; return NULL;}
+            cval->vt = JFH_LIST;
+            break;
+        }
+        default: errno = EINVAL; return NULL;
+    }
+    return cval;
+}

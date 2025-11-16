@@ -109,4 +109,7 @@ jfh_obj_t *JFH_copy_map(jfh_obj_t *, jfh_obj_t *);
 // Copies the given list, either returns the copy or copies the whole list to another list.
 jfh_array_t *JFH_copy_list(jfh_array_t *, jfh_array_t *);
 
+// Copies the given json value, either returns the copy or copies the json value to 2nd parameter json value
+jfh_json_value_t *JFH_copy_json_value(jfh_json_value_t *, jfh_json_value_t *);
+
 #endif
