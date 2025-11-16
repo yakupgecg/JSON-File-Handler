@@ -24,12 +24,7 @@ you can type
 setrawH(obj, str_Int("8"));
 */
 
-char *str_Short(short);
-char *str_Int(int);
-char *str_Float(float);
-char *str_Double(double);
-char *str_Long(long);
-char *str_Ll(long long);
-char *str_Ld(long double);
+char *JFH_str_Int(int);
+char *JFH_str_Double(double);
 
 #endif

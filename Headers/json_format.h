@@ -16,11 +16,11 @@
     functions and includes string handling
 */
 
-static int stobj_encoder(obj_t *, char **, char **, size_t *, size_t *);
-static int starr_encoder(array_t *, char **, char **, size_t *, size_t *);
-char *encode_obj(obj_t *);
-char *encode_arr(array_t *);
-char *indent_json(char *, size_t);
-obj_t *decode_pair(char*);
+static int stobj_encoder(jfh_obj_t *, char **, char **, size_t *, size_t *);
+static int starr_encoder(jfh_array_t *, char **, char **, size_t *, size_t *);
+char *JFH_encode_obj(jfh_obj_t *);
+char *JFH_encode_arr(jfh_array_t *);
+char *JFH_indent_json(char *, size_t);
+jfh_obj_t *JFH_decode_pair(char*);
 
 #endif

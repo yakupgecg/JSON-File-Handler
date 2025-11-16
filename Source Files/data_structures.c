@@ -2,10 +2,10 @@
 
 // Remember to change the values to higher of lower if needed.
 
-unsigned int SHR_STR_LEN = 6;
-unsigned int INT_STR_LEN = 11;
-unsigned int FLT_STR_LEN = 47;
-unsigned int DBL_STR_LEN = 100;
-unsigned int LONG_STR_LEN = 20;
-unsigned int LL_STR_LEN = 20;
-unsigned int LDBL_STR_LEN = 350;
+unsigned int JFH_SHR_STR_LEN = 6;
+unsigned int JFH_INT_STR_LEN = 11;
+unsigned int JFH_FLT_STR_LEN = 47;
+unsigned int JFH_DBL_STR_LEN = 100;
+unsigned int JFH_LONG_STR_LEN = 20;
+unsigned int JFH_LL_STR_LEN = 20;
+unsigned int JFH_LDBL_STR_LEN = 350;

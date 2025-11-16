@@ -67,7 +67,7 @@ static int st_write(char **cur, char **str, size_t *pos, size_t *alc_n, const ch
     return 0;
 }
 
-static int stobj_encoder(obj_t *curobj, char **str, char **cur, size_t *pos, size_t *alc_n) {
+static int stobj_encoder(jfh_obj_t *curobj, char **str, char **cur, size_t *pos, size_t *alc_n) {
     if (!curobj) {
         errno = EINVAL;
         return 1;
@@ -81,19 +81,19 @@ static int stobj_encoder(obj_t *curobj, char **str, char **cur, size_t *pos, siz
             st_write(cur, str, pos, alc_n, ":")
         ) return 1;
         switch (curobj->value.vt) {
-            case STR: {   
+            case JFH_STR: {   
                 if (st_write(cur, str, pos, alc_n, curobj->value.value.str.str)) return 1;
                 break;
-            } case INT: {
-                char *temp = str_Int(curobj->value.value.i);
+            } case JFH_INT: {
+                char *temp = JFH_str_Int(curobj->value.value.i);
                 if(!temp) {
                     return 1;
                 }
                 if (st_write(cur, str, pos, alc_n, temp)) return 1;
                 free(temp);
                 break;
-            } case DBL: {
-                char *temp = str_Double(curobj->value.value.dbl);
+            } case JFH_DBL: {
+                char *temp = JFH_str_Double(curobj->value.value.dbl);
                 if(!temp) {
                     return 1;
                 }
@@ -101,14 +101,14 @@ static int stobj_encoder(obj_t *curobj, char **str, char **cur, size_t *pos, siz
                 free(temp);
                 break;
             }
-            case OBJ:{
+            case JFH_OBJ:{
                 int r = stobj_encoder(curobj->value.value.obj, str, cur, pos, alc_n);
                 if (r) {
                     return 1;
                 }
                 break;
             }
-            case LIST: {
+            case JFH_LIST: {
                 int r = starr_encoder(curobj->value.value.arr, str, cur, pos, alc_n);
                 if (r) {
                     return 1;
@@ -126,7 +126,7 @@ static int stobj_encoder(obj_t *curobj, char **str, char **cur, size_t *pos, siz
     return 0;
 }
 
-static int starr_encoder(array_t *curarr, char **str, char **cur, size_t *pos, size_t *alc_n) {
+static int starr_encoder(jfh_array_t *curarr, char **str, char **cur, size_t *pos, size_t *alc_n) {
     if (!curarr) {
         errno = EINVAL;
         return 1;
@@ -134,19 +134,19 @@ static int starr_encoder(array_t *curarr, char **str, char **cur, size_t *pos, s
     if (st_write(cur, str, pos, alc_n, "[")) return 1;
     while (curarr) {
         switch (curarr->value.vt) {
-            case STR: {
+            case JFH_STR: {
                 if (st_write(cur, str, pos, alc_n, curarr->value.value.str.str)) return 1;
                 break;
-            } case INT: {
-                char *temp = str_Int(curarr->value.value.i);
+            } case JFH_INT: {
+                char *temp = JFH_str_Int(curarr->value.value.i);
                 if(!temp) {
                     return 1;
                 }
                 if (st_write(cur, str, pos, alc_n, temp)) return 1;
                 free(temp);
                 break;
-            } case DBL: {
-                char *temp = str_Double(curarr->value.value.dbl);
+            } case JFH_DBL: {
+                char *temp = JFH_str_Double(curarr->value.value.dbl);
                 if(!temp) {
                     return 1;
                 }
@@ -154,14 +154,14 @@ static int starr_encoder(array_t *curarr, char **str, char **cur, size_t *pos, s
                 free(temp);
                 break;
             }
-            case OBJ: {
+            case JFH_OBJ: {
                 int r = stobj_encoder(curarr->value.value.obj, str, cur, pos, alc_n);
                 if (r) {
                     return 1;
                 }
                 break;
             }
-            case LIST: {
+            case JFH_LIST: {
                 int r = starr_encoder(curarr->value.value.arr, str, cur, pos, alc_n);
                 if (r) {
                     return 1;
@@ -179,7 +179,7 @@ static int starr_encoder(array_t *curarr, char **str, char **cur, size_t *pos, s
     return 0;
 }
 
-char *encode_obj(obj_t *obj) {
+char *JFH_encode_obj(jfh_obj_t *obj) {
     if (!obj) {
         errno = EINVAL;
         return NULL;
@@ -192,7 +192,7 @@ char *encode_obj(obj_t *obj) {
         return NULL;
     }
     char *cur = str;
-    obj_t *curobj = obj;
+    jfh_obj_t *curobj = obj;
     int r = stobj_encoder(curobj, &str, &cur, &pos, &alc_n);
     if (r) {
         return NULL;
@@ -216,7 +216,7 @@ char *encode_obj(obj_t *obj) {
     return str;
 }
 
-char *encode_arr(array_t *arr) {
+char *JFH_encode_arr(jfh_array_t *arr) {
     if (!arr) {
         errno = EINVAL;
         return NULL;
@@ -229,7 +229,7 @@ char *encode_arr(array_t *arr) {
         return NULL;
     }
     char *cur = str;
-    array_t *curarr = arr;
+    jfh_array_t *curarr = arr;
     int r = starr_encoder(curarr, &str, &cur, &pos, &alc_n);
     if (r) {
         return NULL;
@@ -254,7 +254,7 @@ char *encode_arr(array_t *arr) {
 }
 
 // Indents and formats a json string
-char *indent_json(char *ajson, size_t indent_len) {
+char *JFH_indent_json(char *ajson, size_t indent_len) {
     if (ajson == NULL) {
         errno = EINVAL;
         return NULL;
@@ -265,14 +265,14 @@ char *indent_json(char *ajson, size_t indent_len) {
     }
     char *cur = json;
     if (*cur != '{' && *cur != '[') {
-        errno = EJSON;
+        errno = JFH_EJSON;
         return NULL;
     }
 		
     bool is_string = false;
     size_t alc_n = 256;
     int indentation = 0;
-    size_t str_len = strlen(json)+1;
+    size_t JFH_str_len = strlen(json)+1;
     size_t len_i = 0; // How many characters are appended to newjson
     size_t nmem = 0; // Needed memory for reallocation
     int k;
@@ -285,7 +285,7 @@ char *indent_json(char *ajson, size_t indent_len) {
         return NULL;
     }
     char *newcur = newjson;
-    for (i = 0; i < str_len; i++) {
+    for (i = 0; i < JFH_str_len; i++) {
         nmem = 0;
         if (*cur == '\"') {
             if (*(cur - 1) != '\\') {
@@ -372,7 +372,7 @@ char *indent_json(char *ajson, size_t indent_len) {
     }
     if (list_index != 0 || nest_index != 0) {
         free(newjson);
-        errno = EJSON;
+        errno = JFH_EJSON;
         return NULL;
     }
     *newcur = '\0';
@@ -380,7 +380,7 @@ char *indent_json(char *ajson, size_t indent_len) {
 }
 
 // Decodes a json string that represents a pair
-obj_t *decode_pair(char *str) {
+jfh_obj_t *JFH_decode_pair(char *str) {
     // Check for invalid args
     if (str == NULL) {
         errno = EINVAL;
@@ -388,7 +388,7 @@ obj_t *decode_pair(char *str) {
     }
 
     // Create object
-    obj_t *newobj = initM();
+    jfh_obj_t *newobj = JFH_initM();
     if (newobj == NULL) {
         errno = ENOMEM;
         return NULL;
@@ -434,9 +434,9 @@ obj_t *decode_pair(char *str) {
     *newcur = '\0';
     newcur = newstr;
     if (*newcur != '{') {
-        errno = EJSON;
+        errno = JFH_EJSON;
         free(newstr);
-        free_map(newobj);
+        JFH_free_map(newobj);
         return NULL;
     }
 
@@ -459,9 +459,9 @@ obj_t *decode_pair(char *str) {
         newcur++;
     }
     if (nest != 0) {
-        errno = EJSON;
-        free_map(newobj);
+        errno = JFH_EJSON;
         free(newstr);
+        JFH_free_map(newobj);
         return NULL;
     }
 
@@ -477,9 +477,9 @@ obj_t *decode_pair(char *str) {
         }
     }
     if (quots % 2 != 0) {
+        errno = JFH_EJSON;
         free(newstr);
-        free_map(newobj);
-        errno = EJSON;
+        JFH_free_map(newobj);
         return NULL;
     }
 
@@ -511,7 +511,7 @@ obj_t *decode_pair(char *str) {
         key_i++;
     }
     *keycur = '\0';
-    resetkey(newobj, key);
+    JFH_resetkey(newobj, key);
 
     // Value evaluation
     alc_i = 0;
@@ -551,7 +551,7 @@ obj_t *decode_pair(char *str) {
         val_i++;
     }
     *valcur = '\0';
-    setstrH(newobj, NULL, val);
+    JFH_setstrH(newobj, NULL, val);
     free(newstr);
     return newobj;
 }

@@ -1,6 +1,6 @@
 #include "..\Headers\numtostr.h"
 
-char *str_Int(int value) {
+char *JFH_str_Int(int value) {
     size_t size = snprintf(NULL, 0, "%d", value);
     char *buffer = malloc(size + 1);
     if (!buffer) {
@@ -11,7 +11,7 @@ char *str_Int(int value) {
     return buffer;
 }
 
-char *str_Double(double value) {
+char *JFH_str_Double(double value) {
     size_t size = snprintf(NULL, 0, "%lf", value);
     char *buffer = malloc(size + 1);
     if (!buffer) {
