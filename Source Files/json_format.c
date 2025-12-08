@@ -5,7 +5,7 @@ static char *remove_whitespace(char *str) {
         errno = EINVAL;
         return NULL;
     }
-    char *newstr = malloc(strlen(str));
+    char *newstr = malloc(strlen(str) + 1);
     if (newstr == NULL) {
         errno = ENOMEM;
         return NULL;
@@ -199,7 +199,7 @@ char *JFH_encode_obj(jfh_obj_t *obj) {
     }
     while (pos >= alc_n) {
         alc_n *= 2;
-        if (alc_n > 1073741824) {
+        if (alc_n >= 1073741824) {
             fprintf(stderr, "Memory limit (1073741824 bytes) reached\n");
             errno = ENOMEM;
             return NULL;
@@ -236,7 +236,7 @@ char *JFH_encode_arr(jfh_array_t *arr) {
     }
     while (pos >= alc_n) {
         alc_n *= 2;
-        if (alc_n > 1073741824) {
+        if (alc_n >= 1073741824) {
             fprintf(stderr, "Memory limit (1073741824 bytes) reached\n");
             errno = ENOMEM;
             return NULL;
@@ -264,6 +264,7 @@ char *JFH_indent_json(char *ajson, size_t indent_len) {
         return NULL;
     }
     char *cur = json;
+    char *prev = json;
     if (*cur != '{' && *cur != '[') {
         errno = JFH_EJSON;
         return NULL;
@@ -288,7 +289,7 @@ char *JFH_indent_json(char *ajson, size_t indent_len) {
     for (i = 0; i < JFH_str_len; i++) {
         nmem = 0;
         if (*cur == '\"') {
-            if (*(cur - 1) != '\\') {
+            if (*prev != '\\') {
                 if (is_string) {
                     is_string = false;
                 } else {
@@ -342,6 +343,7 @@ char *JFH_indent_json(char *ajson, size_t indent_len) {
                 len_i++;
             }
         }
+        prev = newcur;
 	    *newcur = *cur;
         newcur++;
         if (*cur == ':' && !is_string) {
@@ -379,179 +381,217 @@ char *JFH_indent_json(char *ajson, size_t indent_len) {
     return newjson;
 }
 
-// Decodes a json string that represents a pair
-jfh_obj_t *JFH_decode_pair(char *str) {
-    // Check for invalid args
-    if (str == NULL) {
+static int stobj_parser(char *cur, jfh_obj_t **curobj) {
+    if (!cur || !curobj) {
         errno = EINVAL;
-        return NULL;
+        return 1;
     }
-
-    // Create object
-    jfh_obj_t *newobj = JFH_initM();
-    if (newobj == NULL) {
-        errno = ENOMEM;
-        return NULL;
-    }
-
-    char *cur = str;
-    size_t alc_i = 1;
+    int nest_index = 0;
+    int last_brace = 1;
+    char *prev = cur;
     bool is_string = false;
-
-    // Get the needed size for the string
+    bool is_key = true;
+    bool is_obj = false;
+    bool is_arr = false;
     while (*cur != '\0') {
-        if (*cur == '\"') {
-            if (*--cur != '\\') {
-                if (is_string) is_string = false; else is_string = true; 
+        char *key = malloc(JFH_PARSER_KEYSIZE);
+        char *val = malloc(JFH_PARSER_VALSIZE);
+        char *curkey = key;
+        char *curval = val;
+        is_obj = false;
+        is_arr = false;
+        while (true) {
+            if (is_string && is_key) {
+                *curkey = *cur;
+                curkey++;
             }
-            cur++;
-        }
-       if (is_string || (*cur != ' ' && *cur != '\t' && *cur != '\n')) {
-            alc_i++;
-        }
-        cur++;
-    }
-    cur = str;
-    char *newstr = malloc(alc_i);
-    if (newstr == NULL) {
-        errno = ENOMEM;
-        return NULL;
-    }
-    char *newcur = newstr;
-
-    // Copy the string without spaces
-    while (*cur != '\0') {
-        if (*cur == '\"') {
-            if (is_string) is_string = false; else is_string = true; 
-        } else if ((*cur == ' ' || *cur == '\n' || *cur == '\t') && !is_string) {
-            cur++;
-            continue;
-        }
-        *newcur = *cur;
-        cur++;
-        newcur++;
-    }
-    *newcur = '\0';
-    newcur = newstr;
-    if (*newcur != '{') {
-        errno = JFH_EJSON;
-        free(newstr);
-        JFH_free_map(newobj);
-        return NULL;
-    }
-
-    // Check that there are right amount of brackets
-    is_string = false;
-    newcur = newstr;
-    int nest = 0;
-    while (*newcur != '\0') {
-        if (*newcur == '\"') {
-            if (*--newcur != '\\') {
-                if (is_string) is_string = false; else is_string = true;
-                newcur++;
-            }
-            newcur++;
-        }
-        if (!is_string) {
-            if (*newcur == '{') nest++;
-            else if (*newcur == '}') nest--;
-        }
-        newcur++;
-    }
-    if (nest != 0) {
-        errno = JFH_EJSON;
-        free(newstr);
-        JFH_free_map(newobj);
-        return NULL;
-    }
-
-    // Check the appropriate quotation marks
-    newcur = newstr;
-    size_t quots = 0;
-    while (*++newcur != '\0') {
-        if (*newcur == '\"') {
-            if (*--newcur != '\\') {
-                quots++;
-            }
-            newcur++;
-        }
-    }
-    if (quots % 2 != 0) {
-        errno = JFH_EJSON;
-        free(newstr);
-        JFH_free_map(newobj);
-        return NULL;
-    }
-
-    // Key evaluation
-    newcur = newstr;
-    alc_i = 0;
-    size_t key_i = 0;
-    while (*newcur != '\"') newcur++;
-    while (*++newcur != '\0') {
-        if (*newcur == '\"') {
-            if (*--newcur != '\\') break;
-            newcur++;
-        }
-        alc_i++;
-    }
-    char *key = malloc(alc_i);
-    if (key == NULL) {
-        errno = ENOMEM;
-        return NULL;
-    }
-    char *keycur = key;
-    newcur = newstr;
-    while (*newcur != '\"') newcur++;
-    newcur++;
-    while (key_i < alc_i) {
-        *keycur = *newcur;
-        keycur++;
-        newcur++;
-        key_i++;
-    }
-    *keycur = '\0';
-    JFH_resetkey(newobj, key);
-
-    // Value evaluation
-    alc_i = 0;
-    while (*newcur != ':') newcur++;
-    newcur++;
-    char *temp = newcur;
-    while (*newcur != '\0') {
-        if (*newcur == '\"') {
-            if (*--newcur != '\\') {
+            if (*cur == '\"' && *prev != '\\') {
                 if (is_string) {
                     is_string = false;
                 } else {
                     is_string = true;
                 }
             }
-            newcur++;
+            if (*cur == '{' && !is_string) {
+                if (nest_index > 0 && !is_obj && !is_arr) {
+                    is_obj = true;
+                    last_brace = nest_index;
+                }
+                nest_index++;
+            } else if (*cur == '}' && !is_string) {
+                nest_index--;
+            } else if (*cur == '[' && !is_string) {
+                if (nest_index > 0 && !is_arr && !is_obj) {
+                    is_arr = true;
+                    last_brace = nest_index;
+                }
+                nest_index++;
+            } else if (*cur == ']' && !is_string) {
+                nest_index--;
+            }
+            if (nest_index <= 0) break;
+            if (*cur == ',' && !is_string && last_brace >= nest_index) {
+                is_key = true;
+                prev = cur;
+                cur++;
+                break;
+            }
+            if (!is_key) {
+                *curval = *cur;
+                curval++;
+            }
+            if (*cur == ':' && !is_string) {
+                is_key = false;
+            }
+            prev = cur;
+            cur++;
         }
-        if (*newcur == '\"' && !is_string) {
-            alc_i++;
-            break;
+        curkey--;
+        *curkey = '\0';
+        *curval = '\0';
+        if (is_obj) {
+            jfh_obj_t *newobj = JFH_initM();
+            jfh_obj_t *newcurobj = newobj;
+            stobj_parser(val, &newcurobj);
+            JFH_setobjH(*curobj, key, newobj);
+            free(val);
+        } else if (is_arr) {
+            jfh_array_t *newarr = JFH_initL();
+            jfh_array_t *newcurarr = newarr;
+            starr_parser(val, &newcurarr);
+            JFH_setarrH(*curobj, key, newarr);
+            free(val);
+        } else {
+            JFH_setstrH(*curobj, key, val);
         }
-        alc_i++;
-        newcur++;
+        if (nest_index <= 0) break;
+        (*curobj)->next = JFH_initM();
+        (*curobj)->next->prev = (*curobj);
+        (*curobj) = (*curobj)->next;
     }
-    char *val = malloc(alc_i);
-    if (val == NULL) {
+    if (nest_index != 0) {
+        errno = JFH_EJSON;
+        return 1;
+    }
+    return 0;
+}
+
+static int starr_parser(char *cur, jfh_array_t **curarr) {
+    if (!curarr || !cur) {
+        errno = EINVAL;
+        return 1;
+    }
+    int nest_index = 1;
+    int last_brace = 1;
+    char *prev = cur;
+    bool is_string = false;
+    bool is_obj = false;
+    bool is_arr = false;
+    bool is_first = true;
+    cur++;
+    while (*cur != '\0') {
+        char *val = malloc(JFH_PARSER_VALSIZE);
+        char *curval = val;
+        is_obj = false;
+        is_arr = false;
+        while (true) {
+            if (*cur == '\"' && *prev != '\\') {
+                if (is_string) {
+                    is_string = false;
+                } else {
+                    is_string = true;
+                }
+            }
+            if (*cur == '[' && !is_string) {
+                if (nest_index > 0 && !is_arr && !is_obj) {
+                    is_arr = true;
+                    last_brace = nest_index;
+                }
+                nest_index++;
+            } else if (*cur == ']' && !is_string) {
+                nest_index--;
+            } else if (*cur == '{' && !is_string) {
+                if (nest_index > 0 && !is_obj && !is_arr) {
+                    is_obj = true;
+                    last_brace = nest_index;
+                }
+                nest_index++;
+            } else if (*cur == '}' && !is_string) {
+                nest_index--;
+            }
+            if (nest_index <= 0) break;
+            if (*cur == ',' && !is_string && last_brace >= nest_index) {
+                prev = cur;
+                cur++;
+                break;
+            }
+            *curval = *cur;
+            curval++;
+            prev = cur;
+            cur++;
+        }
+        *curval = '\0';
+        if (is_obj) {
+            jfh_obj_t *newobj = JFH_initM();
+            jfh_obj_t *newcurobj = newobj;
+            stobj_parser(val, &newcurobj);
+            JFH_setobjL(*curarr, newobj);
+            free(val);
+        } else if (is_arr) {
+            jfh_array_t *newarr = JFH_initL();
+            jfh_array_t *newcurarr = newarr;
+            starr_parser(val, &newcurarr);
+            JFH_setarrL(*curarr, newarr);
+            free(val);
+        } else {
+            JFH_setstrL(*curarr, val);
+        }
+        if (nest_index <= 0) break;
+        (*curarr)->next = JFH_initL();
+        (*curarr)->next->prev = (*curarr);
+        (*curarr) = (*curarr)->next;
+    }
+}
+
+// Decodes a json string that represents a obj
+jfh_obj_t *JFH_parse_obj(char *str) {
+    if (!str) {
+        errno = EINVAL;
+        return NULL;
+    }
+    char *json = remove_whitespace(str);
+    char *cur = json;
+    if (*cur != '{') {
+        errno = JFH_EJSON;
+        return NULL;
+    }
+    jfh_obj_t *newobj = JFH_initM();
+    if (!newobj) {
         errno = ENOMEM;
         return NULL;
     }
-    char *valcur = val;
-    size_t val_i = 0;
-    newcur = temp;
-    while (val_i < alc_i) {
-        *valcur = *newcur;
-        valcur++;
-        newcur++;
-        val_i++;
-    }
-    *valcur = '\0';
-    JFH_setstrH(newobj, NULL, val);
-    free(newstr);
+    jfh_obj_t *curobj = newobj;
+    stobj_parser(cur, &curobj);
     return newobj;
+}
+
+jfh_array_t *JFH_parse_arr(char *str) {
+    if (!str) {
+        errno = EINVAL;
+        return NULL;
+    }
+    char *json = remove_whitespace(str);
+    char *cur = json;
+    if (*cur != '[') {
+        errno = JFH_EJSON;
+        return NULL;
+    }
+    jfh_array_t *newarr = JFH_initL();
+    if (!newarr) {
+        errno = ENOMEM;
+        return NULL;
+    }
+    jfh_array_t *curarr = newarr;
+    starr_parser(cur, &curarr);
+    return newarr;
 }

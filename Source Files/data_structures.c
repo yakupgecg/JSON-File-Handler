@@ -9,3 +9,5 @@ unsigned int JFH_DBL_STR_LEN = 100;
 unsigned int JFH_LONG_STR_LEN = 20;
 unsigned int JFH_LL_STR_LEN = 20;
 unsigned int JFH_LDBL_STR_LEN = 350;
+size_t JFH_PARSER_KEYSIZE = 16384;
+size_t JFH_PARSER_VALSIZE = 16384;
