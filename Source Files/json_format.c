@@ -394,8 +394,8 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj) {
     bool is_obj = false;
     bool is_arr = false;
     while (*cur != '\0') {
-        char *key = malloc(JFH_PARSER_KEYSIZE);
-        char *val = malloc(JFH_PARSER_VALSIZE);
+        char *key = malloc(strlen(cur));
+        char *val = malloc(strlen(cur));
         char *curkey = key;
         char *curval = val;
         is_obj = false;
@@ -490,7 +490,7 @@ static int starr_parser(char *cur, jfh_array_t **curarr) {
     bool is_first = true;
     cur++;
     while (*cur != '\0') {
-        char *val = malloc(JFH_PARSER_VALSIZE);
+        char *val = malloc(strlen(cur));
         char *curval = val;
         is_obj = false;
         is_arr = false;

@@ -32,8 +32,6 @@ extern unsigned int JFH_DBL_STR_LEN;   // The maximum length of a string made fr
 extern unsigned int JFH_LONG_STR_LEN;  // The maximum length of a string made from a Long
 extern unsigned int JFH_LL_STR_LEN;    // The maximum length of a string made from a Long long
 extern unsigned int JFH_LDBL_STR_LEN;  // The maximum length of a string made from a Long double
-extern size_t JFH_PARSER_KEYSIZE; // The allocation size of the key in the parser
-extern size_t JFH_PARSER_VALSIZE; // The allocation size of the value in the parser
 
 typedef struct jfh_Hmap jfh_obj_t;
 typedef struct jfh_Linkedlist jfh_array_t;
