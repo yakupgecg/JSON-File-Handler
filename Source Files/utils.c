@@ -137,7 +137,7 @@ int JFH_free_list(jfh_array_t *list) {
 }
 
 // Returns the map, which has the key to find
-jfh_obj_t *JFH_getpairbykey(jfh_obj_t *root, char *key) {
+jfh_obj_t *JFH_pairbykey(jfh_obj_t *root, char *key) {
     if (root == NULL) {
         errno = EINVAL;
         return NULL;
