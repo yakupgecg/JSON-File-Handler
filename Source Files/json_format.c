@@ -462,7 +462,143 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj) {
             JFH_setarrH(*curobj, key, newarr);
             free(val);
         } else {
-            JFH_setstrH(*curobj, key, val);
+            curval = val;
+            if (
+                *curval == '1' ||
+                *curval == '2' ||
+                *curval == '3' ||
+                *curval == '4' ||
+                *curval == '5' ||
+                *curval == '6' ||
+                *curval == '7' ||
+                *curval == '8' ||
+                *curval == '9'
+            ) {
+                int num = 0;
+                double dbl = 0.0;
+                bool is_dbl = false;
+                while (*curval != '\0') {
+                    switch (*curval) {
+                        case '0': num *= 10; break;
+                        case '1': num *= 10; num++; break;
+                        case '2': num *= 10; num += 2; break;
+                        case '3': num *= 10; num += 3; break;
+                        case '4': num *= 10; num += 4; break;
+                        case '5': num *= 10; num += 5; break;
+                        case '6': num *= 10; num += 6; break;
+                        case '7': num *= 10; num += 7; break;
+                        case '8': num *= 10; num += 8; break;
+                        case '9': num *= 10; num += 9; break;
+                    }
+                    if (*curval == '.') {
+                        long i = 1;
+                        is_dbl = true;
+                        curval++;
+                        if (
+                            *curval != '0' &&
+                            *curval != '1' &&
+                            *curval != '2' &&
+                            *curval != '3' &&
+                            *curval != '4' &&
+                            *curval != '5' &&
+                            *curval != '6' &&
+                            *curval != '7' &&
+                            *curval != '8' &&
+                            *curval != '9'
+                        ) {
+                            errno = JFH_EJSON;
+                            return 1;
+                        }
+                        dbl += num;
+                        while (*curval != '\0') {
+                            i *= 10;
+                            switch (*curval) {
+                                case '1': dbl += 1.0 / i; break;
+                                case '2': dbl += 2.0 / i; break;
+                                case '3': dbl += 3.0 / i; break;
+                                case '4': dbl += 4.0 / i; break;
+                                case '5': dbl += 5.0 / i; break;
+                                case '6': dbl += 6.0 / i; break;
+                                case '7': dbl += 7.0 / i; break;
+                                case '8': dbl += 8.0 / i; break;
+                                case '9': dbl += 9.0 / i; break;
+                            }
+                            curval++;
+                        }
+                        break;
+                    }
+                    curval++;
+                }
+                if (is_dbl) {
+                    JFH_setdoubleH(*curobj, key, dbl);
+                } else {
+                    JFH_setintH(*curobj, key, num);
+                }
+            } else if (*curval == '-') {
+                curval++;
+                int num = 0;
+                double dbl = 0.0;
+                bool is_dbl = false;
+                while (*curval != '\0') {
+                    switch (*curval) {
+                        case '0': num *= 10; break;
+                        case '1': num *= 10; num++; break;
+                        case '2': num *= 10; num += 2; break;
+                        case '3': num *= 10; num += 3; break;
+                        case '4': num *= 10; num += 4; break;
+                        case '5': num *= 10; num += 5; break;
+                        case '6': num *= 10; num += 6; break;
+                        case '7': num *= 10; num += 7; break;
+                        case '8': num *= 10; num += 8; break;
+                        case '9': num *= 10; num += 9; break;
+                    }
+                    if (*curval == '.') {
+                        long i = 1;
+                        is_dbl = true;
+                        curval++;
+                        if (
+                            *curval != '0' &&
+                            *curval != '1' &&
+                            *curval != '2' &&
+                            *curval != '3' &&
+                            *curval != '4' &&
+                            *curval != '5' &&
+                            *curval != '6' &&
+                            *curval != '7' &&
+                            *curval != '8' &&
+                            *curval != '9'
+                        ) {
+                            errno = JFH_EJSON;
+                            return 1;
+                        }
+                        dbl += num;
+                        while (*curval != '\0') {
+                            i *= 10;
+                            switch (*curval) {
+                                case '1': dbl += 1.0 / i; break;
+                                case '2': dbl += 2.0 / i; break;
+                                case '3': dbl += 3.0 / i; break;
+                                case '4': dbl += 4.0 / i; break;
+                                case '5': dbl += 5.0 / i; break;
+                                case '6': dbl += 6.0 / i; break;
+                                case '7': dbl += 7.0 / i; break;
+                                case '8': dbl += 8.0 / i; break;
+                                case '9': dbl += 9.0 / i; break;
+                            }
+                            curval++;
+                        }
+                        break;
+                    }
+                    curval++;
+                }
+                if (is_dbl) {
+                    JFH_setdoubleH(*curobj, key, dbl * (-1));
+                } else {
+                    JFH_setintH(*curobj, key, num * (-1));
+                }
+            } else {
+                JFH_setstrH(*curobj, key, val);
+            }
         }
         if (nest_index <= 0) break;
         (*curobj)->next = JFH_initM();
@@ -544,7 +680,143 @@ static int starr_parser(char *cur, jfh_array_t **curarr) {
             JFH_setarrL(*curarr, newarr);
             free(val);
         } else {
-            JFH_setstrL(*curarr, val);
+            curval = val;
+            if (
+                *curval == '1' ||
+                *curval == '2' ||
+                *curval == '3' ||
+                *curval == '4' ||
+                *curval == '5' ||
+                *curval == '6' ||
+                *curval == '7' ||
+                *curval == '8' ||
+                *curval == '9'
+            ) {
+                int num = 0;
+                double dbl = 0.0;
+                bool is_dbl = false;
+                while (*curval != '\0') {
+                    switch (*curval) {
+                        case '0': num *= 10; break;
+                        case '1': num *= 10; num++; break;
+                        case '2': num *= 10; num += 2; break;
+                        case '3': num *= 10; num += 3; break;
+                        case '4': num *= 10; num += 4; break;
+                        case '5': num *= 10; num += 5; break;
+                        case '6': num *= 10; num += 6; break;
+                        case '7': num *= 10; num += 7; break;
+                        case '8': num *= 10; num += 8; break;
+                        case '9': num *= 10; num += 9; break;
+                    }
+                    if (*curval == '.') {
+                        long i = 1;
+                        is_dbl = true;
+                        curval++;
+                        if (
+                            *curval != '0' &&
+                            *curval != '1' &&
+                            *curval != '2' &&
+                            *curval != '3' &&
+                            *curval != '4' &&
+                            *curval != '5' &&
+                            *curval != '6' &&
+                            *curval != '7' &&
+                            *curval != '8' &&
+                            *curval != '9'
+                        ) {
+                            errno = JFH_EJSON;
+                            return 1;
+                        }
+                        dbl += num;
+                        while (*curval != '\0') {
+                            i *= 10;
+                            switch (*curval) {
+                                case '1': dbl += 1.0 / i; break;
+                                case '2': dbl += 2.0 / i; break;
+                                case '3': dbl += 3.0 / i; break;
+                                case '4': dbl += 4.0 / i; break;
+                                case '5': dbl += 5.0 / i; break;
+                                case '6': dbl += 6.0 / i; break;
+                                case '7': dbl += 7.0 / i; break;
+                                case '8': dbl += 8.0 / i; break;
+                                case '9': dbl += 9.0 / i; break;
+                            }
+                            curval++;
+                        }
+                        break;
+                    }
+                    curval++;
+                }
+                if (is_dbl) {
+                    JFH_setdoubleL(*curarr, dbl);
+                } else {
+                    JFH_setintL(*curarr, num);
+                }
+            } else if (*curval == '-') {
+                curval++;
+                int num = 0;
+                double dbl = 0.0;
+                bool is_dbl = false;
+                while (*curval != '\0') {
+                    switch (*curval) {
+                        case '0': num *= 10; break;
+                        case '1': num *= 10; num++; break;
+                        case '2': num *= 10; num += 2; break;
+                        case '3': num *= 10; num += 3; break;
+                        case '4': num *= 10; num += 4; break;
+                        case '5': num *= 10; num += 5; break;
+                        case '6': num *= 10; num += 6; break;
+                        case '7': num *= 10; num += 7; break;
+                        case '8': num *= 10; num += 8; break;
+                        case '9': num *= 10; num += 9; break;
+                    }
+                    if (*curval == '.') {
+                        long i = 1;
+                        is_dbl = true;
+                        curval++;
+                        if (
+                            *curval != '0' &&
+                            *curval != '1' &&
+                            *curval != '2' &&
+                            *curval != '3' &&
+                            *curval != '4' &&
+                            *curval != '5' &&
+                            *curval != '6' &&
+                            *curval != '7' &&
+                            *curval != '8' &&
+                            *curval != '9'
+                        ) {
+                            errno = JFH_EJSON;
+                            return 1;
+                        }
+                        dbl += num;
+                        while (*curval != '\0') {
+                            i *= 10;
+                            switch (*curval) {
+                                case '1': dbl += 1.0 / i; break;
+                                case '2': dbl += 2.0 / i; break;
+                                case '3': dbl += 3.0 / i; break;
+                                case '4': dbl += 4.0 / i; break;
+                                case '5': dbl += 5.0 / i; break;
+                                case '6': dbl += 6.0 / i; break;
+                                case '7': dbl += 7.0 / i; break;
+                                case '8': dbl += 8.0 / i; break;
+                                case '9': dbl += 9.0 / i; break;
+                            }
+                            curval++;
+                        }
+                        break;
+                    }
+                    curval++;
+                }
+                if (is_dbl) {
+                    JFH_setdoubleL(*curarr, dbl * (-1));
+                } else {
+                    JFH_setintL(*curarr, num * (-1));
+                }
+            } else {
+                JFH_setstrL(*curarr, val);
+            }
         }
         if (nest_index <= 0) break;
         (*curarr)->next = JFH_initL();
