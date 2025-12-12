@@ -176,6 +176,7 @@ static int starr_encoder(jfh_array_t *curarr, char **str, char **cur, size_t *po
     return 0;
 }
 
+// Encodes an object to a json string that represents an object
 char *JFH_encode_obj(jfh_obj_t *obj) {
     if (!obj) {
         errno = EINVAL;
@@ -213,6 +214,7 @@ char *JFH_encode_obj(jfh_obj_t *obj) {
     return str;
 }
 
+// Encodes an array to a json string that represents an array
 char *JFH_encode_arr(jfh_array_t *arr) {
     if (!arr) {
         errno = EINVAL;
@@ -271,8 +273,8 @@ char *JFH_indent_json(char *ajson, size_t indent_len) {
     size_t alc_n = 256;
     int indentation = 0;
     size_t JFH_str_len = strlen(json)+1;
-    size_t len_i = 0; // How many characters are appended to newjson
-    size_t nmem = 0; // Needed memory for reallocation
+    size_t len_i = 0;
+    size_t nmem = 0;
     int k;
     int i;
     int nest_index = 0;
@@ -296,7 +298,7 @@ char *JFH_indent_json(char *ajson, size_t indent_len) {
         } else if (*cur == '{' && !is_string) {
             nest_index++;
             indentation++;
-            nmem += indentation * indent_len + 1; // Extra 1 for the new line
+            nmem += indentation * indent_len + 1;
         } else if (*cur == '}' && !is_string) {
             nest_index--;
             indentation--;
@@ -856,7 +858,7 @@ static int starr_parser(char *cur, jfh_array_t **curarr) {
     return 0;
 }
 
-// Decodes a json string that represents a obj
+// Parses a json string that represents an object
 jfh_obj_t *JFH_parse_obj(char *str) {
     if (!str) {
         errno = EINVAL;
@@ -878,6 +880,7 @@ jfh_obj_t *JFH_parse_obj(char *str) {
     return newobj;
 }
 
+// Parses a json string that represents an array
 jfh_array_t *JFH_parse_arr(char *str) {
     if (!str) {
         errno = EINVAL;
