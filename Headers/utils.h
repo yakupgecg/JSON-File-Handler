@@ -34,6 +34,12 @@ int JFH_free_list(jfh_array_t *);
 // Returns the object that has the given key
 jfh_obj_t *JFH_pairbykey(jfh_obj_t *, char *);
 
+// Returns the object that has the given key, but object was searched across nested objects.
+jfh_obj_t *JFH_searchH(jfh_obj_t *, char *);
+
+// Returns the first object found anywhere in the list.  
+jfh_obj_t *JFH_searchL(jfh_array_t *, char *);
+
 // Returns the element by index in the given list
 jfh_array_t *JFH_getelementbyindex(jfh_array_t *, size_t);
 

@@ -152,6 +152,57 @@ jfh_obj_t *JFH_pairbykey(jfh_obj_t *root, char *key) {
     return NULL;
 }
 
+// Returns the first object found anywhere in the root.
+jfh_obj_t *JFH_searchH(jfh_obj_t *root, char *key) {
+    if (!root || !key) {
+        errno = EINVAL;
+        return NULL;
+    }
+    jfh_obj_t *current = root;
+    while (current != NULL) {
+        if (strcmp(current->key, key) == 0) {
+            return current;
+        }
+        if (current->value.vt == JFH_OBJ) {
+            jfh_obj_t *result = JFH_searchH(current->value.value.obj, key);
+            if (result != NULL) {
+                return result;
+            }
+        } else if (current->value.vt == JFH_LIST) {
+            jfh_obj_t *result = JFH_searchL(current->value.value.arr, key);
+            if (result != NULL) {
+                return result;
+            }
+        }
+        current = current->next;
+    }
+    return NULL;
+}
+
+// Returns the first object found anywhere in the list.
+jfh_obj_t *JFH_searchL(jfh_array_t *root, char *key) {
+    if (!root || !key) {
+        errno = EINVAL;
+        return NULL;
+    }
+    jfh_array_t *current = root;
+    while (current != NULL) {
+        if (current->value.vt == JFH_OBJ) {
+            jfh_obj_t *result = JFH_searchH(current->value.value.obj, key);
+                        if (result != NULL) {
+                return result;
+            }
+        } else if (current->value.vt == JFH_LIST) {
+            jfh_obj_t *result = JFH_searchL(current->value.value.arr, key);
+            if (result != NULL) {
+                return result;
+            }
+        }
+        current = current->next;
+    }
+    return NULL;
+}
+
 // Returns the element by index. For example if index is 1 it returns root->next
 jfh_array_t *JFH_getelementbyindex(jfh_array_t *root, size_t index) {
     if (root == NULL) {
