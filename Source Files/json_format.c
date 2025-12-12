@@ -611,6 +611,7 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj) {
                 if (!JFH_setstrH(*curobj, key, val)) return 1;
             }
         }
+        free(key);
         if (nest_index <= 0) break;
         (*curobj)->next = JFH_initM();
         if (!(*curobj)->next) return 1;
