@@ -13,9 +13,6 @@ static char *remove_whitespace(char *str) {
     char *newcur = newstr;
     char *cur = str;
     char *prev = str;
-    *newcur = *cur;
-    newcur++;
-    cur++;
     bool is_string = false;
     while (*cur != '\0') {
         if (*cur == '\"') {
