@@ -823,6 +823,7 @@ static int starr_parser(char *cur, jfh_array_t **curarr) {
         (*curarr)->next->prev = (*curarr);
         (*curarr) = (*curarr)->next;
     }
+    return 0;
 }
 
 // Decodes a json string that represents a obj
