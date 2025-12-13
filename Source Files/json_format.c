@@ -413,7 +413,7 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj) {
         char *curval = val;
         is_obj = false;
         is_arr = false;
-        while (true) {
+        while (*cur != '\0') {
             if (is_string && is_key) {
                 *curkey = *cur;
                 curkey++;
@@ -664,7 +664,7 @@ static int starr_parser(char *cur, jfh_array_t **curarr) {
         char *curval = val;
         is_obj = false;
         is_arr = false;
-        while (true) {
+        while (*cur != '\0') {
             if (*cur == '\"' && *prev != '\\') {
                 if (is_string) {
                     is_string = false;
