@@ -126,7 +126,7 @@ static int stobj_encoder(jfh_obj_t *curobj, char **str, char **cur, size_t *pos,
                 }
                 break;
             }
-            default: break;
+            default: errno = JFH_EJSON; return 1;
         }
         curobj = curobj->next;
         if (curobj) {
@@ -183,7 +183,7 @@ static int starr_encoder(jfh_array_t *curarr, char **str, char **cur, size_t *po
                 }
                 break;
             }
-            default: break;
+            default: errno = JFH_EJSON; return 1;
         }
         curarr = curarr->next;
         if (curarr) {
