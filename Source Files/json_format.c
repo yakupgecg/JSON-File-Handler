@@ -34,11 +34,12 @@ static char *remove_whitespace(char *str) {
         } else if ((*cur == '}' || *cur == ']') && !is_string) {
             braces--;
         }
+        prev = cur;
         cur++;
-        prev++;
     }
     if (braces) {
         free(newstr);
+        errno = JFH_EJSON;
         return NULL;
     }
     *newcur = '\0';
