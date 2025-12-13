@@ -397,23 +397,26 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj) {
     }
     int nest_index = 0;
     int last_brace = 1;
-    char *prev = cur;
     bool is_string = false;
     bool is_key = true;
     bool is_obj = false;
     bool is_arr = false;
-    while (*cur != '\0') {
-        char *key = malloc(strlen(cur) + 1);
-        char *val = malloc(strlen(cur) + 1);
-        if (!val || !key) {
-            errno = ENOMEM;
-            return 1;
-        }
-        char *curkey = key;
-        char *curval = val;
+    size_t len = strlen(cur);
+    char *key = malloc(len);
+    char *val = malloc(len);
+    char *prev = cur;
+    if (!val || !key) {
+        errno = ENOMEM;
+        return 1;
+    }
+    char *curkey;
+    char *curval;
+    while (*cur) {
+        curkey = key;
+        curval = val;
         is_obj = false;
         is_arr = false;
-        while (*cur != '\0') {
+        while (*cur) {
             if (is_string && is_key) {
                 *curkey = *cur;
                 curkey++;
@@ -468,14 +471,12 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj) {
             jfh_obj_t *newcurobj = newobj;
             if (stobj_parser(val, &newcurobj)) return 1;
             if (!JFH_setobjH(*curobj, key, newobj)) return 1;
-            free(val);
         } else if (is_arr) {
             jfh_array_t *newarr = JFH_initL();
             if (!newarr) return 1;
             jfh_array_t *newcurarr = newarr;
             if (starr_parser(val, &newcurarr)) return 1;
             if (!JFH_setarrH(*curobj, key, newarr)) return 1;
-            free(val);
         } else {
             curval = val;
             if (
@@ -633,13 +634,13 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj) {
                 if (!JFH_setstrH(*curobj, key, val)) return 1;
             }
         }
-        free(key);
         if (nest_index <= 0) break;
         (*curobj)->next = JFH_initM();
         if (!(*curobj)->next) return 1;
         (*curobj)->next->prev = (*curobj);
         (*curobj) = (*curobj)->next;
     }
+    free(key);
     return 0;
 }
 
@@ -650,21 +651,23 @@ static int starr_parser(char *cur, jfh_array_t **curarr) {
     }
     int nest_index = 1;
     int last_brace = 1;
+    size_t len = strlen(cur);
+    char *val = malloc(len);
+    if (!val) {
+        errno = ENOMEM;
+        return 1;
+    }
+    char *curval;
     char *prev = cur;
     bool is_string = false;
     bool is_obj = false;
     bool is_arr = false;
     cur++;
-    while (*cur != '\0') {
-        char *val = malloc(strlen(cur) + 1);
-        if (!val) {
-            errno = ENOMEM;
-            return 1;
-        }
-        char *curval = val;
+    while (*cur) {
+        curval = val;
         is_obj = false;
         is_arr = false;
-        while (*cur != '\0') {
+        while (*cur) {
             if (*cur == '\"' && *prev != '\\') {
                 if (is_string) {
                     is_string = false;
@@ -707,13 +710,11 @@ static int starr_parser(char *cur, jfh_array_t **curarr) {
             jfh_obj_t *newcurobj = newobj;
             if (stobj_parser(val, &newcurobj)) return 1;
             if (!JFH_setobjL(*curarr, newobj)) return 1;
-            free(val);
         } else if (is_arr) {
             jfh_array_t *newarr = JFH_initL();
             jfh_array_t *newcurarr = newarr;
             if (starr_parser(val, &newcurarr)) return 1;
             if (!JFH_setarrL(*curarr, newarr)) return 1;
-            free(val);
         } else {
             curval = val;
             if (
@@ -808,6 +809,7 @@ static int starr_parser(char *cur, jfh_array_t **curarr) {
                         case '7': num *= 10; num += 7; break;
                         case '8': num *= 10; num += 8; break;
                         case '9': num *= 10; num += 9; break;
+                        case '.': break;
                         default: errno = JFH_EJSON; return 1;
                     }
                     if (*curval == '.') {
@@ -859,15 +861,15 @@ static int starr_parser(char *cur, jfh_array_t **curarr) {
             } else {
                 if (*val != '\"') {
                     if (
-                        strcmp(val, "true") != 0 || 
-                        strcmp(val, "false") != 0 ||
+                        strcmp(val, "true") != 0 && 
+                        strcmp(val, "false") != 0 &&
                         strcmp(val, "null") != 0
                     ) {
                         errno = JFH_EJSON;
                         return 1;
                     }
                 }
-                if (!JFH_setstrL(*curarr, val)) return 1;
+                if (!JFH_setstrL(*curarr, curval)) return 1;
             }
         }
         if (nest_index <= 0) break;
