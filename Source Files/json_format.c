@@ -80,6 +80,10 @@ static int stobj_encoder(jfh_obj_t *curobj, char **str, char **cur, size_t *pos,
         return 1;
     }
     if (st_write(cur, str, pos, alc_n, "{")) return 1;
+    if (curobj->empty == true) {
+        if (st_write(cur, str, pos, alc_n, "}")) return 1;
+        return 0;
+    }
     while (curobj) {
         if (
             st_write(cur, str, pos, alc_n, "\"") ||
@@ -139,6 +143,10 @@ static int starr_encoder(jfh_array_t *curarr, char **str, char **cur, size_t *po
         return 1;
     }
     if (st_write(cur, str, pos, alc_n, "[")) return 1;
+    if (curarr->empty == true) {
+        if (st_write(cur, str, pos, alc_n, "]")) return 1;
+        return 0;
+    }
     while (curarr) {
         switch (curarr->value.vt) {
             case JFH_STR: {
@@ -468,14 +476,18 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj) {
         if (is_obj) {
             jfh_obj_t *newobj = JFH_initM();
             if (!newobj) return 1;
-            jfh_obj_t *newcurobj = newobj;
-            if (stobj_parser(val, &newcurobj)) return 1;
+            if (strcmp(val, "{}") != 0) {
+                jfh_obj_t *newcurobj = newobj;
+                if (stobj_parser(val, &newcurobj)) return 1;
+            }
             if (!JFH_setobjH(*curobj, key, newobj)) return 1;
         } else if (is_arr) {
             jfh_array_t *newarr = JFH_initL();
             if (!newarr) return 1;
-            jfh_array_t *newcurarr = newarr;
-            if (starr_parser(val, &newcurarr)) return 1;
+            if (strcmp(val, "[]") != 0) {
+                jfh_array_t *newcurarr = newarr;
+                if (starr_parser(val, &newcurarr)) return 1;
+            }
             if (!JFH_setarrH(*curobj, key, newarr)) return 1;
         } else {
             curval = val;
@@ -707,13 +719,17 @@ static int starr_parser(char *cur, jfh_array_t **curarr) {
         if (is_obj) {
             jfh_obj_t *newobj = JFH_initM();
             if (!newobj) return 1;
-            jfh_obj_t *newcurobj = newobj;
-            if (stobj_parser(val, &newcurobj)) return 1;
+            if (strcmp(val, "{}") != 0) {
+                jfh_obj_t *newcurobj = newobj;
+                if (stobj_parser(val, &newcurobj)) return 1;
+            }
             if (!JFH_setobjL(*curarr, newobj)) return 1;
         } else if (is_arr) {
             jfh_array_t *newarr = JFH_initL();
-            jfh_array_t *newcurarr = newarr;
-            if (starr_parser(val, &newcurarr)) return 1;
+            if (strcmp(val, "[]") != 0) {
+                jfh_array_t *newcurarr = newarr;
+                if (starr_parser(val, &newcurarr)) return 1;
+            }
             if (!JFH_setarrL(*curarr, newarr)) return 1;
         } else {
             curval = val;

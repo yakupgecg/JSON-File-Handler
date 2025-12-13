@@ -55,12 +55,14 @@ typedef struct jfh_Hmap {
     jfh_json_value_t value;
     struct jfh_Hmap *next;
     struct jfh_Hmap *prev;
+    bool empty;
 } jfh_obj_t; // Object
 
 typedef struct jfh_Linkedlist {
     jfh_json_value_t value;
     struct jfh_Linkedlist *next;
     struct jfh_Linkedlist *prev;
+    bool empty;
 } jfh_array_t; // Array
 
 #endif // HASHMAP_STRUCT_H

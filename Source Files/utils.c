@@ -242,6 +242,7 @@ jfh_obj_t *JFH_initM() {
     map->prev = NULL;
     map->value.value.str.str = NULL;
     map->value.vt = 0;
+    map->empty = true;
     return map;
 }
 
@@ -282,6 +283,7 @@ jfh_array_t *JFH_initL() {
     list->prev = NULL;
     list->value.value.str.str = NULL;
     list->value.vt = 0;
+    list->empty = true;
     return list;
 }
 
@@ -291,6 +293,7 @@ jfh_obj_t *JFH_appendH(jfh_obj_t *map) {
         errno = EINVAL;
         return NULL;
     }
+    map->empty = false;
     jfh_obj_t *current = map;
     while (current->next) {
         current = current->next;
@@ -310,6 +313,7 @@ jfh_array_t *JFH_appendL(jfh_array_t *list) {
         errno = EINVAL;
         return NULL;
     }
+    list->empty = false;
     jfh_array_t *current = list;
     while (current->next) {
         current = current->next;
@@ -329,6 +333,7 @@ jfh_obj_t *JFH_insertH(jfh_obj_t *obj) {
         errno = EINVAL;
         return NULL;
     }
+    obj->empty = false;
     jfh_obj_t *newobj = JFH_initM();
     if (!newobj) {
         errno = ENOMEM;
@@ -349,6 +354,7 @@ jfh_array_t *JFH_insertL(jfh_array_t *element) {
         errno = EINVAL;
         return NULL;
     }
+    element->empty = false;
     jfh_array_t *newelement = JFH_initL();
     if (!newelement) {
         errno = ENOMEM;
@@ -391,6 +397,7 @@ jfh_obj_t *JFH_resetkey(jfh_obj_t *pair, char *key) {
         errno = EINVAL;
         return NULL;
     }
+    pair->empty = false;
     int str_len = strlen(key);
     free(pair->key);
     pair->key = str_dup(key);
@@ -430,7 +437,7 @@ jfh_obj_t *JFH_setstrH(jfh_obj_t *obj, char *key, char *src) {
         errno = EINVAL;
         return NULL;
     }
-    
+    obj->empty = false;
     if (key) {
         if (!JFH_resetkey(obj, key)) {
             return NULL;
@@ -445,7 +452,7 @@ jfh_array_t *JFH_setstrL(jfh_array_t *arr, char *src) {
         errno = EINVAL;
         return NULL;
     }
-    
+    arr->empty = false;
     JFH_setval(&arr->value, src, JFH_STR);
     return arr;
 }
@@ -456,6 +463,7 @@ jfh_obj_t *JFH_setintH(jfh_obj_t *obj, char *key, int src) {
         errno = EINVAL;
         return NULL;
     }
+    obj->empty = false;
     if (key) {
         if (!JFH_resetkey(obj, key)) {
             return NULL;
@@ -470,7 +478,7 @@ jfh_array_t *JFH_setintL(jfh_array_t *arr, int src) {
         errno = EINVAL;
         return NULL;
     }
-    
+    arr->empty = false;
     JFH_setval(&arr->value, &src, JFH_INT);
     return arr;
 }
@@ -481,6 +489,7 @@ jfh_obj_t *JFH_setdoubleH(jfh_obj_t *obj, char *key, double src) {
         errno = EINVAL;
         return NULL;
     }
+    obj->empty = false;
     if (key) {
         if (!JFH_resetkey(obj, key)) {
             return NULL;
@@ -495,7 +504,7 @@ jfh_array_t *JFH_setdoubleL(jfh_array_t *arr, double src) {
         errno = EINVAL;
         return NULL;
     }
-    
+    arr->empty = false;
     JFH_setval(&arr->value, &src, JFH_DBL);
     return arr;
 }
@@ -506,6 +515,7 @@ jfh_obj_t *JFH_setobjH(jfh_obj_t *obj, char *key, jfh_obj_t *src) {
         errno = EINVAL;
         return NULL;
     }
+    obj->empty = false;
     if (key) {
         if (!JFH_resetkey(obj, key)) {
             return NULL;
@@ -520,7 +530,7 @@ jfh_array_t *JFH_setobjL(jfh_array_t *arr, jfh_obj_t *src) {
         errno = EINVAL;
         return NULL;
     }
-    
+    arr->empty = false;
     JFH_setval(&arr->value, src, JFH_OBJ);
     return arr;
 }
@@ -531,6 +541,7 @@ jfh_obj_t *JFH_setarrH(jfh_obj_t *obj, char *key, jfh_array_t *src) {
         errno = EINVAL;
         return NULL;
     }
+    obj->empty = false;
     if (key) {
         if (!JFH_resetkey(obj, key)) {
             return NULL;
