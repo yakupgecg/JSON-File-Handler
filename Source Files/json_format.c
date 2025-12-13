@@ -1,12 +1,13 @@
 #include "..\Headers\json_format.h"
 
 static char *remove_whitespace(char *str) {
-    if (str == NULL) {
+    if (!str) {
         errno = EINVAL;
         return NULL;
     }
+    int braces = 0;
     char *newstr = malloc(strlen(str) + 1);
-    if (newstr == NULL) {
+    if (!newstr) {
         errno = ENOMEM;
         return NULL;
     }
@@ -14,7 +15,7 @@ static char *remove_whitespace(char *str) {
     char *cur = str;
     char *prev = str;
     bool is_string = false;
-    while (*cur != '\0') {
+    while (*cur) {
         if (*cur == '\"') {
             if (*prev != '\\') {
                 if (is_string) {
@@ -28,8 +29,17 @@ static char *remove_whitespace(char *str) {
             *newcur = *cur;
             newcur++;
         }
+        if ((*cur == '{' || *cur == '[') && !is_string) {
+            braces++;
+        } else if ((*cur == '}' || *cur == ']') && !is_string) {
+            braces--;
+        }
         cur++;
         prev++;
+    }
+    if (braces) {
+        free(newstr);
+        return NULL;
     }
     *newcur = '\0';
     return newstr;
@@ -254,12 +264,12 @@ char *JFH_encode_arr(jfh_array_t *arr) {
 
 // Indents and formats a json string
 char *JFH_indent_json(char *ajson, size_t indent_len) {
-    if (ajson == NULL) {
+    if (!ajson) {
         errno = EINVAL;
         return NULL;
     }
     char *json = remove_whitespace(ajson);
-    if (json == NULL) {
+    if (!json) {
         return NULL;
     }
     char *cur = json;
@@ -280,7 +290,7 @@ char *JFH_indent_json(char *ajson, size_t indent_len) {
     int nest_index = 0;
     int list_index = 0;
     char *newjson = malloc(alc_n);
-    if (newjson == NULL) {
+    if (!newjson) {
         errno = ENOMEM;
         return NULL;
     }
@@ -324,7 +334,7 @@ char *JFH_indent_json(char *ajson, size_t indent_len) {
                 free(newjson);
                 return NULL;
             }
-            if (temp == NULL) {
+            if (!temp) {
                 errno = ENOMEM;
                 free(newjson);
                 return NULL;
@@ -371,7 +381,7 @@ char *JFH_indent_json(char *ajson, size_t indent_len) {
 	    cur++;
 	    len_i++;
     }
-    if (list_index != 0 || nest_index != 0) {
+    if (list_index || nest_index) {
         free(newjson);
         errno = JFH_EJSON;
         return NULL;
@@ -393,8 +403,8 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj) {
     bool is_obj = false;
     bool is_arr = false;
     while (*cur != '\0') {
-        char *key = malloc(strlen(cur));
-        char *val = malloc(strlen(cur));
+        char *key = malloc(strlen(cur) + 1);
+        char *val = malloc(strlen(cur) + 1);
         if (!val || !key) {
             errno = ENOMEM;
             return 1;
@@ -456,14 +466,14 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj) {
             jfh_obj_t *newobj = JFH_initM();
             if (!newobj) return 1;
             jfh_obj_t *newcurobj = newobj;
-            if (stobj_parser(val, &newcurobj) != 0) return 1;
+            if (stobj_parser(val, &newcurobj)) return 1;
             if (!JFH_setobjH(*curobj, key, newobj)) return 1;
             free(val);
         } else if (is_arr) {
             jfh_array_t *newarr = JFH_initL();
             if (!newarr) return 1;
             jfh_array_t *newcurarr = newarr;
-            if (starr_parser(val, &newcurarr) != 0) return 1;
+            if (starr_parser(val, &newcurarr)) return 1;
             if (!JFH_setarrH(*curobj, key, newarr)) return 1;
             free(val);
         } else {
@@ -620,10 +630,6 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj) {
         (*curobj)->next->prev = (*curobj);
         (*curobj) = (*curobj)->next;
     }
-    if (nest_index != 0) {
-        errno = JFH_EJSON;
-        return 1;
-    }
     return 0;
 }
 
@@ -641,7 +647,7 @@ static int starr_parser(char *cur, jfh_array_t **curarr) {
     bool is_first = true;
     cur++;
     while (*cur != '\0') {
-        char *val = malloc(strlen(cur));
+        char *val = malloc(strlen(cur) + 1);
         if (!val) {
             errno = ENOMEM;
             return 1;
@@ -690,13 +696,13 @@ static int starr_parser(char *cur, jfh_array_t **curarr) {
             jfh_obj_t *newobj = JFH_initM();
             if (!newobj) return 1;
             jfh_obj_t *newcurobj = newobj;
-            if (stobj_parser(val, &newcurobj) != 0) return 1;
+            if (stobj_parser(val, &newcurobj)) return 1;
             if (!JFH_setobjL(*curarr, newobj)) return 1;
             free(val);
         } else if (is_arr) {
             jfh_array_t *newarr = JFH_initL();
             jfh_array_t *newcurarr = newarr;
-            if (starr_parser(val, &newcurarr) != 0) return 1;
+            if (starr_parser(val, &newcurarr)) return 1;
             if (!JFH_setarrL(*curarr, newarr)) return 1;
             free(val);
         } else {
@@ -851,10 +857,6 @@ static int starr_parser(char *cur, jfh_array_t **curarr) {
         (*curarr)->next->prev = (*curarr);
         (*curarr) = (*curarr)->next;
     }
-    if (nest_index != 0) {
-        errno = JFH_EJSON;
-        return 1;
-    }
     return 0;
 }
 
@@ -865,6 +867,9 @@ jfh_obj_t *JFH_parse_obj(char *str) {
         return NULL;
     }
     char *json = remove_whitespace(str);
+    if (!json) {
+        return NULL;
+    }
     char *cur = json;
     if (*cur != '{') {
         errno = JFH_EJSON;
@@ -876,7 +881,10 @@ jfh_obj_t *JFH_parse_obj(char *str) {
         return NULL;
     }
     jfh_obj_t *curobj = newobj;
-    if (stobj_parser(cur, &curobj) != 0) return NULL;
+    if (stobj_parser(cur, &curobj)) {
+        JFH_free_map(newobj);
+        return NULL;
+    }
     return newobj;
 }
 
@@ -887,6 +895,9 @@ jfh_array_t *JFH_parse_arr(char *str) {
         return NULL;
     }
     char *json = remove_whitespace(str);
+    if (!json) {
+        return NULL;
+    }
     char *cur = json;
     if (*cur != '[') {
         errno = JFH_EJSON;
@@ -898,6 +909,9 @@ jfh_array_t *JFH_parse_arr(char *str) {
         return NULL;
     }
     jfh_array_t *curarr = newarr;
-    if (starr_parser(cur, &curarr) != 0) return NULL;
+    if (starr_parser(cur, &curarr)) {
+        JFH_free_list(newarr);
+        return NULL;
+    }
     return newarr;
 }

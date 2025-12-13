@@ -2,13 +2,13 @@
 
 // This is a helper function since I am on windows and cannot use normal stdup()
 static char *str_dup(char *str) {
-    if (str == NULL) {
+    if (!str) {
         errno = EINVAL;
         return NULL;
     }
     int keylen = strlen(str) + 1;
     char *newstr = malloc(keylen * sizeof(char));
-    if (newstr == NULL) {
+    if (!newstr) {
         errno = ENOMEM;
         return NULL;
     }
@@ -30,9 +30,13 @@ char *JFH_get_vt(enum jfh_valuetype vt) {
 
 // Returns the length of the map, but if the pair is not the root of the map, it will start from pair
 size_t JFH_map_len(jfh_obj_t *map) {
+    if (!map) {
+        errno = EINVAL;
+        return 0;
+    }
     size_t len = 0;
     jfh_obj_t *current = map;
-    while (current != NULL) {
+    while (current) {
         len += 1;
         current = current->next;
     }
@@ -41,9 +45,13 @@ size_t JFH_map_len(jfh_obj_t *map) {
 
 // Returns the length of the list
 size_t JFH_list_len(jfh_array_t *list) {
+    if (!list) {
+        errno = EINVAL;
+        return 0;
+    }
     size_t len = 0;
     jfh_array_t *current = list;
-    while (current != NULL) {
+    while (current) {
         len += 1;
         current = current->next;
     }
@@ -52,18 +60,18 @@ size_t JFH_list_len(jfh_array_t *list) {
 
 //Frees a json value
 int JFH_free_json_value(jfh_json_value_t *val) {
-    if (val == NULL) {
+    if (!val) {
         errno = EINVAL;
         return 1;
     }
     if (val->vt == JFH_OBJ) {
-        if (val->value.obj != NULL) JFH_free_map(val->value.obj);
+        if (val->value.obj) JFH_free_map(val->value.obj);
         val->value.obj = NULL;
     } else if (val->vt == JFH_LIST) {
-        if (val->value.arr != NULL) JFH_free_list(val->value.arr);
+        if (val->value.arr) JFH_free_list(val->value.arr);
         val->value.arr = NULL;
     } else if (val->vt == JFH_STR) {
-        if (val->value.str.str != NULL) free(val->value.str.str);
+        if (val->value.str.str) free(val->value.str.str);
         val->value.str.str = NULL;
         val->value.str.len = 0;
     }
@@ -73,11 +81,11 @@ int JFH_free_json_value(jfh_json_value_t *val) {
 
 // Forcefully frees a pair
 int JFH_free_pair(jfh_obj_t *pair) {
-    if (pair == NULL) {
+    if (!pair) {
         errno = EINVAL;
         return 1;
     }
-    if (pair->key != NULL) {
+    if (pair->key) {
         free(pair->key);
     }
     if (JFH_free_json_value(&pair->value) == 1) {
@@ -91,11 +99,11 @@ int JFH_free_pair(jfh_obj_t *pair) {
 
 // Forcefully frees an element
 int JFH_free_element(jfh_array_t *element) {
-    if (element == NULL) {
+    if (!element) {
         errno = EINVAL;
         return 1;
     }
-    if (JFH_free_json_value(&element->value) == 1) {
+    if (!JFH_free_json_value(&element->value)) {
         free(element);
         errno = EINVAL;
         return 1;
@@ -106,13 +114,13 @@ int JFH_free_element(jfh_array_t *element) {
 
 // Frees all the pairs after map and itself
 int JFH_free_map(jfh_obj_t* map) {
-    if (map == NULL) {
+    if (!map) {
         errno = EINVAL;
         return 1;
     }
     jfh_obj_t *current = map;
     jfh_obj_t *next;
-    while (current != NULL) {
+    while (current) {
         next = current->next;
         JFH_free_pair(current);
         current = next;
@@ -122,13 +130,13 @@ int JFH_free_map(jfh_obj_t* map) {
 
 // Frees the list (or frees every element after the given element)
 int JFH_free_list(jfh_array_t *list) {
-    if (list == NULL) {
+    if (!list) {
         errno = EINVAL;
         return 1;
     }
     jfh_array_t *current = list;
     jfh_array_t *next;
-    while (current != NULL) {
+    while (current) {
         next = current->next;
         JFH_free_element(current);
         current = next;
@@ -138,12 +146,12 @@ int JFH_free_list(jfh_array_t *list) {
 
 // Returns the map, which has the key to find
 jfh_obj_t *JFH_pairbykey(jfh_obj_t *root, char *key) {
-    if (root == NULL) {
+    if (!root) {
         errno = EINVAL;
         return NULL;
     }
     jfh_obj_t *current = root;
-    while (current != NULL) {
+    while (current) {
         if (strcmp(current->key, key) == 0) {
             return current;
         }
@@ -159,18 +167,18 @@ jfh_obj_t *JFH_searchH(jfh_obj_t *root, char *key) {
         return NULL;
     }
     jfh_obj_t *current = root;
-    while (current != NULL) {
+    while (current) {
         if (strcmp(current->key, key) == 0) {
             return current;
         }
         if (current->value.vt == JFH_OBJ) {
             jfh_obj_t *result = JFH_searchH(current->value.value.obj, key);
-            if (result != NULL) {
+            if (result) {
                 return result;
             }
         } else if (current->value.vt == JFH_LIST) {
             jfh_obj_t *result = JFH_searchL(current->value.value.arr, key);
-            if (result != NULL) {
+            if (result) {
                 return result;
             }
         }
@@ -186,15 +194,15 @@ jfh_obj_t *JFH_searchL(jfh_array_t *root, char *key) {
         return NULL;
     }
     jfh_array_t *current = root;
-    while (current != NULL) {
+    while (current) {
         if (current->value.vt == JFH_OBJ) {
             jfh_obj_t *result = JFH_searchH(current->value.value.obj, key);
-                        if (result != NULL) {
+            if (result) {
                 return result;
             }
         } else if (current->value.vt == JFH_LIST) {
             jfh_obj_t *result = JFH_searchL(current->value.value.arr, key);
-            if (result != NULL) {
+            if (result) {
                 return result;
             }
         }
@@ -205,7 +213,7 @@ jfh_obj_t *JFH_searchL(jfh_array_t *root, char *key) {
 
 // Returns the element by index. For example if index is 1 it returns root->next
 jfh_array_t *JFH_getelementbyindex(jfh_array_t *root, size_t index) {
-    if (root == NULL) {
+    if (!root) {
         errno = EINVAL;
         return NULL;
     }
@@ -221,12 +229,12 @@ jfh_array_t *JFH_getelementbyindex(jfh_array_t *root, size_t index) {
 // This will initalize a map and then return a pointer to it
 jfh_obj_t *JFH_initM() {
     jfh_obj_t *map = malloc(sizeof(jfh_obj_t));
-    if (map == NULL) {
+    if (!map) {
         errno = ENOMEM;
         return NULL;
     }
     map->key = malloc(1);
-    if (map->key == NULL) {
+    if (!map->key) {
         errno = ENOMEM;
         return NULL;
     }
@@ -239,12 +247,12 @@ jfh_obj_t *JFH_initM() {
 
 // Returns the last pair in a map
 jfh_obj_t *JFH_last_pair(jfh_obj_t *root) {
-    if (root == NULL) {
+    if (!root) {
         errno = EINVAL;
         return NULL;
     }
     jfh_obj_t *current = root;
-    while (current->next !=  NULL) {
+    while (current->next) {
         current = current->next;
     }
     return current;
@@ -252,12 +260,12 @@ jfh_obj_t *JFH_last_pair(jfh_obj_t *root) {
 
 // Returns the last element in a list
 jfh_array_t *JFH_last_element(jfh_array_t *root) {
-    if (root == NULL) {
+    if (!root) {
         errno = EINVAL;
         return NULL;
     }
     jfh_array_t *current = root;
-    while (current->next != NULL) {
+    while (current->next) {
         current = current->next;
     }
     return current;
@@ -266,7 +274,7 @@ jfh_array_t *JFH_last_element(jfh_array_t *root) {
 // Initializes a list
 jfh_array_t *JFH_initL() {
     jfh_array_t *list = malloc(sizeof(jfh_array_t));
-    if (list == NULL) {
+    if (!list) {
         errno = ENOMEM;
         return NULL;
     }
@@ -279,17 +287,17 @@ jfh_array_t *JFH_initL() {
 
 // Adds a pair to the end of the given map and returns it
 jfh_obj_t *JFH_appendH(jfh_obj_t *map) {
-    if (map == NULL) {
+    if (!map) {
         errno = EINVAL;
         return NULL;
     }
     jfh_obj_t *current = map;
-    while (current->next != NULL) {
+    while (current->next) {
         current = current->next;
     }
     current->next = JFH_initM();
     current->next->prev = current;
-    if (current->next == NULL) {
+    if (!current->next) {
         errno = ENOMEM;
         return NULL;
     }
@@ -298,17 +306,17 @@ jfh_obj_t *JFH_appendH(jfh_obj_t *map) {
 
 // Adds an element to the end of the given list and returns it
 jfh_array_t *JFH_appendL(jfh_array_t *list) {
-    if (list == NULL) {
+    if (!list) {
         errno = EINVAL;
         return NULL;
     }
     jfh_array_t *current = list;
-    while (current->next != NULL) {
+    while (current->next) {
         current = current->next;
     }
     current->next = JFH_initL();
     current->next->prev = current;
-    if (current->next == NULL) {
+    if (!current->next) {
         errno = ENOMEM;
         return NULL;
     }
@@ -328,7 +336,7 @@ jfh_obj_t *JFH_insertH(jfh_obj_t *obj) {
     }
     newobj->next = obj->next;
     newobj->prev = obj;
-    if (obj->next != NULL) {
+    if (obj->next) {
         obj->next->prev = newobj;
     }
     obj->next = newobj;
@@ -348,7 +356,7 @@ jfh_array_t *JFH_insertL(jfh_array_t *element) {
     }
     newelement->next = element->next;
     newelement->prev = element;
-    if (element->next != NULL) {
+    if (element->next) {
         element->next->prev = newelement;
     }
     element->next = newelement;
@@ -379,14 +387,14 @@ jfh_array_t *JFH_popL(jfh_array_t *element) {
 
 // Resets pairs key to the given string
 jfh_obj_t *JFH_resetkey(jfh_obj_t *pair, char *key) {
-    if (pair == NULL || key == NULL) {
+    if (!pair || !key) {
         errno = EINVAL;
         return NULL;
     }
     int str_len = strlen(key);
     free(pair->key);
     pair->key = str_dup(key);
-    if (pair->key == NULL) {
+    if (!pair->key) {
         return NULL;
     }
     pair->key[str_len] = '\0';
@@ -394,7 +402,7 @@ jfh_obj_t *JFH_resetkey(jfh_obj_t *pair, char *key) {
 }
 
 void JFH_setval(jfh_json_value_t *value, void *src, enum jfh_valuetype vt) {
-    if (value == NULL) {
+    if (!value) {
         errno = EINVAL;
         return;
     }
@@ -418,13 +426,13 @@ void JFH_setval(jfh_json_value_t *value, void *src, enum jfh_valuetype vt) {
 
 // Sets the object's or element's value to a string
 jfh_obj_t *JFH_setstrH(jfh_obj_t *obj, char *key, char *src) {
-    if (obj == NULL || src == NULL) {
+    if (!obj || !src) {
         errno = EINVAL;
         return NULL;
     }
     
-    if (key != NULL) {
-        if (JFH_resetkey(obj, key) == NULL) {
+    if (key) {
+        if (!JFH_resetkey(obj, key)) {
             return NULL;
         }
     }
@@ -433,7 +441,7 @@ jfh_obj_t *JFH_setstrH(jfh_obj_t *obj, char *key, char *src) {
 }
 
 jfh_array_t *JFH_setstrL(jfh_array_t *arr, char *src) {
-    if (arr == NULL || src == NULL) {
+    if (!arr || !src) {
         errno = EINVAL;
         return NULL;
     }
@@ -444,12 +452,12 @@ jfh_array_t *JFH_setstrL(jfh_array_t *arr, char *src) {
 
 // Sets the object's or element's value to an integer
 jfh_obj_t *JFH_setintH(jfh_obj_t *obj, char *key, int src) {
-    if (obj == NULL) {
+    if (!obj) {
         errno = EINVAL;
         return NULL;
     }
-    if (key != NULL) {
-        if (JFH_resetkey(obj, key) == NULL) {
+    if (key) {
+        if (!JFH_resetkey(obj, key)) {
             return NULL;
         }
     }
@@ -458,7 +466,7 @@ jfh_obj_t *JFH_setintH(jfh_obj_t *obj, char *key, int src) {
 }
 
 jfh_array_t *JFH_setintL(jfh_array_t *arr, int src) {
-    if (arr == NULL) {
+    if (!arr) {
         errno = EINVAL;
         return NULL;
     }
@@ -469,12 +477,12 @@ jfh_array_t *JFH_setintL(jfh_array_t *arr, int src) {
 
 // Sets the object's or element's to a double
 jfh_obj_t *JFH_setdoubleH(jfh_obj_t *obj, char *key, double src) {
-    if (obj == NULL) {
+    if (!obj) {
         errno = EINVAL;
         return NULL;
     }
-    if (key != NULL) {
-        if (JFH_resetkey(obj, key) == NULL) {
+    if (key) {
+        if (!JFH_resetkey(obj, key)) {
             return NULL;
         }
     }
@@ -483,7 +491,7 @@ jfh_obj_t *JFH_setdoubleH(jfh_obj_t *obj, char *key, double src) {
 }
 
 jfh_array_t *JFH_setdoubleL(jfh_array_t *arr, double src) {
-    if (arr == NULL) {
+    if (!arr) {
         errno = EINVAL;
         return NULL;
     }
@@ -494,12 +502,12 @@ jfh_array_t *JFH_setdoubleL(jfh_array_t *arr, double src) {
 
 // Sets the object's or element's to an object
 jfh_obj_t *JFH_setobjH(jfh_obj_t *obj, char *key, jfh_obj_t *src) {
-    if (obj == NULL || src == NULL) {
+    if (!obj || !src) {
         errno = EINVAL;
         return NULL;
     }
-    if (key != NULL) {
-        if (JFH_resetkey(obj, key) == NULL) {
+    if (key) {
+        if (!JFH_resetkey(obj, key)) {
             return NULL;
         }
     }
@@ -508,7 +516,7 @@ jfh_obj_t *JFH_setobjH(jfh_obj_t *obj, char *key, jfh_obj_t *src) {
 }
 
 jfh_array_t *JFH_setobjL(jfh_array_t *arr, jfh_obj_t *src) {
-    if (arr == NULL || src == NULL) {
+    if (!arr || !src) {
         errno = EINVAL;
         return NULL;
     }
@@ -519,12 +527,12 @@ jfh_array_t *JFH_setobjL(jfh_array_t *arr, jfh_obj_t *src) {
 
 // Sets the object's or element's to an array
 jfh_obj_t *JFH_setarrH(jfh_obj_t *obj, char *key, jfh_array_t *src) {
-    if (obj == NULL || src == NULL) {
+    if (!obj || !src) {
         errno = EINVAL;
         return NULL;
     }
-    if (key != NULL) {
-        if (JFH_resetkey(obj, key) == NULL) {
+    if (key) {
+        if (!JFH_resetkey(obj, key)) {
             return NULL;
         }
     }
@@ -533,7 +541,7 @@ jfh_obj_t *JFH_setarrH(jfh_obj_t *obj, char *key, jfh_array_t *src) {
 }
 
 jfh_array_t *JFH_setarrL(jfh_array_t *arr, jfh_array_t *src) {
-    if (arr == NULL || src == NULL) {
+    if (!arr || !src) {
         errno = EINVAL;
         return NULL;
     }
@@ -548,7 +556,7 @@ jfh_obj_t *JFH_copy_obj(jfh_obj_t *obj, jfh_obj_t *cobj) {
         errno = EINVAL;
         return NULL;
     }
-    if (cobj != NULL) {
+    if (cobj) {
         switch (obj->value.vt) {
             case JFH_STR: JFH_setstrH(cobj, obj->key, obj->value.value.str.str); break;
             case JFH_INT: JFH_setintH(cobj, obj->key, obj->value.value.i); break;
@@ -581,7 +589,7 @@ jfh_array_t *JFH_copy_element(jfh_array_t *element, jfh_array_t *celement) {
         errno = EINVAL;
         return NULL;
     }
-    if (celement != NULL) {
+    if (celement) {
         switch (element->value.vt) {
             case JFH_STR: JFH_setstrL(celement, element->value.value.str.str); break;
             case JFH_INT: JFH_setintL(celement, element->value.value.i); break;
