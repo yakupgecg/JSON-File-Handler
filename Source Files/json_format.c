@@ -350,7 +350,7 @@ char *JFH_indent_json(char *ajson, size_t indent_len) {
             newjson = temp;
 			newcur = newjson + len_i;
         }
-        if ((*cur == '}' || *cur == ']') && !is_string) {
+        if ((*cur == '}' || *cur == ']') && !is_string && (*prev != '{' && *prev != '[')) {
             *newcur = '\n';
             newcur++;
             len_i++;
@@ -376,7 +376,7 @@ char *JFH_indent_json(char *ajson, size_t indent_len) {
                 newcur++;
                 len_i++;
             }
-        } else if ((*cur == '{' || *cur == '[') && !is_string) {
+        } else if ((*cur == '{' || *cur == '[') && !is_string && (*(cur+1) != '}' && *(cur+1) != ']')) {
             *newcur = '\n';
             newcur++;
             len_i++;
@@ -917,6 +917,9 @@ jfh_obj_t *JFH_parse_obj(char *str) {
         errno = ENOMEM;
         return NULL;
     }
+    if (!strcmp(json, "{}")) {
+        return newobj;
+    }
     jfh_obj_t *curobj = newobj;
     if (stobj_parser(cur, &curobj)) {
         JFH_free_map(newobj);
@@ -944,6 +947,9 @@ jfh_array_t *JFH_parse_arr(char *str) {
     if (!newarr) {
         errno = ENOMEM;
         return NULL;
+    }
+    if (!strcmp(json, "[]")) {
+        return newarr;
     }
     jfh_array_t *curarr = newarr;
     if (starr_parser(cur, &curarr)) {
