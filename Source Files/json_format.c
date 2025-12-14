@@ -75,6 +75,69 @@ static int st_write(char **cur, char **str, size_t *pos, size_t *alc_n, const ch
     return 0;
 }
 
+static char *evalu(char *str) {
+    if (!str) {
+        errno = EINVAL;
+        return NULL;
+    }
+    char *cur = str;
+    size_t alc_n = 1;
+    while (*cur) {
+        alc_n++;
+        switch (*cur) {
+            case '\n': alc_n++; break;
+            case '\t': alc_n++; break;
+            case '\r': alc_n++; break;
+            case '\b': alc_n++; break;
+            case '\f': alc_n++; break;
+        }
+        cur++;
+    }
+    char *newstr = malloc(alc_n);
+    char *newcur = newstr;
+    cur = str;
+    while (*cur) {
+        switch (*cur) {
+            case '\n': *newcur++ = '\\'; *newcur++ = 'n'; cur++; break;
+            case '\t': *newcur++ = '\\'; *newcur++ = 't'; cur++; break;
+            case '\r': *newcur++ = '\\'; *newcur++ = 'r'; cur++; break;
+            case '\b': *newcur++ = '\\'; *newcur++ = 'b'; cur++; break;
+            case '\f': *newcur++ = '\\'; *newcur++ = 'f'; cur++; break;
+            default: *newcur = *cur; newcur++; cur++; break;
+        }
+    }
+    *newcur = '\0';
+    return newstr;
+}
+
+static char *_evalu(char *str) {
+    if (!str) {
+        errno = EINVAL;
+        return NULL;
+    }
+    char *newstr = malloc(strlen(str) + 1);
+    char *newcur = newstr;
+    char *cur = str;
+    while (*cur) {
+        if (*cur == '\\') {
+            cur++;
+            switch (*cur) {
+                case 'n': *newcur++ = '\n'; cur++; break;
+                case 't': *newcur++ = '\t'; cur++; break;
+                case 'r': *newcur++ = '\r'; cur++; break;
+                case 'b': *newcur++ = '\b'; cur++; break;
+                case 'f': *newcur++ = '\f'; cur++; break;
+                case '\"': *newcur++ = '\\'; *newcur++ = '\"'; cur++; break;
+            }
+        }
+        *newcur = *cur;
+        newcur++;
+        cur++;
+    }
+    *newcur = '\0';
+    return newstr;
+}
+
 static int stobj_encoder(jfh_obj_t *curobj, char **str, char **cur, size_t *pos, size_t *alc_n) {
     if (!curobj) {
         errno = EINVAL;
@@ -93,8 +156,10 @@ static int stobj_encoder(jfh_obj_t *curobj, char **str, char **cur, size_t *pos,
             st_write(cur, str, pos, alc_n, ":")
         ) return 1;
         switch (curobj->value.vt) {
-            case JFH_STR: {   
-                if (st_write(cur, str, pos, alc_n, curobj->value.value.str.str)) return 1;
+            case JFH_STR: {
+                char *new = evalu(curobj->value.value.str.str);
+                if (st_write(cur, str, pos, alc_n, new)) return 1;
+                free(new);
                 break;
             } case JFH_INT: {
                 char *temp = JFH_str_Int(curobj->value.value.i);
@@ -157,7 +222,9 @@ static int starr_encoder(jfh_array_t *curarr, char **str, char **cur, size_t *po
     while (curarr) {
         switch (curarr->value.vt) {
             case JFH_STR: {
-                if (st_write(cur, str, pos, alc_n, curarr->value.value.str.str)) return 1;
+                char *new = evalu(curarr->value.value.str.str);
+                if (st_write(cur, str, pos, alc_n, new)) return 1;
+                free(new);
                 break;
             } case JFH_INT: {
                 char *temp = JFH_str_Int(curarr->value.value.i);
@@ -666,7 +733,9 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj) {
                         goto fail;
                     }
                 } else {
-                    if (!JFH_setstrH_nquots(*curobj, key, val)) goto fail;
+                    char *new = _evalu(val);
+                    if (!JFH_setstrH_nquots(*curobj, key, new)) goto fail;
+                    free(new);
                 }
             }
         }
@@ -915,7 +984,9 @@ static int starr_parser(char *cur, jfh_array_t **curarr) {
                         goto fail;
                     }
                 } else {
-                    if (!JFH_setstrL_nquots(*curarr, val)) goto fail;
+                    char *new = _evalu(val);
+                    if (!JFH_setstrL_nquots(*curarr, new)) goto fail;
+                    free(new);
                 }
             }
         }
