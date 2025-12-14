@@ -48,9 +48,11 @@ char *JFH_get_vt(enum jfh_valuetype vt) {
         case JFH_STR: return "STR";
         case JFH_INT: return "INT";
         case JFH_DBL: return "DBL";
-        case JFH_LIST: return "LIST";
         case JFH_OBJ: return "OBJ";
-        default: return "NULL";
+        case JFH_LIST: return "LIST";
+        case JFH_BOOL: return "BOOL";
+        case JFH_NULL: return "NULL";
+        default: return "(unknown type)";
     }
 }
 
@@ -439,7 +441,7 @@ void JFH_setval(jfh_json_value_t *value, void *src, enum jfh_valuetype vt) {
         errno = EINVAL;
         return;
     }
-
+    
     JFH_free_json_value(value);
 
     switch (vt) {
@@ -453,6 +455,13 @@ void JFH_setval(jfh_json_value_t *value, void *src, enum jfh_valuetype vt) {
         case JFH_DBL: value->value.dbl = *(double*)src; value->vt = JFH_DBL; break;
         case JFH_OBJ: value->value.obj = (jfh_obj_t*)src;  value->vt = JFH_OBJ; break;
         case JFH_LIST: value->value.arr = (jfh_array_t*)src; value->vt = JFH_LIST; break;
+        case JFH_BOOL: value->value.b = *(bool*)src; value->vt = JFH_BOOL; break;
+        case JFH_NULL: {
+            value->value.str.str = str_dup((char*)src);
+            value->value.str.len = strlen((char*)src);
+            value->vt = JFH_NULL;
+            break;
+        }
         default: errno = EINVAL; return;
     }
 }
@@ -532,6 +541,86 @@ jfh_array_t *JFH_setdoubleL(jfh_array_t *arr, double src) {
     }
     arr->empty = false;
     JFH_setval(&arr->value, &src, JFH_DBL);
+    return arr;
+}
+
+// Sets the object's or element's to a boolean value
+jfh_obj_t *JFH_setboolH(jfh_obj_t *obj, char *key, bool b) {
+    if (!obj) {
+        errno = EINVAL;
+        return NULL;
+    }
+    obj->empty = false;
+    if (key) {
+        if (!JFH_resetkey(obj, key)) {
+            return NULL;
+        }
+    }
+    JFH_setval(&obj->value, &b, JFH_BOOL);
+    return obj;
+}
+
+jfh_array_t *JFH_setboolL(jfh_array_t *arr, bool b) {
+    if (!arr) {
+        errno = EINVAL;
+        return NULL;
+    }
+    arr->empty = false;
+    JFH_setval(&arr->value, &b, JFH_BOOL);
+    return arr;
+}
+
+// Sets the object's or element's to null
+jfh_obj_t *JFH_setnullH(jfh_obj_t *obj, char *key) {
+    if (!obj) {
+        errno = EINVAL;
+        return NULL;
+    }
+    obj->empty = false;
+    if (key) {
+        if (!JFH_resetkey(obj, key)) {
+            return NULL;
+        }
+    }
+    JFH_setval(&obj->value, "null", JFH_NULL);
+    return obj;
+}
+
+jfh_array_t *JFH_setnullL(jfh_array_t *arr) {
+    if (!arr) {
+        errno = EINVAL;
+        return NULL;
+    }
+    arr->empty = false;
+    JFH_setval(&arr->value, "null", JFH_NULL);
+    return arr;
+}
+
+// Sets the object's or element's value to a string with no quotes
+jfh_obj_t *JFH_setstrH_nquots(jfh_obj_t *obj, char *key, char *src) {
+    if (!obj || !src) {
+        errno = EINVAL;
+        return NULL;
+    }
+    obj->empty = false;
+    if (key) {
+        if (!JFH_resetkey(obj, key)) {
+            return NULL;
+        }
+    }
+    JFH_setval(&obj->value, src, JFH_NULL);
+    obj->value.vt = JFH_STR;
+    return obj;
+}
+
+jfh_array_t *JFH_setstrL_nquots(jfh_array_t *arr, char *src) {
+    if (!arr || !src) {
+        errno = EINVAL;
+        return NULL;
+    }
+    arr->empty = false;
+    JFH_setval(&arr->value, src, JFH_NULL);
+    arr->value.vt = JFH_STR;
     return arr;
 }
 

@@ -126,6 +126,12 @@ static int stobj_encoder(jfh_obj_t *curobj, char **str, char **cur, size_t *pos,
                     return 1;
                 }
                 break;
+            } case JFH_BOOL: {
+                if (st_write(cur, str, pos, alc_n, curobj->value.value.b ? "true" : "false")) return 1;
+                break;
+            } case JFH_NULL: {
+                if (st_write(cur, str, pos, alc_n, "null")) return 1;
+                break;
             }
             default: errno = JFH_EJSON; return 1;
         }
@@ -182,6 +188,12 @@ static int starr_encoder(jfh_array_t *curarr, char **str, char **cur, size_t *po
                 if (r) {
                     return 1;
                 }
+                break;
+            } case JFH_BOOL: {
+                if (st_write(cur, str, pos, alc_n, curarr->value.value.b ? "true" : "false")) return 1;
+                break;
+            } case JFH_NULL: {
+                if (st_write(cur, str, pos, alc_n, "null")) return 1;
                 break;
             }
             default: errno = JFH_EJSON; return 1;
@@ -635,16 +647,19 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj) {
                 }
             } else {
                 if (*val != '\"') {
-                    if (
-                        strcmp(val, "true") != 0 && 
-                        strcmp(val, "false") != 0 &&
-                        strcmp(val, "null") != 0
-                    ) {
+                    if (strcmp(val, "true") == 0) {
+                        if (!JFH_setboolH(*curobj, key, true)) return 1;
+                    } else if (strcmp(val, "false") == 0) {
+                        if (!JFH_setboolH(*curobj, key, false)) return 1;
+                    } else if (strcmp(val, "null") == 0) {
+                        if (!JFH_setnullH(*curobj, key)) return 1;
+                    } else {
                         errno = JFH_EJSON;
                         return 1;
                     }
+                } else {
+                    if (!JFH_setstrH_nquots(*curobj, key, val)) return 1;
                 }
-                if (!JFH_setstrH(*curobj, key, val)) return 1;
             }
         }
         if (nest_index <= 0) break;
@@ -877,16 +892,19 @@ static int starr_parser(char *cur, jfh_array_t **curarr) {
                 }
             } else {
                 if (*val != '\"') {
-                    if (
-                        strcmp(val, "true") != 0 && 
-                        strcmp(val, "false") != 0 &&
-                        strcmp(val, "null") != 0
-                    ) {
+                    if (strcmp(val, "true") == 0) {
+                        if (!JFH_setboolL(*curarr, true)) return 1;
+                    } else if (strcmp(val, "false") == 0) {
+                        if (!JFH_setboolL(*curarr, false)) return 1;
+                    } else if (strcmp(val, "null") == 0) {
+                        if (!JFH_setnullL(*curarr)) return 1;
+                    } else {
                         errno = JFH_EJSON;
                         return 1;
                     }
+                } else {
+                    if (!JFH_setstrL_nquots(*curarr, val)) return 1;
                 }
-                if (!JFH_setstrL(*curarr, curval)) return 1;
             }
         }
         if (nest_index <= 0) break;

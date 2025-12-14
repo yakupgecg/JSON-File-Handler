@@ -17,7 +17,9 @@ enum jfh_valuetype {
     JFH_INT,   // Integer
     JFH_DBL,   // Double
     JFH_LIST,  // Nested list
-    JFH_OBJ   // Nested map
+    JFH_OBJ,    // Nested map
+    JFH_BOOL,   // Boolean
+    JFH_NULL   // Null (can also be strings without quotes, but not practical and illegal in json)
 };
 
 #ifndef JFH_EJSON
@@ -45,6 +47,7 @@ typedef struct {
         } str;
         int i;
         double dbl;
+        bool b;
         jfh_obj_t *obj;
         jfh_array_t *arr;
     } value;

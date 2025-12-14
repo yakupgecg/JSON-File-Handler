@@ -91,6 +91,18 @@ jfh_array_t *JFH_setintL(jfh_array_t *, int);
 jfh_obj_t *JFH_setdoubleH(jfh_obj_t *, char *, double);
 jfh_array_t *JFH_setdoubleL(jfh_array_t *, double);
 
+// Sets the object's or element's to a boolean value
+jfh_obj_t *JFH_setboolH(jfh_obj_t *, char *, bool);
+jfh_array_t *JFH_setboolL(jfh_array_t *, bool);
+
+// Sets the object's or element's to null
+jfh_obj_t *JFH_setnullH(jfh_obj_t *, char *);
+jfh_array_t *JFH_setnullL(jfh_array_t *);
+
+// Sets the object's or element's value to a string with no quotes
+jfh_obj_t *JFH_setstrH_nquots(jfh_obj_t *, char *, char *);
+jfh_array_t *JFH_setstrL_nquots(jfh_array_t *, char *);
+
 // Sets the object's or element's to an object
 jfh_obj_t *JFH_setobjH(jfh_obj_t *, char *, jfh_obj_t *);
 jfh_array_t *JFH_setobjL(jfh_array_t *, jfh_obj_t *);
