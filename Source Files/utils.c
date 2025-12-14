@@ -6,13 +6,39 @@ static char *str_dup(char *str) {
         errno = EINVAL;
         return NULL;
     }
-    int keylen = strlen(str) + 1;
-    char *newstr = malloc(keylen * sizeof(char));
+    int len = strlen(str) + 1;
+    char *newstr = malloc(len * sizeof(char));
     if (!newstr) {
         errno = ENOMEM;
         return NULL;
     }
-    memcpy(newstr, str, keylen);
+    memcpy(newstr, str, len);
+    return newstr;
+}
+
+static char *quots(char *str) {
+    if (!str) {
+        errno = EINVAL;
+        return NULL;
+    }
+    int len = strlen(str) + 3;
+    char *newstr = malloc(len);
+    if (!newstr) {
+        errno = ENOMEM;
+        return NULL;
+    }
+    char *cur = str;
+    char *newcur = newstr;
+    *newcur = '\"';
+    newcur++;
+    while (*cur) {
+        *newcur = *cur;
+        cur++;
+        newcur++;
+    }
+    *newcur = '\"';
+    newcur++;
+    *newcur = '\0';
     return newstr;
 }
 
@@ -418,7 +444,7 @@ void JFH_setval(jfh_json_value_t *value, void *src, enum jfh_valuetype vt) {
 
     switch (vt) {
         case JFH_STR: {
-            value->value.str.str = str_dup((char*)src);
+            value->value.str.str = quots((char*)src);
             value->value.str.len = strlen((char*)src);
             value->vt = JFH_STR;
             break;
