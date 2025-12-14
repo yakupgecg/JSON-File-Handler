@@ -5,6 +5,7 @@ static char *remove_whitespace(char *str) {
         errno = EINVAL;
         return NULL;
     }
+    size_t quots = 0;
     int braces = 0;
     char *newstr = malloc(strlen(str) + 1);
     if (!newstr) {
@@ -18,6 +19,7 @@ static char *remove_whitespace(char *str) {
     while (*cur) {
         if (*cur == '\"') {
             if (*prev != '\\') {
+                quots++;
                 if (is_string) {
                     is_string = false;
                 } else {
@@ -37,7 +39,7 @@ static char *remove_whitespace(char *str) {
         prev = cur;
         cur++;
     }
-    if (braces) {
+    if (braces || quots % 2 != 0) {
         free(newstr);
         errno = JFH_EJSON;
         return NULL;
