@@ -174,7 +174,7 @@ int JFH_free_list(jfh_array_t *list) {
 
 // Returns the map, which has the key to find
 jfh_obj_t *JFH_pairbykey(jfh_obj_t *root, char *key) {
-    if (!root) {
+    if (!root || !key) {
         errno = EINVAL;
         return NULL;
     }
@@ -437,7 +437,7 @@ jfh_obj_t *JFH_resetkey(jfh_obj_t *pair, char *key) {
 }
 
 void JFH_setval(jfh_json_value_t *value, void *src, enum jfh_valuetype vt) {
-    if (!value) {
+    if (!value || !src) {
         errno = EINVAL;
         return;
     }
@@ -468,7 +468,7 @@ void JFH_setval(jfh_json_value_t *value, void *src, enum jfh_valuetype vt) {
 
 // Sets the object's or element's value to a string
 jfh_obj_t *JFH_setstrH(jfh_obj_t *obj, char *key, char *src) {
-    if (!obj || !src) {
+    if (!obj || !key || !src) {
         errno = EINVAL;
         return NULL;
     }
@@ -494,7 +494,7 @@ jfh_array_t *JFH_setstrL(jfh_array_t *arr, char *src) {
 
 // Sets the object's or element's value to an integer
 jfh_obj_t *JFH_setintH(jfh_obj_t *obj, char *key, int src) {
-    if (!obj) {
+    if (!obj || !key) {
         errno = EINVAL;
         return NULL;
     }
@@ -520,7 +520,7 @@ jfh_array_t *JFH_setintL(jfh_array_t *arr, int src) {
 
 // Sets the object's or element's to a double
 jfh_obj_t *JFH_setdoubleH(jfh_obj_t *obj, char *key, double src) {
-    if (!obj) {
+    if (!obj || !key) {
         errno = EINVAL;
         return NULL;
     }
@@ -546,7 +546,7 @@ jfh_array_t *JFH_setdoubleL(jfh_array_t *arr, double src) {
 
 // Sets the object's or element's to a boolean value
 jfh_obj_t *JFH_setboolH(jfh_obj_t *obj, char *key, bool b) {
-    if (!obj) {
+    if (!obj || !key) {
         errno = EINVAL;
         return NULL;
     }
@@ -572,7 +572,7 @@ jfh_array_t *JFH_setboolL(jfh_array_t *arr, bool b) {
 
 // Sets the object's or element's to null
 jfh_obj_t *JFH_setnullH(jfh_obj_t *obj, char *key) {
-    if (!obj) {
+    if (!obj || !key) {
         errno = EINVAL;
         return NULL;
     }
@@ -598,7 +598,7 @@ jfh_array_t *JFH_setnullL(jfh_array_t *arr) {
 
 // Sets the object's or element's value to a string with no quotes
 jfh_obj_t *JFH_setstrH_nquots(jfh_obj_t *obj, char *key, char *src) {
-    if (!obj || !src) {
+    if (!obj || !key || !src) {
         errno = EINVAL;
         return NULL;
     }
@@ -626,7 +626,7 @@ jfh_array_t *JFH_setstrL_nquots(jfh_array_t *arr, char *src) {
 
 // Sets the object's or element's to an object
 jfh_obj_t *JFH_setobjH(jfh_obj_t *obj, char *key, jfh_obj_t *src) {
-    if (!obj || !src) {
+    if (!obj || !key || !src) {
         errno = EINVAL;
         return NULL;
     }
@@ -652,7 +652,7 @@ jfh_array_t *JFH_setobjL(jfh_array_t *arr, jfh_obj_t *src) {
 
 // Sets the object's or element's to an array
 jfh_obj_t *JFH_setarrH(jfh_obj_t *obj, char *key, jfh_array_t *src) {
-    if (!obj || !src) {
+    if (!obj || !key || !src) {
         errno = EINVAL;
         return NULL;
     }
@@ -678,7 +678,7 @@ jfh_array_t *JFH_setarrL(jfh_array_t *arr, jfh_array_t *src) {
 
 // Copies the given object, either returns the copy or copies to another object.
 jfh_obj_t *JFH_copy_obj(jfh_obj_t *obj, jfh_obj_t *cobj) {
-    if (!obj) {
+    if (!obj || !cobj) {
         errno = EINVAL;
         return NULL;
     }
@@ -711,7 +711,7 @@ jfh_obj_t *JFH_copy_obj(jfh_obj_t *obj, jfh_obj_t *cobj) {
 
 // Copies the given element, either returns the copy or copies to another element.
 jfh_array_t *JFH_copy_element(jfh_array_t *element, jfh_array_t *celement) {
-    if (!element) {
+    if (!element || !celement) {
         errno = EINVAL;
         return NULL;
     }
@@ -744,7 +744,7 @@ jfh_array_t *JFH_copy_element(jfh_array_t *element, jfh_array_t *celement) {
 
 // Copies the given map, either returns the copy or copies the whole map to another map.
 jfh_obj_t *JFH_copy_map(jfh_obj_t *map, jfh_obj_t *cmap) {
-    if (!map) {
+    if (!map || !cmap) {
         errno = EINVAL;
         return NULL;
     }
@@ -800,7 +800,7 @@ jfh_obj_t *JFH_copy_map(jfh_obj_t *map, jfh_obj_t *cmap) {
 
 // Copies the given list, either returns the copy or copies the whole list to another list.
 jfh_array_t *JFH_copy_list(jfh_array_t *list, jfh_array_t *clist) {
-    if (!list) {
+    if (!list || !clist) {
         errno = EINVAL;
         return NULL;
     }
