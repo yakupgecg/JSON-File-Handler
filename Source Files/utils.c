@@ -411,6 +411,7 @@ jfh_obj_t *JFH_popH(jfh_obj_t *obj) {
     }
     jfh_obj_t *last = JFH_last_pair(obj);
     last->prev->next = NULL;
+    last->prev = NULL;
     return last;
 }
 
@@ -422,6 +423,7 @@ jfh_array_t *JFH_popL(jfh_array_t *element) {
     }
     jfh_array_t *last = JFH_last_element(element);
     last->prev->next = NULL;
+    last->prev = NULL;
     return last;
 }
 
