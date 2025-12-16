@@ -26,15 +26,6 @@ enum jfh_valuetype {
 #define JFH_EJSON 200 // For errors with json strings
 #endif
 
-// These variables below are for encoding functions to allocate enough memory for each type
-extern unsigned int JFH_SHR_STR_LEN;   // The maximum length of a string made from a Short
-extern unsigned int JFH_INT_STR_LEN;   // The maximum length of a string made from an Integer
-extern unsigned int JFH_FLT_STR_LEN;   // The maximum length of a string made from a Float
-extern unsigned int JFH_DBL_STR_LEN;   // The maximum length of a string made from a Double
-extern unsigned int JFH_LONG_STR_LEN;  // The maximum length of a string made from a Long
-extern unsigned int JFH_LL_STR_LEN;    // The maximum length of a string made from a Long long
-extern unsigned int JFH_LDBL_STR_LEN;  // The maximum length of a string made from a Long double
-
 typedef struct jfh_Hmap jfh_obj_t;
 typedef struct jfh_Linkedlist jfh_array_t;
 
