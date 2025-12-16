@@ -34,7 +34,7 @@ typedef struct {
     union {
         struct {
             char *str;
-            unsigned int len;
+            size_t len;
         } str;
         int i;
         double dbl;
