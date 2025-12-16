@@ -1,4 +1,4 @@
-#include "JSON.h"
+#include "JFH.h"
 
 int main() {
     jfh_obj_t *obj = JFH_initM();

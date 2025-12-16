@@ -1,4 +1,4 @@
-#include "JSON.h"
+#include "JFH.h"
 
 int main() {
 	char *json = "{\"foo\": \"bar\"}";

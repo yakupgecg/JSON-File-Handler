@@ -20,7 +20,7 @@
             "json_format.h",
             "numtostr.h",
             "utils.h",
-            "JSON.h"
+            "JFH.h"
         ],
         "Source Files": [
             "data_structures.c",
