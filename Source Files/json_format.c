@@ -92,12 +92,16 @@ static char *evalu(char *str) {
             case '\r': alc_n++; break;
             case '\b': alc_n++; break;
             case '\f': alc_n++; break;
+            case '\\': alc_n++; break;
+            case '\"': alc_n++; break;
         }
         cur++;
     }
     char *newstr = malloc(alc_n);
     char *newcur = newstr;
     cur = str;
+    bool is_first = true;
+    bool is_last = false;
     while (*cur) {
         switch (*cur) {
             case '\n': *newcur++ = '\\'; *newcur++ = 'n'; cur++; break;
@@ -106,8 +110,18 @@ static char *evalu(char *str) {
             case '\b': *newcur++ = '\\'; *newcur++ = 'b'; cur++; break;
             case '\f': *newcur++ = '\\'; *newcur++ = 'f'; cur++; break;
             case '\\': *newcur++ = '\\'; *newcur++ = '\\'; cur++; break;
+            case '\"': {
+                if (!is_first && !is_last) {
+                    *newcur++ = '\\'; 
+                    *newcur++ = '\"'; 
+                    cur++; 
+                    break;
+                }
+            }
             default: *newcur = *cur; newcur++; cur++; break;
         }
+        is_first = false;
+        if (*(cur+1) == '\0') is_last = true;
     }
     *newcur = '\0';
     return newstr;
@@ -130,7 +144,7 @@ static char *_evalu(char *str) {
                 case 'r': *newcur++ = '\r'; cur++; break;
                 case 'b': *newcur++ = '\b'; cur++; break;
                 case 'f': *newcur++ = '\f'; cur++; break;
-                case '\"': *newcur++ = '\\'; *newcur++ = '\"'; cur++; break;
+                case '\"': *newcur++ = '\"'; cur++; break;
                 case '\\': *newcur++ = '\\'; cur++; break;
             }
         }
