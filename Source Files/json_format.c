@@ -105,6 +105,7 @@ static char *evalu(char *str) {
             case '\r': *newcur++ = '\\'; *newcur++ = 'r'; cur++; break;
             case '\b': *newcur++ = '\\'; *newcur++ = 'b'; cur++; break;
             case '\f': *newcur++ = '\\'; *newcur++ = 'f'; cur++; break;
+            case '\\': *newcur++ = '\\'; *newcur++ = '\\'; cur++; break;
             default: *newcur = *cur; newcur++; cur++; break;
         }
     }
@@ -130,6 +131,7 @@ static char *_evalu(char *str) {
                 case 'b': *newcur++ = '\b'; cur++; break;
                 case 'f': *newcur++ = '\f'; cur++; break;
                 case '\"': *newcur++ = '\\'; *newcur++ = '\"'; cur++; break;
+                case '\\': *newcur++ = '\\'; cur++; break;
             }
         }
         *newcur = *cur;
