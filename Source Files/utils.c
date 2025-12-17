@@ -456,6 +456,7 @@ void JFH_setval(jfh_json_value_t *value, void *src, enum jfh_valuetype vt) {
     switch (vt) {
         case JFH_STR: {
             value->value.str.str = quots((char*)src);
+            if (!value->value.str.str) return;
             value->value.str.len = strlen((char*)src);
             value->vt = JFH_STR;
             break;
@@ -467,6 +468,7 @@ void JFH_setval(jfh_json_value_t *value, void *src, enum jfh_valuetype vt) {
         case JFH_BOOL: value->value.b = *(bool*)src; value->vt = JFH_BOOL; break;
         case JFH_NULL: {
             value->value.str.str = str_dup((char*)src);
+            if (!value->value.str.str) return;
             value->value.str.len = strlen((char*)src);
             value->vt = JFH_NULL;
             break;
