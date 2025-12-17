@@ -114,8 +114,8 @@ static char *evalu(char *str) {
                 if (!is_first && !is_last) {
                     *newcur++ = '\\'; 
                     *newcur++ = '\"'; 
-                    cur++; 
                 }
+                cur++; 
                 break;
             }
             default: *newcur = *cur; newcur++; cur++; break;
