@@ -56,7 +56,7 @@ static int st_write(char **cur, char **str, size_t *pos, size_t *alc_n, const ch
     size_t len = strlen(src);
     while (*pos + len+1 > *alc_n) {
         *alc_n *= 2;
-        if (*alc_n > 1073741824) {
+        if (*alc_n >= 1073741824) {
             fprintf(stderr, "Memory limit (1073741824 bytes) reached\n");
             errno = ENOMEM;
             return 1;
@@ -439,7 +439,7 @@ char *JFH_indent_json(char *ajson, size_t indent_len) {
         while (len_i + nmem >= alc_n) {
             alc_n *= 2;
             char *temp = realloc(newjson, alc_n);
-            if (alc_n > 1073741824) {
+            if (alc_n >= 1073741824) {
                 fprintf(stderr, "Memory limit (1073741824 bytes) reached\n");
                 free(newjson);
                 return NULL;
