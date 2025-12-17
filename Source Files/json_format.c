@@ -395,8 +395,8 @@ char *JFH_indent_json(char *ajson, size_t indent_len) {
     size_t JFH_str_len = strlen(json)+1;
     size_t len_i = 0;
     size_t nmem = 0;
-    int k;
-    int i;
+    size_t k;
+    size_t i;
     int nest_index = 0;
     int list_index = 0;
     char *newjson = malloc(alc_n);

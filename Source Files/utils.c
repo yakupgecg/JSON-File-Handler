@@ -247,7 +247,7 @@ jfh_array_t *JFH_getelementbyindex(jfh_array_t *root, size_t index) {
     }
     if (JFH_list_len(root) < index) return JFH_last_element(root);
     jfh_array_t *current = root;
-    int i;
+    size_t i;
     for (i = 0; i < index; i++) {
         current = current->next;
     }
