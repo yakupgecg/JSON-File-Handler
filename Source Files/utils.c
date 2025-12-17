@@ -264,6 +264,7 @@ jfh_obj_t *JFH_initM() {
     map->key = malloc(1);
     if (!map->key) {
         errno = ENOMEM;
+        free(map);
         return NULL;
     }
     map->next = NULL;
