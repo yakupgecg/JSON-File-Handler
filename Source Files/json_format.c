@@ -532,12 +532,10 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj) {
     size_t len = strlen(cur);
     char *key = malloc(len);
     char *val = malloc(len);
-    if (!key) {
-        if (val) free(val);
-        return 1;
-    }
-    if (!val) {
+    if (!key || !val) {
         if (key) free(key);
+        if (val) free(val);
+        errno = ENOMEM;
         return 1;
     }
     char *prev = cur;
