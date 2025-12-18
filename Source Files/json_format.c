@@ -176,7 +176,11 @@ static int stobj_encoder(jfh_obj_t *curobj, char **str, char **cur, size_t *pos,
         switch (curobj->value.vt) {
             case JFH_STR: {
                 char *new = evalu(curobj->value.value.str.str);
-                if (st_write(cur, str, pos, alc_n, new)) return 1;
+                if ( 
+                    (st_write(cur, str, pos, alc_n, "\"")) ||
+                    (st_write(cur, str, pos, alc_n, new)) ||
+                    (st_write(cur, str, pos, alc_n, "\""))
+                ) return 1;
                 free(new);
                 break;
             } case JFH_INT: {
@@ -241,7 +245,11 @@ static int starr_encoder(jfh_array_t *curarr, char **str, char **cur, size_t *po
         switch (curarr->value.vt) {
             case JFH_STR: {
                 char *new = evalu(curarr->value.value.str.str);
-                if (st_write(cur, str, pos, alc_n, new)) return 1;
+                if ( 
+                    (st_write(cur, str, pos, alc_n, "\"")) ||
+                    (st_write(cur, str, pos, alc_n, new)) ||
+                    (st_write(cur, str, pos, alc_n, "\""))
+                ) return 1;
                 free(new);
                 break;
             } case JFH_INT: {
