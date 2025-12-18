@@ -4,8 +4,8 @@ int main() {
     jfh_obj_t *obj = JFH_initM();
     jfh_array_t *list = JFH_initL();
     if (!obj || !list) {
-        if (obj) free(obj);
-        if (list) free(list);
+        if (obj) JFH_free_map(obj);
+        if (list) JFH_free_list(list);
         return 1;
     }
     JFH_setintL(list, -7);
