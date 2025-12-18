@@ -1,8 +1,8 @@
 # JSON-File-Handler
 A JSON library built entirely from C.
 
-## What is JSON?
-**JSON** is shorthand for JavaScript object notation. It is a lightweight data interchange method usually associated with APIs, so data requests from servers.
+## What is JSON? (Read if you don't know)
+**JSON** is shorthand for JavaScript object notation. It is a lightweight data interchange method usually associated with APIs.
 For example if you want the current weather in a certain city, you do a HTTP request to a server that can provide the weather, the response
 is usually something like:
 
@@ -44,13 +44,9 @@ Nested objects or arrays, have another object or array in their value, looks lik
 Technically they can be nested infinitely but it completely depends on how much you have memory available.
 
 But we can't get data straight out from a JSON string, and that is why we need json parsers. They turn a json string into a datatype that the machine understands.
-But you probably wonder how did the weather service turn data into JSON strings, that's where encoders come in, they turn data into json.
+But you probably wonder how did the weather service turn data into JSON strings, that's where encoders come in, they turn data into a json string.
 
 More information about json in this link: http://www.json.org/
-
-
-
-
 
 ## What is JFH
 
@@ -157,14 +153,14 @@ typedef struct {
 } jfh_json_value_t;
 ```
 
-jfh_valuetype can be one of 7 valuetypes:
-JFH_STR,    String (can also be bool, null or any number)
-JFH_INT,    Integer
-JFH_DBL,    Double
-JFH_LIST,   Nested list
-JFH_OBJ,    Nested map
-JFH_BOOL,   Boolean
-JFH_NULL    Null (can also be strings without quotes, but it is impractical and illegal in json)
+jfh_valuetype can be one of 7 valuetypes:                                                               
+JFH_STR,    String  
+JFH_INT,    Integer  
+JFH_DBL,    Double  
+JFH_LIST,   Nested list  
+JFH_OBJ,    Nested map  
+JFH_BOOL,   Boolean  
+JFH_NULL    Null (can also be strings without quotes, but it is impractical and illegal in json)  
 
 ### Important functions
 
@@ -176,18 +172,17 @@ Here is a few important notes:
 
 The most important functions: 
 
-* `jfh_obj_t *JFH_initM()`: Initializes a new object with every property set to null and returns a pointer to the object
-* `jfh_array_t *JFH_initL()`: Initializes a new array with every property set to null and returns a pointer to the array
-* `jfh_obj_t *JFH_setstrH(jfh_obj_t *obj, char *key, char *string)`: Sets an object's key to *key and value to *string and returns a pointer to the changed objects
-* `jfh_array_t *JFH_setstrL(jfh_obj_t *obj, char *string)`: Works the same way as JFH_setstrH()
-* `jfh_obj_t *JFH_appendH(jfh_obj_t *obj)`: Appends an object to a map and returns a pointer to it. Also a variant for arrays JFH_appendL()
-* `jfh_obj_t *JFH_popH(jfh_obj_t *obj)`: Takes the last element of the map and disconnects it from the map and returns a pointer to the deleted object
-
-* `jfh_obj_t *JFH_parse_obj(char *json)`: Parses the given json into a map and returns a pointer to it. Has a variant for arrays JFH_parse_arr()
-* `char *JFH_encode_obj(jfh_obj_t *object)`: Encodes a map to a json string, and returns a pointer to it
-* `char *indent_json(char *json, size_t indent)`: Indents a json string and returns a pointer to the indented string
-* `int JFH_free_map(jfh_obj_t *object)`: Frees the object and everything after it
-* `int JFH_free_list(jfh_array_t *list  )`: Frees the object and everything after it.
+* `jfh_obj_t *JFH_initM()`: Initializes a new object with every property set to null and returns a pointer to the object.
+* `jfh_array_t *JFH_initL()`: Initializes a new array with every property set to null and returns a pointer to the array.
+* `jfh_obj_t *JFH_setstrH(jfh_obj_t *obj, char *key, char *string)`: Sets an object's key to *key and value to *string and returns a pointer to the changed objects.
+* `jfh_array_t *JFH_setstrL(jfh_obj_t *obj, char *string)`: Works the same way as JFH_setstrH().
+* `jfh_obj_t *JFH_appendH(jfh_obj_t *obj)`: Appends an object to a map and returns a pointer to it. Also a variant for arrays JFH_appendL().
+* `jfh_obj_t *JFH_popH(jfh_obj_t *obj)`: Takes the last element of the map and disconnects it from the map and returns a pointer to the deleted object.
+* `jfh_obj_t *JFH_parse_obj(char *json)`: Parses the given json into a map and returns a pointer to it. Has a variant for arrays JFH_parse_arr(). Remember to free it using JFH_free_map() or JFH_free_list().
+* `char *JFH_encode_obj(jfh_obj_t *object)`: Encodes a map to an allocated string, and returns a pointer to it. Remember to free it.
+* `char *indent_json(char *json, size_t indent)`: Indents a json string and returns a pointer to the indented string. It's allocated so remember to free it.
+* `int JFH_free_map(jfh_obj_t *object)`: Frees the object and everything after it.
+* `int JFH_free_list(jfh_array_t *list)`: Frees the array and everything after it.
 
 ### Macros
 
@@ -217,21 +212,22 @@ JFH.h includes the following system libraries:
 
 So you don't need to include these libraries if you use JFH.h
 
-### How to use
+### Examples
 
-Using this lib is pretty straightforward. Most of the time you use functions. Sometimes if you don't check a functions failure
+Using this lib is pretty straightforward. Most of the time you use functions. Sometimes if you don't check a function failures
 and use the object or element later, it might give a segmentation fault depending on the function. 
 
-Every one of those examples are tested so no need to worry testing at your own computer.
+Every one of the following examples are tested so no need to worry testing at your own computer.
 
 #### Objects
 
 Like I mentioned earlier, objects are basically key-value pairs.
+
 Here is some examples, I'll explain them.
 
 ##### Encoding
 
-First we have 2 simple objects.
+Example with an object:
 
 ```c
 #include <JFH.h>
@@ -257,15 +253,17 @@ int main() {
     free(indented_json);
     return 0;
 }
-```
+```  
 
-output:
-{
-    "foo": "bar",
-    "Example": 5
+output:  
+{  
+    "foo": "bar",  
+    "Example": 5  
 }
 
-Now we get to nested objects.
+
+
+Example with nested objects:
 
 ```c
 #include <JFH.h>
@@ -290,15 +288,17 @@ int main() {
     JFH_free_map(obj);
     return 0;
 }
-```
+```  
 
-output:
-{
-    "foo" {
-        "ExampleDbl": 3.141000,
-        "ExampleNum": 123
-    }
+Example output:  
+{  
+    "foo" {  
+        "ExampleDbl": 3.141000,  
+        "ExampleNum": 123  
+    }  
 }
+
+
 
 ##### Parsing
 
@@ -319,14 +319,16 @@ int main() {
     JFH_free_map(obj);
     free(encoded);
 }
-```
+```  
 
-output: 
-{
-    "Address1": 1001,
-    "Address2": 9221,
-    "Address3": 2835
+Example output:  
+{  
+    "Address1": 1001,  
+    "Address2": 9221,  
+    "Address3": 2835  
 }
+
+
 
 ```c
 #include <JFH.h>
@@ -345,31 +347,36 @@ int main() {
     JFH_free_map(obj);
     free(json);
 }
-```
+```  
 
-output:
-JSON:
-{
-    "Random city": {
-        "Street1": {
-            "Address1": 521,
-            "Address2": 859,
-            "Address3": 210
-        },
-        "Street2": {
-            "Address1": 592,
-            "Address2": 911
-        },
-        "Street3": {
-            "Address1": 110,
-            "Address2": 219,
-            "Address3": 251
-        }
-    }
+Example output:  
+JSON:  
+{  
+    "Random city": {  
+        "Street1": {  
+            "Address1": 521,  
+            "Address2": 859,  
+            "Address3": 210  
+        },  
+        "Street2": {  
+            "Address1": 592,  
+            "Address2": 911  
+        },  
+        "Street3": {  
+            "Address1": 110,  
+            "Address2": 219,  
+            "Address3": 251  
+        }  
+    }  
 }
 
 
+
 #### Arrays
+
+Like mentioned earlier, they are value arrays.
+
+Here is some examples for arrays.
 
 ##### Encoding
 
@@ -394,18 +401,18 @@ int main() {
     free(json);
     return 0;
 }
-```
+```  
 
-output:
-JSON:
-[
-    "foo",
-    "bar",
-    true,
-    3
+Example output:  
+JSON:  
+[  
+    "foo",  
+    "bar",  
+    true,  
+    3  
 ]
 
-Nested arrays:
+
 
 ```c
 #include <JFH.h>
@@ -431,19 +438,21 @@ int main() {
     free(json);
 	return 0;
 }
-```
+```  
 
-output:
-JSON:
-[
-    3.141500,
-    null,
-    [
-        true,
-        123,
-        "Hello, World!"
-    ]
+Example output:  
+JSON:  
+[  
+    3.141500,  
+    null,  
+    [  
+        true,  
+        123,  
+        "Hello, World!"  
+    ]  
 ]
+
+
 
 ##### Parsing
 
@@ -465,19 +474,21 @@ int main() {
     free(encoded);
     return 0;
 }
-```
+```  
 
-output:
-JSON:
-[
-    3.141500,
-    null,
-    [
-        true,
-        123,
-        "Hello, World!"
-    ]
+Example output:  
+JSON:  
+[  
+    3.141500,  
+    null,  
+    [  
+        true,  
+        123,  
+        "Hello, World!"  
+    ]  
 ]
+
+
 
 #### Objects & Arrays
 
@@ -500,5 +511,46 @@ int main() {
     JFH_free_map(obj);
     free(encoded);
 }
+```  
 
-```
+Example output:  
+JSON:  
+{  
+    "JSON-File-Handler": {  
+        "Examples": {  
+            "Example1": [  
+                CompileMethod.txt,  
+                main.c  
+            ],  
+            "Example2": [  
+                CompileMethod.txt,  
+                main.c  
+            ],  
+            "Example3": [  
+                CompileMethod.txt,  
+                main.c,  
+                Test.json  
+            ]  
+        },  
+        "Headers": [  
+            data_structures.h,  
+            json_format.h,  
+            numtostr.h,  
+            utils.h,  
+            JFH.h  
+        ],  
+        "Source Files": [  
+            data_structures.c,  
+            json_format.c,  
+            numtostr.c,  
+            utils.c  
+        ]  
+    }  
+}
+
+
+
+## After v1.0.0
+
+Because I will be doing other things, this library won't be getting as much updates as much as before.
+And I will definitely create more features, and possibly the features in [Unsupported features](#Unsupported-features).
