@@ -782,6 +782,7 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj) {
         (*curobj) = (*curobj)->next;
     }
     free(key);
+    free(val);
     return 0;
     fail:
         free(key);
