@@ -11,3 +11,11 @@ int main() {
     JFH_free_map(obj);
     return 0;
 }
+/*
+Expected output:
+
+Test json          : {"foo": "bar"}
+Key                : foo
+Value              : "bar"
+
+*/

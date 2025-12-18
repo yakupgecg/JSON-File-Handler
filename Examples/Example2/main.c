@@ -19,3 +19,15 @@ int main() {
     JFH_free_map(obj);
     return 0;
 }
+/*
+Expected output:
+
+Json:
+{
+    "Example list": [
+        -7,
+        true
+    ]
+}
+
+*/
