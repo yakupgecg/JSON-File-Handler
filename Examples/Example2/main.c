@@ -3,8 +3,11 @@
 int main() {
     jfh_obj_t *obj = JFH_initM();
     jfh_array_t *list = JFH_initL();
-    if (!obj || !list) return 1;
-    
+    if (!obj || !list) {
+        if (obj) free(obj);
+        if (list) free(list);
+        return 1;
+    }
     JFH_setintL(list, -7);
     JFH_setboolL(JFH_appendL(list), true);
 
