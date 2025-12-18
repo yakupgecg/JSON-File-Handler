@@ -98,6 +98,10 @@ static char *evalu(char *str) {
         cur++;
     }
     char *newstr = malloc(alc_n);
+    if (!newstr) {
+        errno = ENOMEM;
+        return NULL;
+    }
     char *newcur = newstr;
     cur = str;
     bool is_first = true;
@@ -133,6 +137,10 @@ static char *_evalu(char *str) {
         return NULL;
     }
     char *newstr = malloc(strlen(str) + 1);
+    if (!newstr) {
+        errno = ENOMEM;
+        return NULL;
+    }
     char *newcur = newstr;
     char *cur = str;
     while (*cur) {
@@ -176,6 +184,7 @@ static int stobj_encoder(jfh_obj_t *curobj, char **str, char **cur, size_t *pos,
         switch (curobj->value.vt) {
             case JFH_STR: {
                 char *new = evalu(curobj->value.value.str.str);
+                if (!new) return 1;
                 if ( 
                     (st_write(cur, str, pos, alc_n, "\"")) ||
                     (st_write(cur, str, pos, alc_n, new)) ||
@@ -245,6 +254,7 @@ static int starr_encoder(jfh_array_t *curarr, char **str, char **cur, size_t *po
         switch (curarr->value.vt) {
             case JFH_STR: {
                 char *new = evalu(curarr->value.value.str.str);
+                if (!new) return 1;
                 if ( 
                     (st_write(cur, str, pos, alc_n, "\"")) ||
                     (st_write(cur, str, pos, alc_n, new)) ||
