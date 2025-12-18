@@ -15,7 +15,11 @@ int main() {
     JFH_setarrH(obj, "Example list", list);
 
     char *json = JFH_indent_json(JFH_encode_obj(obj), 4);
-    if (!json) return 1;
+    if (!json) {
+        JFH_free_map(obj);
+        JFH_free_list(list);
+        return 1;
+    }
 
     printf("Json: \n%s\n", json);
     free(json);

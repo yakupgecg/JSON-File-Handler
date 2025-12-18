@@ -6,7 +6,10 @@ int main() {
     jfh_obj_t *obj = JFH_parse_obj(json);
     if (!obj) return 1; 
     char *encjson = JFH_indent_json(JFH_encode_obj(obj), 4);
-    if (!encjson) return 1;
+    if (!encjson) {
+        JFH_free_map(obj);
+        return 1;
+    }
     fprintf(file, "%s\n", encjson);
     fflush(file);
     printf("JSON: \n%s\n", encjson);
