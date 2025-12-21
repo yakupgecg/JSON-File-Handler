@@ -7,6 +7,7 @@ static char *remove_whitespace(char *str) {
     }
     size_t quots = 0;
     int braces = 0;
+    int square_brackets = 0;
     char *newstr = malloc(strlen(str) + 1);
     if (!newstr) {
         errno = ENOMEM;
@@ -31,15 +32,19 @@ static char *remove_whitespace(char *str) {
             *newcur = *cur;
             newcur++;
         }
-        if ((*cur == '{' || *cur == '[') && !is_string) {
+        if (*cur == '{' && !is_string) {
             braces++;
-        } else if ((*cur == '}' || *cur == ']') && !is_string) {
+        } else if (*cur == '}' && !is_string) {
             braces--;
+        } else if (*cur == '[' && !is_string) {
+            square_brackets++;
+        } else if (*cur == ']' && !is_string) {
+            square_brackets--;
         }
         prev = cur;
         cur++;
     }
-    if (braces || quots % 2 != 0) {
+    if (braces || square_brackets || quots % 2 != 0) {
         free(newstr);
         errno = JFH_EJSON;
         return NULL;
