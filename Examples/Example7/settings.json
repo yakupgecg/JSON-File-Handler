@@ -1,0 +1,33 @@
+{
+    "App": {
+        "Window": {
+            "Size": [500, 850],
+            "Position": [1250, 500],
+            "Visible": true,
+            "Theme": "Dark"
+        },
+        "System_configurations": {
+            "Default font": "Calibri",
+            "Logo": "logo.png",
+            "Supported_os": "Windows",
+            "Confirm_close": true
+        },
+        "Audio": {
+            "Volume": 100,
+            "Muted": false
+        },
+        "Saves": [
+            {
+                "Name": "Testsave",
+                "Archived": true,
+                "Data": {},
+                "Mods": []
+            }, {
+                "Name": "Backup",
+                "Archived": false,
+                "Data": {},
+                "Mods": ["stats.mod", "Customfonts.mod"]
+            }
+        ]
+    }
+}
