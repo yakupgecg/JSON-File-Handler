@@ -626,6 +626,7 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj) {
         } else {
             curval = val;
             if (
+                *curval == '0' ||
                 *curval == '1' ||
                 *curval == '2' ||
                 *curval == '3' ||
@@ -882,6 +883,7 @@ static int starr_parser(char *cur, jfh_array_t **curarr) {
         } else {
             curval = val;
             if (
+                *curval == '0' ||
                 *curval == '1' ||
                 *curval == '2' ||
                 *curval == '3' ||
