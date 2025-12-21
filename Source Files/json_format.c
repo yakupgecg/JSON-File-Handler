@@ -607,10 +607,12 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj) {
         curkey--;
         *curkey = '\0';
         *curval = '\0';
+        printf("%s\n", val);
         if (is_obj) {
             jfh_obj_t *newobj = JFH_initM();
             if (!newobj) goto fail;
             if (strcmp(val, "{}") != 0) {
+                newobj->empty = false;
                 jfh_obj_t *newcurobj = newobj;
                 if (stobj_parser(val, &newcurobj)) goto fail;
             }
@@ -619,6 +621,7 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj) {
             jfh_array_t *newarr = JFH_initL();
             if (!newarr) goto fail;
             if (strcmp(val, "[]") != 0) {
+                newarr->empty = false;
                 jfh_array_t *newcurarr = newarr;
                 if (starr_parser(val, &newcurarr)) goto fail;
             }
@@ -869,13 +872,16 @@ static int starr_parser(char *cur, jfh_array_t **curarr) {
             jfh_obj_t *newobj = JFH_initM();
             if (!newobj) goto fail;
             if (strcmp(val, "{}") != 0) {
+                newobj->empty = false;
                 jfh_obj_t *newcurobj = newobj;
                 if (stobj_parser(val, &newcurobj)) goto fail;
             }
             if (!JFH_setobjL(*curarr, newobj)) goto fail;
         } else if (is_arr) {
             jfh_array_t *newarr = JFH_initL();
+            if (!newarr) goto fail;
             if (strcmp(val, "[]") != 0) {
+                newarr->empty = false;
                 jfh_array_t *newcurarr = newarr;
                 if (starr_parser(val, &newcurarr)) goto fail;
             }
