@@ -149,8 +149,12 @@ static char *_evalu(char *str) {
     char *newcur = newstr;
     char *cur = str;
     while (*cur) {
+        switch (*cur) {
+            case '\n': case '\t': case '\r': case '\b': case '\f': goto fail;
+        }
         if (*cur == '\\') {
             cur++;
+            if (*cur == '\0') goto fail;
             switch (*cur) {
                 case 'n': *newcur++ = '\n'; cur++; break;
                 case 't': *newcur++ = '\t'; cur++; break;
@@ -159,14 +163,19 @@ static char *_evalu(char *str) {
                 case 'f': *newcur++ = '\f'; cur++; break;
                 case '\"': *newcur++ = '\"'; cur++; break;
                 case '\\': *newcur++ = '\\'; cur++; break;
+                case '/': *newcur++ = '/'; cur++; break;
+                default: goto fail;
             }
+            continue;
         }
-        *newcur = *cur;
-        newcur++;
-        cur++;
+        *newcur++ = *cur++;
     }
     *newcur = '\0';
     return newstr;
+    fail:
+        free(newstr);
+        errno = JFH_EJSON;
+        return NULL;
 }
 
 static int stobj_encoder(jfh_obj_t *curobj, char **str, char **cur, size_t *pos, size_t *alc_n) {
@@ -777,6 +786,7 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj) {
                     }
                 } else {
                     char *new = _evalu(val);
+                    if (!new) goto fail;
                     if (!JFH_setstrH_nquots(*curobj, key, new)) goto fail;
                     free(new);
                 }
@@ -1032,6 +1042,7 @@ static int starr_parser(char *cur, jfh_array_t **curarr) {
                     }
                 } else {
                     char *new = _evalu(val);
+                    if (!new) goto fail;
                     if (!JFH_setstrL_nquots(*curarr, new)) goto fail;
                     free(new);
                 }
