@@ -564,6 +564,7 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj) {
                 }
             }
             if (*cur == '{' && !is_string) {
+                if (*(cur+1) != '\"') goto fail;
                 if (nest_index > 0 && !is_obj && !is_arr) {
                     is_obj = true;
                     last_brace = nest_index;
@@ -572,6 +573,7 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj) {
             } else if (*cur == '}' && !is_string) {
                 nest_index--;
             } else if (*cur == '[' && !is_string) {
+                if (*(cur + 1) == ',') goto fail;
                 if (nest_index > 0 && !is_arr && !is_obj) {
                     is_arr = true;
                     last_brace = nest_index;
@@ -582,6 +584,7 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj) {
             }
             if (nest_index <= 0) break;
             if (*cur == ',' && !is_string && last_brace >= nest_index) {
+                if (*(cur + 1) == '}' || *(cur + 1) == ']') goto fail;
                 is_key = true;
                 prev = cur;
                 cur++;
@@ -592,6 +595,7 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj) {
                 curval++;
             }
             if (*cur == ':' && !is_string) {
+                if (*(cur + 1) == ',') goto fail;
                 is_key = false;
             }
             prev = cur;
@@ -825,6 +829,7 @@ static int starr_parser(char *cur, jfh_array_t **curarr) {
                 }
             }
             if (*cur == '[' && !is_string) {
+                if (*(cur + 1) == ',') goto fail;
                 if (nest_index > 0 && !is_arr && !is_obj) {
                     is_arr = true;
                     last_brace = nest_index;
@@ -833,6 +838,7 @@ static int starr_parser(char *cur, jfh_array_t **curarr) {
             } else if (*cur == ']' && !is_string) {
                 nest_index--;
             } else if (*cur == '{' && !is_string) {
+                if (*(cur + 1) != '\"') goto fail;
                 if (nest_index > 0 && !is_obj && !is_arr) {
                     is_obj = true;
                     last_brace = nest_index;
@@ -843,6 +849,7 @@ static int starr_parser(char *cur, jfh_array_t **curarr) {
             }
             if (nest_index <= 0) break;
             if (*cur == ',' && !is_string && last_brace >= nest_index) {
+                if (*(cur + 1) == '}' || *(cur + 1) == ']') goto fail;
                 prev = cur;
                 cur++;
                 break;
