@@ -14,10 +14,6 @@ Which takes incredibly much time over including 4 headers, you can just type
 
 #include "JSON.h"
 
-This can save in total of (((4 * (len("#include") + 4)) + len("parser.h") + len("structure.h") + len("json-encoder.h") + len("functions.h")) - 3 - len("#include") - len("JSON.h")) bytes,
-and very much time for you to do other stuff than to stupidly type four headers
-
-Time to do some math my fellow JSON'ers
 */
 
 #include "numtostr.h"
@@ -26,15 +22,6 @@ Time to do some math my fellow JSON'ers
 #include "utils.h"
 
 /*
-
-Here is a list of all the features coming soon
-    -Function that could find any errors on JSON strings or files
-    -JSON decoder
-    -More advanced indent function that will indent based on a setting.json file (only when JSON decoder is done)
-    -Finish the project by fixing bugs and ensuring memory management is safe
-
-At the time I have made all these updates and improvements
-this project will probably be in v1.0.0.
 
 I might be adding new and better improvements but still rarely, since
 after v1.0.0 I will work on a new project.
