@@ -30,8 +30,8 @@ int main() {
 	JFH_setstrH(subobj, "foo", "bar");
 
 	JFH_setintL(subarr, 1);
-	JFH_setintL(subarr, 2);
-	JFH_setintL(subarr, 3);
+	JFH_setintL(JFH_appendL(subarr), 2);
+	JFH_setintL(JFH_appendL(subarr), 3);
 
 	char *json = JFH_indent_json(JFH_encode_obj(obj), 4);
 	if (!json) {
@@ -68,7 +68,9 @@ JSON:
         "foo": "bar"
     },
     "Test11": [
-        3
+        1,
+		2,
+		3
     ]
 }
     
