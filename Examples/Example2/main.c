@@ -1,5 +1,9 @@
 #include "JFH.h"
 
+/*
+This example works with nested structures. In this case having a root object and then a nested array.
+*/
+
 int main() {
     jfh_obj_t *obj = JFH_initM();
     jfh_array_t *list = JFH_initL();

@@ -1,5 +1,9 @@
 #include <JFH.h>
 
+/*
+This example shows the handling of empty objects and arrays.
+*/
+
 int main() {
     jfh_obj_t *obj = JFH_initM();
     jfh_obj_t *emptyobj = JFH_initM();

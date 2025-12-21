@@ -1,5 +1,11 @@
 #include <JFH.h>
 
+/*
+This example shows a real world usage for JFH. In this example you can imagine there is an app, and some of the apps properties are stored
+in a json file. JFH parses that json and puts the data on structs. Sometimes when a real app is being built, properties can be put onto json
+files for easier maintainability.
+*/
+
 typedef struct {
     int size_x;
     int size_y;

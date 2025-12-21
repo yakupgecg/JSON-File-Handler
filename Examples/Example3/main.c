@@ -1,5 +1,10 @@
 #include "JFH.h"
 
+/*
+This example shows parsing and then encoding it back and writing it to a json file. You might need
+that if you want to edit a json you have gotten and then encode it back.
+*/
+
 int main() {
     FILE *file = fopen("Test.json", "w");
     char *json = "{\"JSON-File-Handler\": {\"Examples\": {\"Example1\": [\"CompileMethod.txt\", \"main.c\"],\"Example2\": [\"CompileMethod.txt\", \"main.c\"],\"Example3\": [\"CompileMethod.txt\", \"main.c\",\"Test.json\"]},\"Headers\": [\"data_structures.h\", \"json_format.h\", \"numtostr.h\", \"utils.h\", \"JFH.h\"],\"Source Files\": [\"data_structures.c\", \"json_format.c\", \"numtostr.c\", \"utils.c\"]}}";

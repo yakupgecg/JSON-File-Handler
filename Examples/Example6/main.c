@@ -1,5 +1,9 @@
 #include <JFH.h>
 
+/*
+This example shows parsing and then modifying the data and then encoding it back.
+*/
+
 int main() {
     char *json = "{\"Human\": {\"Height\": 170.2, \"Age\": 25}}";
 

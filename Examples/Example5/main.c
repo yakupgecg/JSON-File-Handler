@@ -1,5 +1,9 @@
 #include <JFH.h>
 
+/*
+This example works with every type JFH can support and then encodes it.
+*/
+
 int main() {
 	jfh_obj_t *obj = JFH_initM();
 	jfh_obj_t *subobj = JFH_initM();

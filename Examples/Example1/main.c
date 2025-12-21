@@ -1,5 +1,9 @@
 #include "JFH.h"
 
+/*
+This example shows that the parser works. Nothing else.
+*/
+
 int main() {
 	char *json = "{\"foo\": \"bar\"}";
 	printf("Test json          : %s\n", json);
