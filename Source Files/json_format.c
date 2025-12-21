@@ -92,13 +92,7 @@ static char *evalu(char *str) {
     while (*cur) {
         alc_n++;
         switch (*cur) {
-            case '\n': alc_n++; break;
-            case '\t': alc_n++; break;
-            case '\r': alc_n++; break;
-            case '\b': alc_n++; break;
-            case '\f': alc_n++; break;
-            case '\\': alc_n++; break;
-            case '\"': alc_n++; break;
+            case '\n': case '\t': case '\r': case '\b': case '\f': case '\\': case '\"': alc_n++; break;
         }
         cur++;
     }
