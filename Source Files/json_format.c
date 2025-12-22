@@ -607,7 +607,6 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj) {
         curkey--;
         *curkey = '\0';
         *curval = '\0';
-        printf("%s\n", val);
         if (is_obj) {
             jfh_obj_t *newobj = JFH_initM();
             if (!newobj) goto fail;
