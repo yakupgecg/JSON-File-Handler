@@ -255,12 +255,13 @@ int main() {
 }
 ```  
 
-output:  
+Output:  
+```json
 {  
     "foo": "bar",  
     "Example": 5  
 }
-
+```
 
 
 Example with nested objects:
@@ -290,14 +291,15 @@ int main() {
 }
 ```  
 
-Example output:  
+Output:  
+```json
 {  
     "foo" {  
         "ExampleDbl": 3.141000,  
         "ExampleNum": 123  
     }  
 }
-
+```
 
 
 ##### Parsing
@@ -321,13 +323,14 @@ int main() {
 }
 ```  
 
-Example output:  
+Output:  
+```json
 {  
     "Address1": 1001,  
     "Address2": 9221,  
     "Address3": 2835  
 }
-
+```
 
 
 ```c
@@ -349,7 +352,8 @@ int main() {
 }
 ```  
 
-Example output:  
+Output:  
+```json
 JSON:  
 {  
     "Random city": {  
@@ -369,7 +373,7 @@ JSON:
         }  
     }  
 }
-
+```
 
 
 #### Arrays
@@ -403,7 +407,8 @@ int main() {
 }
 ```  
 
-Example output:  
+Output:  
+```json
 JSON:  
 [  
     "foo",  
@@ -411,7 +416,7 @@ JSON:
     true,  
     3  
 ]
-
+```
 
 
 ```c
@@ -440,7 +445,8 @@ int main() {
 }
 ```  
 
-Example output:  
+Output:  
+```json
 JSON:  
 [  
     3.141500,  
@@ -451,7 +457,7 @@ JSON:
         "Hello, World!"  
     ]  
 ]
-
+```
 
 
 ##### Parsing
@@ -476,7 +482,8 @@ int main() {
 }
 ```  
 
-Example output:  
+Output:  
+```json
 JSON:  
 [  
     3.141500,  
@@ -487,7 +494,7 @@ JSON:
         "Hello, World!"  
     ]  
 ]
-
+```
 
 
 #### Objects & Arrays
@@ -513,41 +520,42 @@ int main() {
 }
 ```  
 
-Example output:  
+Output:  
+```json
 JSON:  
 {  
     "JSON-File-Handler": {  
         "Examples": {  
             "Example1": [  
-                CompileMethod.txt,  
-                main.c  
+                "CompileMethod.txt",  
+                "main.c"  
             ],  
             "Example2": [  
-                CompileMethod.txt,  
-                main.c  
+                "CompileMethod.txt",  
+                "main.c"  
             ],  
             "Example3": [  
-                CompileMethod.txt,  
-                main.c,  
-                Test.json  
+                "CompileMethod.txt",  
+                "main.c",  
+                "Test.json"  
             ]  
         },  
         "Headers": [  
-            data_structures.h,  
-            json_format.h,  
-            numtostr.h,  
-            utils.h,  
-            JFH.h  
+            "data_structures.h",  
+            "json_format.h",  
+            "numtostr.h",  
+            "utils.h",  
+            "JFH.h"  
         ],  
         "Source Files": [  
-            data_structures.c,  
-            json_format.c,  
-            numtostr.c,  
-            utils.c  
+            "data_structures.c",  
+            "json_format.c",  
+            "numtostr.c",  
+            "utils.c"  
         ]  
     }  
 }
-
+```
 
 
 ## After v1.0.0
