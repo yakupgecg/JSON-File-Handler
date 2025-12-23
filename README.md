@@ -77,7 +77,7 @@ Basically everything needed for basic JSON work, but this isn't on the high leve
 * Exponents
 * Scientific notation
 
-These features are about to be added later since. Why? Because they is very difficult to make.
+These features are about to be added later since they are rarely used.
 Exponents or scientific notations aren't as hard as Unicode which needs the support for hexadecimal numbers and a lookup table
 for parsing.
 
