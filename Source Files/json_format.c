@@ -1094,6 +1094,7 @@ jfh_obj_t *JFH_parse_obj(char *str) {
         free(json);
         return NULL;
     }
+    free(json);
     return newobj;
 }
 
@@ -1129,5 +1130,6 @@ jfh_array_t *JFH_parse_arr(char *str) {
         free(json);
         return NULL;
     }
+    free(json);
     return newarr;
 }
