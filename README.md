@@ -105,7 +105,7 @@ typedef struct jfh_Hmap {
 } jfh_obj_t;
 ```
 
-You might wonder why empty exist, and that is for handling empty structures. Sometimes there might be a nested object or an array that doesn't have anything ({} or []). For example:
+You might wonder why the bool `empty` exists, and that is for handling empty structures. Sometimes there might be a nested object or an array that doesn't have anything ({} or []). For example:
 
 ```json
 {"emptyobject": {}}
