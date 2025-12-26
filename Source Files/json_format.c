@@ -488,7 +488,7 @@ char *JFH_indent_json(char *ajson, size_t indent_len) {
                 len_i++;
             }
         }
-        prev = newcur;
+        prev = cur;
 	    *newcur = *cur;
         newcur++;
         if (*cur == ':' && !is_string) {
