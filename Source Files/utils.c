@@ -332,10 +332,6 @@ jfh_obj_t *JFH_appendH(jfh_obj_t *map) {
         return NULL;
     }
     current->next->prev = current;
-    if (!current->next) {
-        errno = ENOMEM;
-        return NULL;
-    }
     return current->next;
 }
 
@@ -355,10 +351,6 @@ jfh_array_t *JFH_appendL(jfh_array_t *list) {
         return NULL;
     }
     current->next->prev = current;
-    if (!current->next) {
-        errno = ENOMEM;
-        return NULL;
-    }
     return current->next;
 }
 
