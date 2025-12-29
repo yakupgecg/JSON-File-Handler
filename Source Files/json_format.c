@@ -619,7 +619,7 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj) {
             }
             if (nest_index <= 0) break;
             if (*cur == ',' && !is_string && last_brace >= nest_index) {
-                if (*(cur + 1) == '}' || *(cur + 1) == ']') goto fail;
+                if (*(cur + 1) == '}' || *(cur + 1) == ']' || *(cur + 1) == ',') goto fail;
                 is_key = true;
                 prev = cur;
                 cur++;
@@ -900,7 +900,7 @@ static int starr_parser(char *cur, jfh_array_t **curarr) {
             }
             if (nest_index <= 0) break;
             if (*cur == ',' && !is_string && last_brace >= nest_index) {
-                if (*(cur + 1) == '}' || *(cur + 1) == ']') goto fail;
+                if (*(cur + 1) == '}' || *(cur + 1) == ']' || *(cur + 1) == ',') goto fail;
                 prev = cur;
                 cur++;
                 break;
