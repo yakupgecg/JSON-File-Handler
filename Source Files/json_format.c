@@ -16,6 +16,7 @@ static char *remove_whitespace(char *str) {
     char *newcur = newstr;
     char *cur = str;
     char *prev = str;
+    char *p_prev = str;
     bool is_string = false;
     while (*cur) {
         if (*cur == '\"') {
@@ -25,6 +26,15 @@ static char *remove_whitespace(char *str) {
                     is_string = false;
                 } else {
                     is_string = true;
+                }
+            } else {
+                if (*p_prev == '\\') {
+                    quots++;
+                    if (is_string) {
+                        is_string = false;
+                    } else {
+                        is_string = true;
+                    }
                 }
             }
         }
@@ -41,6 +51,7 @@ static char *remove_whitespace(char *str) {
         } else if (*cur == ']' && !is_string) {
             square_brackets--;
         }
+        p_prev = prev;
         prev = cur;
         cur++;
     }
@@ -410,6 +421,7 @@ char *JFH_indent_json(char *ajson, size_t indent_len) {
     }
     char *cur = json;
     char *prev = json;
+    char *p_prev = json;
     if (*cur != '{' && *cur != '[') {
         errno = JFH_EJSON;
         return NULL;
@@ -439,6 +451,14 @@ char *JFH_indent_json(char *ajson, size_t indent_len) {
                     is_string = false;
                 } else {
                     is_string = true;
+                }
+            } else {
+                if (*p_prev == '\\') {
+                    if (is_string) {
+                        is_string = false;
+                    } else {
+                        is_string = true;
+                    }
                 }
             }
         } else if (*cur == '{' && !is_string) {
@@ -488,6 +508,7 @@ char *JFH_indent_json(char *ajson, size_t indent_len) {
                 len_i++;
             }
         }
+        p_prev = prev;
         prev = cur;
 	    *newcur = *cur;
         newcur++;
@@ -547,6 +568,7 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj) {
         return 1;
     }
     char *prev = cur;
+    char *p_prev = cur;
     char *curkey;
     char *curval;
     while (*cur) {
@@ -559,11 +581,21 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj) {
                 *curkey = *cur;
                 curkey++;
             }
-            if (*cur == '\"' && *prev != '\\') {
-                if (is_string) {
-                    is_string = false;
+            if (*cur == '\"') {
+                if (*prev != '\\') {
+                    if (is_string) {
+                        is_string = false;
+                    } else {
+                        is_string = true;
+                    }
                 } else {
-                    is_string = true;
+                    if (*p_prev == '\\') {
+                        if (is_string) {
+                            is_string = false;
+                        } else {
+                            is_string = true;
+                        }
+                    }
                 }
             }
             if (*cur == '{' && !is_string) {
@@ -601,6 +633,7 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj) {
                 if (*(cur + 1) == ',') goto fail;
                 is_key = false;
             }
+            p_prev = prev;
             prev = cur;
             cur++;
         }
@@ -819,6 +852,7 @@ static int starr_parser(char *cur, jfh_array_t **curarr) {
     }
     char *curval;
     char *prev = cur;
+    char *p_prev = cur;
     bool is_string = false;
     bool is_obj = false;
     bool is_arr = false;
@@ -828,11 +862,21 @@ static int starr_parser(char *cur, jfh_array_t **curarr) {
         is_obj = false;
         is_arr = false;
         while (*cur) {
-            if (*cur == '\"' && *prev != '\\') {
-                if (is_string) {
-                    is_string = false;
+            if (*cur == '\"') {
+                if (*prev != '\\') {
+                    if (is_string) {
+                        is_string = false;
+                    } else {
+                        is_string = true;
+                    }
                 } else {
-                    is_string = true;
+                    if (*p_prev == '\\') {
+                        if (is_string) {
+                            is_string = false;
+                        } else {
+                            is_string = true;
+                        }
+                    }
                 }
             }
             if (*cur == '[' && !is_string) {
@@ -863,6 +907,7 @@ static int starr_parser(char *cur, jfh_array_t **curarr) {
             }
             *curval = *cur;
             curval++;
+            p_prev = prev;
             prev = cur;
             cur++;
         }
