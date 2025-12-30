@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef JSON_H
-#define JSON_H
+#ifndef JFH_H
+#define JFH_H
 
 /* This header includes all the other header files so you do not have to type and spending incredibly useful seconds of your life on useless extra writing
 
@@ -12,7 +12,7 @@
 
 Which takes incredibly much time over including 4 headers, you can just type
 
-#include "JSON.h"
+#include "JFH.h"
 
 */
 
