@@ -554,7 +554,7 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj, char *keys, char *vals) {
                 *curkey = *cur;
                 curkey++;
             }
-            if (*cur == '\"') {F
+            if (*cur == '\"') {
                 if (*prev != '\\') {
                     if (is_string) {
                         is_string = false;
