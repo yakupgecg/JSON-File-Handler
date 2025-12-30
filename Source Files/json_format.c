@@ -554,7 +554,7 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj, char *keys, char *vals) {
                 *curkey = *cur;
                 curkey++;
             }
-            if (*cur == '\"') {
+            if (*cur == '\"') {F
                 if (*prev != '\\') {
                     if (is_string) {
                         is_string = false;
@@ -1125,25 +1125,21 @@ jfh_array_t *JFH_parse_arr(char *str) {
     char *json = remove_whitespace(str);
     if (!json) {
         return NULL;
-        printf("ERR1");
     }
     char *cur = json;
     if (*cur != '[') {
         errno = JFH_EJSON;
         free(json);
-        printf("ERR2");
         return NULL;
     }
     jfh_array_t *newarr = JFH_initL();
     if (!newarr) {
         errno = ENOMEM;
         free(json);
-        printf("ERR3");
         return NULL;
     }
     if (!strcmp(json, "[]")) {
         free(json);
-        printf("ERR4");
         return newarr;
     }
     size_t len = strlen(str);
@@ -1153,14 +1149,12 @@ jfh_array_t *JFH_parse_arr(char *str) {
         if (keys) free(keys);
         if (vals) free(vals);
         errno = ENOMEM;
-        printf("ERR5");
         return NULL;
     }
     jfh_array_t *curarr = newarr;
     if (starr_parser(cur, &curarr, keys, vals)) {
         JFH_free_list(newarr);
         free(json);
-        printf("ERR6");
         return NULL;
     }
     free(vals);
