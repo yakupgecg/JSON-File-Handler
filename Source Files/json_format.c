@@ -72,11 +72,6 @@ static int st_write(char **cur, char **str, size_t *pos, size_t *alc_n, const ch
     size_t len = strlen(src);
     while (*pos + len+1 > *alc_n) {
         *alc_n *= 2;
-        if (*alc_n >= 1073741824) {
-            fprintf(stderr, "Memory limit (1073741824 bytes) reached\n");
-            errno = ENOMEM;
-            return 1;
-        }
         char *temp = realloc(*str, *alc_n);
         if (!temp) {
             free(*str);
@@ -351,11 +346,6 @@ char *JFH_encode_obj(jfh_obj_t *obj) {
     }
     while (pos >= alc_n) {
         alc_n *= 2;
-        if (alc_n >= 1073741824) {
-            fprintf(stderr, "Memory limit (1073741824 bytes) reached\n");
-            errno = ENOMEM;
-            return NULL;
-        }
         char *temp = realloc(str, alc_n);
         if (!temp) {
             free(str);
@@ -391,11 +381,6 @@ char *JFH_encode_arr(jfh_array_t *arr) {
     }
     while (pos >= alc_n) {
         alc_n *= 2;
-        if (alc_n >= 1073741824) {
-            fprintf(stderr, "Memory limit (1073741824 bytes) reached\n");
-            errno = ENOMEM;
-            return NULL;
-        }
         char *temp = realloc(str, alc_n);
         if (!temp) {
             free(str);
@@ -484,11 +469,6 @@ char *JFH_indent_json(char *ajson, size_t indent_len) {
         }
         while (len_i + nmem >= alc_n) {
             alc_n *= 2;
-            if (alc_n >= 1073741824) {
-                fprintf(stderr, "Memory limit (1073741824 bytes) reached\n");
-                free(newjson);
-                return NULL;
-            }
             char *temp = realloc(newjson, alc_n);
             if (!temp) {
                 errno = ENOMEM;
