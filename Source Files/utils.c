@@ -99,9 +99,8 @@ int JFH_free_json_value(jfh_json_value_t *val) {
         if (val->value.arr) JFH_free_list(val->value.arr);
         val->value.arr = NULL;
     } else if (val->vt == JFH_STR) {
-        if (val->value.str.str) free(val->value.str.str);
-        val->value.str.str = NULL;
-        val->value.str.len = 0;
+        if (val->value.str) free(val->value.str);
+        val->value.str = NULL;
     }
     val->vt = 0;
     return 0;
@@ -269,7 +268,7 @@ jfh_obj_t *JFH_initM() {
     }
     map->next = NULL;
     map->prev = NULL;
-    map->value.value.str.str = NULL;
+    map->value.value.str = NULL;
     map->value.vt = 0;
     map->empty = true;
     return map;
@@ -310,7 +309,7 @@ jfh_array_t *JFH_initL() {
     }
     list->next = NULL;
     list->prev = NULL;
-    list->value.value.str.str = NULL;
+    list->value.value.str = NULL;
     list->value.vt = 0;
     list->empty = true;
     return list;
@@ -447,9 +446,8 @@ void JFH_setval(jfh_json_value_t *value, void *src, enum jfh_valuetype vt) {
 
     switch (vt) {
         case JFH_STR: {
-            value->value.str.str = quots((char*)src);
-            if (!value->value.str.str) return;
-            value->value.str.len = strlen((char*)src);
+            value->value.str = quots((char*)src);
+            if (!value->value.str) return;
             value->vt = JFH_STR;
             break;
         }
@@ -459,9 +457,8 @@ void JFH_setval(jfh_json_value_t *value, void *src, enum jfh_valuetype vt) {
         case JFH_LIST: value->value.arr = (jfh_array_t*)src; value->vt = JFH_LIST; break;
         case JFH_BOOL: value->value.b = *(bool*)src; value->vt = JFH_BOOL; break;
         case JFH_NULL: {
-            value->value.str.str = str_dup((char*)src);
-            if (!value->value.str.str) return;
-            value->value.str.len = strlen((char*)src);
+            value->value.str = str_dup((char*)src);
+            if (!value->value.str) return;
             value->vt = JFH_NULL;
             break;
         }
@@ -687,7 +684,7 @@ jfh_obj_t *JFH_copy_obj(jfh_obj_t *obj, jfh_obj_t *cobj) {
     }
     if (cobj) {
         switch (obj->value.vt) {
-            case JFH_STR: JFH_setstrH_nquots(cobj, obj->key, obj->value.value.str.str); break;
+            case JFH_STR: JFH_setstrH_nquots(cobj, obj->key, obj->value.value.str); break;
             case JFH_INT: JFH_setintH(cobj, obj->key, obj->value.value.i); break;
             case JFH_DBL: JFH_setdoubleH(cobj, obj->key, obj->value.value.dbl); break;
             case JFH_OBJ: JFH_setobjH(cobj, obj->key, JFH_copy_map(obj->value.value.obj, NULL)); break;
@@ -704,7 +701,7 @@ jfh_obj_t *JFH_copy_obj(jfh_obj_t *obj, jfh_obj_t *cobj) {
         return NULL;
     }
     switch (obj->value.vt) {
-        case JFH_STR: JFH_setstrH_nquots(newobj, obj->key, obj->value.value.str.str); break;
+        case JFH_STR: JFH_setstrH_nquots(newobj, obj->key, obj->value.value.str); break;
         case JFH_INT: JFH_setintH(newobj, obj->key, obj->value.value.i); break;
         case JFH_DBL: JFH_setdoubleH(newobj, obj->key, obj->value.value.dbl); break;
         case JFH_OBJ: JFH_setobjH(newobj, obj->key, JFH_copy_map(obj->value.value.obj, NULL)); break;
@@ -724,7 +721,7 @@ jfh_array_t *JFH_copy_element(jfh_array_t *element, jfh_array_t *celement) {
     }
     if (celement) {
         switch (element->value.vt) {
-            case JFH_STR: JFH_setstrL_nquots(celement, element->value.value.str.str); break;
+            case JFH_STR: JFH_setstrL_nquots(celement, element->value.value.str); break;
             case JFH_INT: JFH_setintL(celement, element->value.value.i); break;
             case JFH_DBL: JFH_setdoubleL(celement, element->value.value.dbl); break;
             case JFH_OBJ: JFH_setobjL(celement, JFH_copy_map(element->value.value.obj, NULL)); break;
@@ -741,7 +738,7 @@ jfh_array_t *JFH_copy_element(jfh_array_t *element, jfh_array_t *celement) {
         return NULL;
     }
     switch (element->value.vt) {
-        case JFH_STR: JFH_setstrL_nquots(newelement, element->value.value.str.str); break;
+        case JFH_STR: JFH_setstrL_nquots(newelement, element->value.value.str); break;
         case JFH_INT: JFH_setintL(newelement, element->value.value.i); break;
         case JFH_DBL: JFH_setdoubleL(newelement, element->value.value.dbl); break;
         case JFH_OBJ: JFH_setobjL(newelement, JFH_copy_map(element->value.value.obj, NULL)); break;
@@ -766,7 +763,7 @@ jfh_obj_t *JFH_copy_map(jfh_obj_t *map, jfh_obj_t *cmap) {
         ccur = JFH_initM();
         while (cur) {
             switch (cur->value.vt) {
-                case JFH_STR: JFH_setstrH_nquots(ccur, cur->key, cur->value.value.str.str); break;
+                case JFH_STR: JFH_setstrH_nquots(ccur, cur->key, cur->value.value.str); break;
                 case JFH_INT: JFH_setintH(ccur, cur->key, cur->value.value.i); break;
                 case JFH_DBL: JFH_setdoubleH(ccur, cur->key, cur->value.value.dbl); break;
                 case JFH_OBJ: JFH_setobjH(ccur, cur->key, JFH_copy_map(cur->value.value.obj, NULL)); break;
@@ -793,7 +790,7 @@ jfh_obj_t *JFH_copy_map(jfh_obj_t *map, jfh_obj_t *cmap) {
     jfh_obj_t *newcur = newmap;
     while (cur) {
         switch (cur->value.vt) {
-            case JFH_STR: JFH_setstrH_nquots(newcur, cur->key, cur->value.value.str.str); break;
+            case JFH_STR: JFH_setstrH_nquots(newcur, cur->key, cur->value.value.str); break;
             case JFH_INT: JFH_setintH(newcur, cur->key, cur->value.value.i); break;
             case JFH_DBL: JFH_setdoubleH(newcur, cur->key, cur->value.value.dbl); break;
             case JFH_OBJ: JFH_setobjH(newcur, cur->key, JFH_copy_map(cur->value.value.obj, NULL)); break;
@@ -828,7 +825,7 @@ jfh_array_t *JFH_copy_list(jfh_array_t *list, jfh_array_t *clist) {
         ccur = JFH_initL();
         while (cur) {
             switch (cur->value.vt) {
-                case JFH_STR: JFH_setstrL_nquots(ccur, cur->value.value.str.str); break;
+                case JFH_STR: JFH_setstrL_nquots(ccur, cur->value.value.str); break;
                 case JFH_INT: JFH_setintL(ccur, cur->value.value.i); break;
                 case JFH_DBL: JFH_setdoubleL(ccur, cur->value.value.dbl); break;
                 case JFH_OBJ: JFH_setobjL(ccur, JFH_copy_map(cur->value.value.obj, NULL)); break;
@@ -855,7 +852,7 @@ jfh_array_t *JFH_copy_list(jfh_array_t *list, jfh_array_t *clist) {
     jfh_array_t *newcur = newlist;
     while (cur) {
         switch (cur->value.vt) {
-            case JFH_STR: JFH_setstrL_nquots(newcur, cur->value.value.str.str); break;
+            case JFH_STR: JFH_setstrL_nquots(newcur, cur->value.value.str); break;
             case JFH_INT: JFH_setintL(newcur, cur->value.value.i); break;
             case JFH_DBL: JFH_setdoubleL(newcur, cur->value.value.dbl); break;
             case JFH_OBJ: JFH_setobjL(newcur, JFH_copy_map(cur->value.value.obj, NULL)); break;
@@ -886,9 +883,8 @@ jfh_json_value_t *JFH_copy_json_value(jfh_json_value_t *val, jfh_json_value_t *c
     JFH_free_json_value(cval);
     switch (val->vt) {
         case JFH_STR: {
-            cval->value.str.str = str_dup(val->value.str.str);
-            if (!cval->value.str.str) {errno = ENOMEM; return NULL;}
-            cval->value.str.len = val->value.str.len;
+            cval->value.str = str_dup(val->value.str);
+            if (!cval->value.str) {errno = ENOMEM; return NULL;}
             cval->vt = JFH_STR;
             break;
         }

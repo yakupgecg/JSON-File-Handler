@@ -32,10 +32,7 @@ typedef struct jfh_Linkedlist jfh_array_t;
 typedef struct {
     enum jfh_valuetype vt;
     union {
-        struct {
-            char *str;
-            size_t len;
-        } str;
+        char *str;
         int i;
         double dbl;
         bool b;

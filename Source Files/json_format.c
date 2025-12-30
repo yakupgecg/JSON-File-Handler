@@ -197,7 +197,7 @@ static int stobj_encoder(jfh_obj_t *curobj, char **str, char **cur, size_t *pos,
         ) return 1;
         switch (curobj->value.vt) {
             case JFH_STR: {
-                char *new = evalu(curobj->value.value.str.str);
+                char *new = evalu(curobj->value.value.str);
                 if (!new) return 1;
                 if ( 
                     (st_write(cur, str, pos, alc_n, "\"")) ||
@@ -267,7 +267,7 @@ static int starr_encoder(jfh_array_t *curarr, char **str, char **cur, size_t *po
     while (curarr) {
         switch (curarr->value.vt) {
             case JFH_STR: {
-                char *new = evalu(curarr->value.value.str.str);
+                char *new = evalu(curarr->value.value.str);
                 if (!new) return 1;
                 if ( 
                     (st_write(cur, str, pos, alc_n, "\"")) ||
