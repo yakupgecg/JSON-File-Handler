@@ -1,5 +1,21 @@
 #include "..\Headers\json_format.h"
 
+// This is a helper function since I am on windows and cannot use normal stdup()
+static char *str_dup(char *str) {
+    if (!str) {
+        errno = EINVAL;
+        return NULL;
+    }
+    int len = strlen(str) + 1;
+    char *newstr = malloc(len * sizeof(char));
+    if (!newstr) {
+        errno = ENOMEM;
+        return NULL;
+    }
+    memcpy(newstr, str, len);
+    return newstr;
+}
+
 static char *remove_whitespace(char *str) {
     if (!str) {
         errno = EINVAL;
@@ -619,18 +635,20 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj, char *keys, char *vals) {
             if (strcmp(val, "{}") != 0) {
                 newobj->empty = false;
                 jfh_obj_t *newcurobj = newobj;
+                JFH_resetkey(*curobj, key);
                 if (stobj_parser(val, &newcurobj, keys, vals)) goto fail;
             }
-            if (!JFH_setobjH(*curobj, key, newobj)) goto fail;
+            if (!JFH_setobjH(*curobj, NULL, newobj)) goto fail;
         } else if (is_arr) {
             jfh_array_t *newarr = JFH_initL();
             if (!newarr) goto fail;
             if (strcmp(val, "[]") != 0) {
                 newarr->empty = false;
                 jfh_array_t *newcurarr = newarr;
+                JFH_resetkey(*curobj, key);
                 if (starr_parser(val, &newcurarr, keys, vals)) goto fail;
             }
-            if (!JFH_setarrH(*curobj, key, newarr)) goto fail;
+            if (!JFH_setarrH(*curobj, NULL, newarr)) goto fail;
         } else {
             curval = val;
             if (
