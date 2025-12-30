@@ -174,19 +174,19 @@ The most important functions:
 
 * `jfh_obj_t *JFH_initM()`: Initializes a new object with every property set to null and returns a pointer to the object.
 * `jfh_array_t *JFH_initL()`: Initializes a new array with every property set to null and returns a pointer to the array.
-* `jfh_obj_t *JFH_setstrH(jfh_obj_t *obj, char *key, char *string)`: Sets an object's key to *key and value to *string and returns a pointer to the changed objects.
+* `jfh_obj_t *JFH_setstrH(jfh_obj_t *obj, char *key, char *string)`: Sets an object's key to *key and value to *string and returns a pointer to the changed object.
 * `jfh_array_t *JFH_setstrL(jfh_obj_t *obj, char *string)`: Works the same way as JFH_setstrH().
 * `jfh_obj_t *JFH_appendH(jfh_obj_t *obj)`: Appends an object to a map and returns a pointer to it. Also a variant for arrays JFH_appendL().
 * `jfh_obj_t *JFH_popH(jfh_obj_t *obj)`: Takes the last element of the map and disconnects it from the map and returns a pointer to the deleted object.
 * `jfh_obj_t *JFH_parse_obj(char *json)`: Parses the given json into a map and returns a pointer to it. Has a variant for arrays JFH_parse_arr(). Remember to free it using JFH_free_map() or JFH_free_list().
 * `char *JFH_encode_obj(jfh_obj_t *object)`: Encodes a map to an allocated string, and returns a pointer to it. Remember to free it.
-* `char *indent_json(char *json, size_t indent)`: Indents a json string and returns a pointer to the indented string. It's allocated so remember to free it.
+* `char *JFH_indent_json(char *json, size_t indent)`: Indents a json string and returns a pointer to the indented string. It's allocated so remember to free it.
 * `int JFH_free_map(jfh_obj_t *object)`: Frees the object and everything after it.
 * `int JFH_free_list(jfh_array_t *list)`: Frees the array and everything after it.
 
 ### Macros
 
-The only macro is **JFH_EJSON**, which is used by functions `JFH_parse_obj/arr`, `JFH_encode_obj/arr` and `indent_json`. It's used when there's something wrong with the given json string or structure. And if so, errno is set to JFH_EJSON
+The only macro is **JFH_EJSON**, which is used by functions `JFH_parse_obj/arr`, `JFH_encode_obj/arr` and `JFH_indent_json`. It's used when there's something wrong with the given json string or structure. And if so, errno is set to JFH_EJSON
 
 ## Using JFH
 
