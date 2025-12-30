@@ -15,8 +15,8 @@ static int starr_encoder(jfh_array_t *, char **, char **, size_t *, size_t *);
 char *JFH_encode_obj(jfh_obj_t *);
 char *JFH_encode_arr(jfh_array_t *);
 char *JFH_indent_json(char *, size_t);
-static int stobj_parser(char *, jfh_obj_t **);
-static int starr_parser(char *, jfh_array_t **);
+static int stobj_parser(char *, jfh_obj_t **, char *, char *);
+static int starr_parser(char *, jfh_array_t **, char *, char *);
 jfh_obj_t *JFH_parse_obj(char *);
 jfh_array_t *JFH_parse_arr(char *);
 

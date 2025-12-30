@@ -547,7 +547,7 @@ char *JFH_indent_json(char *ajson, size_t indent_len) {
     return newjson;
 }
 
-static int stobj_parser(char *cur, jfh_obj_t **curobj) {
+static int stobj_parser(char *cur, jfh_obj_t **curobj, char *keys, char *vals) {
     if (!cur || !curobj) {
         errno = EINVAL;
         return 1;
@@ -558,15 +558,8 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj) {
     bool is_key = true;
     bool is_obj = false;
     bool is_arr = false;
-    size_t len = strlen(cur);
-    char *key = malloc(len);
-    char *val = malloc(len);
-    if (!key || !val) {
-        if (key) free(key);
-        if (val) free(val);
-        errno = ENOMEM;
-        return 1;
-    }
+    char *key = keys;
+    char *val = vals;
     char *prev = cur;
     char *p_prev = cur;
     char *curkey;
@@ -646,7 +639,7 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj) {
             if (strcmp(val, "{}") != 0) {
                 newobj->empty = false;
                 jfh_obj_t *newcurobj = newobj;
-                if (stobj_parser(val, &newcurobj)) goto fail;
+                if (stobj_parser(val, &newcurobj, keys, vals)) goto fail;
             }
             if (!JFH_setobjH(*curobj, key, newobj)) goto fail;
         } else if (is_arr) {
@@ -655,7 +648,7 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj) {
             if (strcmp(val, "[]") != 0) {
                 newarr->empty = false;
                 jfh_array_t *newcurarr = newarr;
-                if (starr_parser(val, &newcurarr)) goto fail;
+                if (starr_parser(val, &newcurarr, keys, vals)) goto fail;
             }
             if (!JFH_setarrH(*curobj, key, newarr)) goto fail;
         } else {
@@ -828,28 +821,19 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj) {
         (*curobj)->next->prev = (*curobj);
         (*curobj) = (*curobj)->next;
     }
-    free(key);
-    free(val);
     return 0;
     fail:
-        free(key);
-        free(val);
         return 1;
 }
 
-static int starr_parser(char *cur, jfh_array_t **curarr) {
+static int starr_parser(char *cur, jfh_array_t **curarr, char *keys, char *vals) {
     if (!curarr || !cur) {
         errno = EINVAL;
         return 1;
     }
     int nest_index = 1;
     int last_brace = 1;
-    size_t len = strlen(cur);
-    char *val = malloc(len);
-    if (!val) {
-        errno = ENOMEM;
-        return 1;
-    }
+    char *val = vals;
     char *curval;
     char *prev = cur;
     char *p_prev = cur;
@@ -918,7 +902,7 @@ static int starr_parser(char *cur, jfh_array_t **curarr) {
             if (strcmp(val, "{}") != 0) {
                 newobj->empty = false;
                 jfh_obj_t *newcurobj = newobj;
-                if (stobj_parser(val, &newcurobj)) goto fail;
+                if (stobj_parser(val, &newcurobj, keys, vals)) goto fail;
             }
             if (!JFH_setobjL(*curarr, newobj)) goto fail;
         } else if (is_arr) {
@@ -927,7 +911,7 @@ static int starr_parser(char *cur, jfh_array_t **curarr) {
             if (strcmp(val, "[]") != 0) {
                 newarr->empty = false;
                 jfh_array_t *newcurarr = newarr;
-                if (starr_parser(val, &newcurarr)) goto fail;
+                if (starr_parser(val, &newcurarr, keys, vals)) goto fail;
             }
             if (!JFH_setarrL(*curarr, newarr)) goto fail;
         } else {
@@ -1100,10 +1084,8 @@ static int starr_parser(char *cur, jfh_array_t **curarr) {
         (*curarr)->next->prev = (*curarr);
         (*curarr) = (*curarr)->next;
     }
-    free(val);
     return 0;
     fail:
-        free(val);
         return 1;
 }
 
@@ -1133,12 +1115,23 @@ jfh_obj_t *JFH_parse_obj(char *str) {
         free(json);
         return newobj;
     }
+    size_t len = strlen(str);
+    char *keys = malloc(len);
+    char *vals = malloc(len);
+    if (!keys || !vals) {
+        if (keys) free(keys);
+        if (vals) free(vals);
+        errno = ENOMEM;
+        return NULL;
+    }
     jfh_obj_t *curobj = newobj;
-    if (stobj_parser(cur, &curobj)) {
+    if (stobj_parser(cur, &curobj, keys, vals)) {
         JFH_free_map(newobj);
         free(json);
         return NULL;
     }
+    free(keys);
+    free(vals);
     free(json);
     return newobj;
 }
@@ -1152,29 +1145,46 @@ jfh_array_t *JFH_parse_arr(char *str) {
     char *json = remove_whitespace(str);
     if (!json) {
         return NULL;
+        printf("ERR1");
     }
     char *cur = json;
     if (*cur != '[') {
         errno = JFH_EJSON;
         free(json);
+        printf("ERR2");
         return NULL;
     }
     jfh_array_t *newarr = JFH_initL();
     if (!newarr) {
         errno = ENOMEM;
         free(json);
+        printf("ERR3");
         return NULL;
     }
     if (!strcmp(json, "[]")) {
         free(json);
+        printf("ERR4");
         return newarr;
     }
-    jfh_array_t *curarr = newarr;
-    if (starr_parser(cur, &curarr)) {
-        JFH_free_list(newarr);
-        free(json);
+    size_t len = strlen(str);
+    char *keys = malloc(len);
+    char *vals = malloc(len);
+    if (!keys || !vals) {
+        if (keys) free(keys);
+        if (vals) free(vals);
+        errno = ENOMEM;
+        printf("ERR5");
         return NULL;
     }
+    jfh_array_t *curarr = newarr;
+    if (starr_parser(cur, &curarr, keys, vals)) {
+        JFH_free_list(newarr);
+        free(json);
+        printf("ERR6");
+        return NULL;
+    }
+    free(vals);
+    free(keys);
     free(json);
     return newarr;
 }
