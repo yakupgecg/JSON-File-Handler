@@ -588,7 +588,7 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj, char *keys, char *vals) {
                 }
             }
             if (*cur == '{' && !is_string) {
-                if (*(cur+1) != '\"' && *(cur+1) != '}') goto fail;
+                if (*(cur+1) != '\"' && *(cur+1) != '}') return 1;
                 if (nest_index > 0 && !is_obj && !is_arr) {
                     is_obj = true;
                     last_brace = nest_index;
@@ -597,7 +597,7 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj, char *keys, char *vals) {
             } else if (*cur == '}' && !is_string) {
                 nest_index--;
             } else if (*cur == '[' && !is_string) {
-                if (*(cur + 1) == ',') goto fail;
+                if (*(cur + 1) == ',') return 1;
                 if (nest_index > 0 && !is_arr && !is_obj) {
                     is_arr = true;
                     last_brace = nest_index;
@@ -608,7 +608,7 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj, char *keys, char *vals) {
             }
             if (nest_index <= 0) break;
             if (*cur == ',' && !is_string && last_brace >= nest_index) {
-                if (*(cur + 1) == '}' || *(cur + 1) == ']' || *(cur + 1) == ',') goto fail;
+                if (*(cur + 1) == '}' || *(cur + 1) == ']' || *(cur + 1) == ',') return 1;
                 is_key = true;
                 prev = cur;
                 cur++;
@@ -619,7 +619,7 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj, char *keys, char *vals) {
                 curval++;
             }
             if (*cur == ':' && !is_string) {
-                if (*(cur + 1) == ',') goto fail;
+                if (*(cur + 1) == ',') return 1;
                 is_key = false;
             }
             p_prev = prev;
@@ -629,26 +629,27 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj, char *keys, char *vals) {
         curkey--;
         *curkey = '\0';
         *curval = '\0';
+        char *rkey = str_dup(key);
+        if (!rkey) return 1;
         if (is_obj) {
             jfh_obj_t *newobj = JFH_initM();
-            if (!newobj) goto fail;
+            if (!newobj) {free(rkey); return 1;}
             if (strcmp(val, "{}") != 0) {
                 newobj->empty = false;
                 jfh_obj_t *newcurobj = newobj;
-                JFH_resetkey(*curobj, key);
-                if (stobj_parser(val, &newcurobj, keys, vals)) goto fail;
+                if (stobj_parser(val, &newcurobj, keys, vals)) {free(rkey); return 1;}
             }
-            if (!JFH_setobjH(*curobj, NULL, newobj)) goto fail;
+            if (!JFH_setobjH(*curobj, rkey, newobj)) {free(rkey); return 1;}
         } else if (is_arr) {
             jfh_array_t *newarr = JFH_initL();
-            if (!newarr) goto fail;
+            if (!newarr) {free(rkey); return 1;}
             if (strcmp(val, "[]") != 0) {
                 newarr->empty = false;
                 jfh_array_t *newcurarr = newarr;
                 JFH_resetkey(*curobj, key);
-                if (starr_parser(val, &newcurarr, keys, vals)) goto fail;
+                if (starr_parser(val, &newcurarr, keys, vals)) {free(rkey); return 1;}
             }
-            if (!JFH_setarrH(*curobj, NULL, newarr)) goto fail;
+            if (!JFH_setarrH(*curobj, rkey, newarr)) {free(rkey); return 1;}
         } else {
             curval = val;
             if (
@@ -679,7 +680,7 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj, char *keys, char *vals) {
                         case '8': num *= 10; num += 8; break;
                         case '9': num *= 10; num += 9; break;
                         case '.': break;
-                        default: errno = JFH_EJSON; goto fail;
+                        default: errno = JFH_EJSON; {free(rkey); return 1;}
                     }
                     if (*curval == '.') {
                         long i = 1;
@@ -698,7 +699,7 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj, char *keys, char *vals) {
                             *curval != '9'
                         ) {
                             errno = JFH_EJSON;
-                            goto fail;
+                            {free(rkey); return 1;}
                         }
                         dbl += num;
                         while (*curval) {
@@ -714,7 +715,7 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj, char *keys, char *vals) {
                                 case '8': dbl += 8.0 / i; break;
                                 case '9': dbl += 9.0 / i; break;
                                 case '0': break;
-                                default: errno = JFH_EJSON; goto fail;
+                                default: errno = JFH_EJSON; {free(rkey); return 1;}
                             }
                             curval++;
                         }
@@ -723,9 +724,9 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj, char *keys, char *vals) {
                     curval++;
                 }
                 if (is_dbl) {
-                    if (!JFH_setdoubleH(*curobj, key, dbl)) goto fail;
+                    if (!JFH_setdoubleH(*curobj, key, dbl)) {free(rkey); return 1;}
                 } else {
-                    if (!JFH_setintH(*curobj, key, num)) goto fail;
+                    if (!JFH_setintH(*curobj, key, num)) {free(rkey); return 1;}
                 }
             } else if (*curval == '-') {
                 curval++;
@@ -745,7 +746,7 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj, char *keys, char *vals) {
                         case '8': num *= 10; num += 8; break;
                         case '9': num *= 10; num += 9; break;
                         case '.': break;
-                        default: errno = JFH_EJSON; goto fail;
+                        default: errno = JFH_EJSON; {free(rkey); return 1;}
                     }
                     if (*curval == '.') {
                         long i = 1;
@@ -764,7 +765,7 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj, char *keys, char *vals) {
                             *curval != '9'
                         ) {
                             errno = JFH_EJSON;
-                            goto fail;
+                            {free(rkey); return 1;}
                         }
                         dbl += num;
                         while (*curval) {
@@ -780,7 +781,7 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj, char *keys, char *vals) {
                                 case '8': dbl += 8.0 / i; break;
                                 case '9': dbl += 9.0 / i; break;
                                 case '0': break;
-                                default: errno = JFH_EJSON; goto fail;
+                                default: errno = JFH_EJSON; {free(rkey); return 1;}
                             }
                             curval++;
                         }
@@ -789,39 +790,38 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj, char *keys, char *vals) {
                     curval++;
                 }
                 if (is_dbl) {
-                    if (!JFH_setdoubleH(*curobj, key, dbl * (-1))) goto fail;
+                    if (!JFH_setdoubleH(*curobj, key, dbl * (-1))) {free(rkey); return 1;}
                 } else {
-                    if (!JFH_setintH(*curobj, key, num * (-1))) goto fail;
+                    if (!JFH_setintH(*curobj, key, num * (-1))) {free(rkey); return 1;}
                 }
             } else {
                 if (*val != '\"') {
                     if (strcmp(val, "true") == 0) {
-                        if (!JFH_setboolH(*curobj, key, true)) goto fail;
+                        if (!JFH_setboolH(*curobj, key, true)) {free(rkey); return 1;}
                     } else if (strcmp(val, "false") == 0) {
-                        if (!JFH_setboolH(*curobj, key, false)) goto fail;
+                        if (!JFH_setboolH(*curobj, key, false)) {free(rkey); return 1;}
                     } else if (strcmp(val, "null") == 0) {
-                        if (!JFH_setnullH(*curobj, key)) goto fail;
+                        if (!JFH_setnullH(*curobj, key)) {free(rkey); return 1;}
                     } else {
                         errno = JFH_EJSON;
-                        goto fail;
+                        {free(rkey); return 1;}
                     }
                 } else {
                     char *new = _evalu(val);
-                    if (!new) goto fail;
-                    if (!JFH_setstrH_nquots(*curobj, key, new)) goto fail;
+                    if (!new) {free(rkey); return 1;}
+                    if (!JFH_setstrH_nquots(*curobj, key, new)) {free(rkey); free(new); return 1;}
                     free(new);
                 }
             }
         }
+        free(rkey);
         if (nest_index <= 0) break;
         (*curobj)->next = JFH_initM();
-        if (!(*curobj)->next) goto fail;
+        if (!(*curobj)->next) return 1;
         (*curobj)->next->prev = (*curobj);
         (*curobj) = (*curobj)->next;
     }
     return 0;
-    fail:
-        return 1;
 }
 
 static int starr_parser(char *cur, jfh_array_t **curarr, char *keys, char *vals) {
@@ -862,7 +862,7 @@ static int starr_parser(char *cur, jfh_array_t **curarr, char *keys, char *vals)
                 }
             }
             if (*cur == '[' && !is_string) {
-                if (*(cur + 1) == ',') goto fail;
+                if (*(cur + 1) == ',') return 1;
                 if (nest_index > 0 && !is_arr && !is_obj) {
                     is_arr = true;
                     last_brace = nest_index;
@@ -871,7 +871,7 @@ static int starr_parser(char *cur, jfh_array_t **curarr, char *keys, char *vals)
             } else if (*cur == ']' && !is_string) {
                 nest_index--;
             } else if (*cur == '{' && !is_string) {
-                if (*(cur + 1) != '\"'  && *(cur+1) != '}') goto fail;
+                if (*(cur + 1) != '\"'  && *(cur+1) != '}') return 1;
                 if (nest_index > 0 && !is_obj && !is_arr) {
                     is_obj = true;
                     last_brace = nest_index;
@@ -882,7 +882,7 @@ static int starr_parser(char *cur, jfh_array_t **curarr, char *keys, char *vals)
             }
             if (nest_index <= 0) break;
             if (*cur == ',' && !is_string && last_brace >= nest_index) {
-                if (*(cur + 1) == '}' || *(cur + 1) == ']' || *(cur + 1) == ',') goto fail;
+                if (*(cur + 1) == '}' || *(cur + 1) == ']' || *(cur + 1) == ',') return 1;
                 prev = cur;
                 cur++;
                 break;
@@ -896,22 +896,22 @@ static int starr_parser(char *cur, jfh_array_t **curarr, char *keys, char *vals)
         *curval = '\0';
         if (is_obj) {
             jfh_obj_t *newobj = JFH_initM();
-            if (!newobj) goto fail;
+            if (!newobj) return 1;
             if (strcmp(val, "{}") != 0) {
                 newobj->empty = false;
                 jfh_obj_t *newcurobj = newobj;
-                if (stobj_parser(val, &newcurobj, keys, vals)) goto fail;
+                if (stobj_parser(val, &newcurobj, keys, vals)) return 1;
             }
-            if (!JFH_setobjL(*curarr, newobj)) goto fail;
+            if (!JFH_setobjL(*curarr, newobj)) return 1;
         } else if (is_arr) {
             jfh_array_t *newarr = JFH_initL();
-            if (!newarr) goto fail;
+            if (!newarr) return 1;
             if (strcmp(val, "[]") != 0) {
                 newarr->empty = false;
                 jfh_array_t *newcurarr = newarr;
-                if (starr_parser(val, &newcurarr, keys, vals)) goto fail;
+                if (starr_parser(val, &newcurarr, keys, vals)) return 1;
             }
-            if (!JFH_setarrL(*curarr, newarr)) goto fail;
+            if (!JFH_setarrL(*curarr, newarr)) return 1;
         } else {
             curval = val;
             if (
@@ -942,7 +942,7 @@ static int starr_parser(char *cur, jfh_array_t **curarr, char *keys, char *vals)
                         case '8': num *= 10; num += 8; break;
                         case '9': num *= 10; num += 9; break;
                         case '.': break;
-                        default: errno = JFH_EJSON; goto fail;
+                        default: errno = JFH_EJSON; return 1;
                     }
                     if (*curval == '.') {
                         long i = 1;
@@ -961,7 +961,7 @@ static int starr_parser(char *cur, jfh_array_t **curarr, char *keys, char *vals)
                             *curval != '9'
                         ) {
                             errno = JFH_EJSON;
-                            goto fail;
+                            return 1;
                         }
                         dbl += num;
                         while (*curval != '\0') {
@@ -977,7 +977,7 @@ static int starr_parser(char *cur, jfh_array_t **curarr, char *keys, char *vals)
                                 case '8': dbl += 8.0 / i; break;
                                 case '9': dbl += 9.0 / i; break;
                                 case '0': break;
-                                default: errno = JFH_EJSON; goto fail;
+                                default: errno = JFH_EJSON; return 1;
                             }
                             curval++;
                         }
@@ -986,9 +986,9 @@ static int starr_parser(char *cur, jfh_array_t **curarr, char *keys, char *vals)
                     curval++;
                 }
                 if (is_dbl) {
-                    if (!JFH_setdoubleL(*curarr, dbl)) goto fail;
+                    if (!JFH_setdoubleL(*curarr, dbl)) return 1;
                 } else {
-                    if (!JFH_setintL(*curarr, num)) goto fail;
+                    if (!JFH_setintL(*curarr, num)) return 1;
                 }
             } else if (*curval == '-') {
                 curval++;
@@ -1008,7 +1008,7 @@ static int starr_parser(char *cur, jfh_array_t **curarr, char *keys, char *vals)
                         case '8': num *= 10; num += 8; break;
                         case '9': num *= 10; num += 9; break;
                         case '.': break;
-                        default: errno = JFH_EJSON; goto fail;
+                        default: errno = JFH_EJSON; return 1;
                     }
                     if (*curval == '.') {
                         long i = 1;
@@ -1027,7 +1027,7 @@ static int starr_parser(char *cur, jfh_array_t **curarr, char *keys, char *vals)
                             *curval != '9'
                         ) {
                             errno = JFH_EJSON;
-                            goto fail;
+                            return 1;
                         }
                         dbl += num;
                         while (*curval != '\0') {
@@ -1043,7 +1043,7 @@ static int starr_parser(char *cur, jfh_array_t **curarr, char *keys, char *vals)
                                 case '8': dbl += 8.0 / i; break;
                                 case '9': dbl += 9.0 / i; break;
                                 case '0': break;
-                                default: errno = JFH_EJSON; goto fail;
+                                default: errno = JFH_EJSON; return 1;
                             }
                             curval++;
                         }
@@ -1052,39 +1052,37 @@ static int starr_parser(char *cur, jfh_array_t **curarr, char *keys, char *vals)
                     curval++;
                 }
                 if (is_dbl) {
-                    if (!JFH_setdoubleL(*curarr, dbl * (-1))) goto fail;
+                    if (!JFH_setdoubleL(*curarr, dbl * (-1))) return 1;
                 } else {
-                    if (!JFH_setintL(*curarr, num * (-1))) goto fail;
+                    if (!JFH_setintL(*curarr, num * (-1))) return 1;
                 }
             } else {
                 if (*val != '\"') {
                     if (strcmp(val, "true") == 0) {
-                        if (!JFH_setboolL(*curarr, true)) goto fail;
+                        if (!JFH_setboolL(*curarr, true)) return 1;
                     } else if (strcmp(val, "false") == 0) {
-                        if (!JFH_setboolL(*curarr, false)) goto fail;
+                        if (!JFH_setboolL(*curarr, false)) return 1;
                     } else if (strcmp(val, "null") == 0) {
-                        if (!JFH_setnullL(*curarr)) goto fail;
+                        if (!JFH_setnullL(*curarr)) return 1;
                     } else {
                         errno = JFH_EJSON;
-                        goto fail;
+                        return 1;
                     }
                 } else {
                     char *new = _evalu(val);
-                    if (!new) goto fail;
-                    if (!JFH_setstrL_nquots(*curarr, new)) goto fail;
+                    if (!new) return 1;
+                    if (!JFH_setstrL_nquots(*curarr, new)) {free(new); return 1;}
                     free(new);
                 }
             }
         }
         if (nest_index <= 0) break;
         (*curarr)->next = JFH_initL();
-        if (!(*curarr)->next) goto fail;
+        if (!(*curarr)->next) return 1;
         (*curarr)->next->prev = (*curarr);
         (*curarr) = (*curarr)->next;
     }
     return 0;
-    fail:
-        return 1;
 }
 
 // Parses a json string that represents an object
