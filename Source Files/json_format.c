@@ -646,7 +646,6 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj, char *keys, char *vals) {
             if (strcmp(val, "[]") != 0) {
                 newarr->empty = false;
                 jfh_array_t *newcurarr = newarr;
-                JFH_resetkey(*curobj, key);
                 if (starr_parser(val, &newcurarr, keys, vals)) {free(rkey); return 1;}
             }
             if (!JFH_setarrH(*curobj, rkey, newarr)) {free(rkey); return 1;}
