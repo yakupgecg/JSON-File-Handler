@@ -544,7 +544,7 @@ char *JFH_indent_json(char *ajson, size_t indent_len) {
 }
 
 static int stobj_parser(char *cur, jfh_obj_t **curobj, char *keys, char *vals) {
-    if (!cur || !curobj) {
+    if (!cur || !curobj || !keys || !vals) {
         errno = EINVAL;
         return 1;
     }
@@ -825,7 +825,7 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj, char *keys, char *vals) {
 }
 
 static int starr_parser(char *cur, jfh_array_t **curarr, char *keys, char *vals) {
-    if (!curarr || !cur) {
+    if (!curarr || !cur || !keys || !vals) {
         errno = EINVAL;
         return 1;
     }
