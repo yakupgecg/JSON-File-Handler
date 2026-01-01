@@ -44,7 +44,7 @@ static char *remove_whitespace(char *str) {
                     is_string = true;
                 }
             } else {
-                if (*p_prev == '\\') {
+                if (*p_prev == '\\' && *(p_prev-1) != '\\') {
                     quots++;
                     if (is_string) {
                         is_string = false;
@@ -454,7 +454,7 @@ char *JFH_indent_json(char *ajson, size_t indent_len) {
                     is_string = true;
                 }
             } else {
-                if (*p_prev == '\\') {
+                if (*p_prev == '\\' && *(p_prev-1) != '\\') {
                     if (is_string) {
                         is_string = false;
                     } else {
@@ -578,7 +578,7 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj, char *keys, char *vals) {
                         is_string = true;
                     }
                 } else {
-                    if (*p_prev == '\\') {
+                    if (*p_prev == '\\' && *(p_prev-1) != '\\') {
                         if (is_string) {
                             is_string = false;
                         } else {
@@ -852,7 +852,7 @@ static int starr_parser(char *cur, jfh_array_t **curarr, char *keys, char *vals)
                         is_string = true;
                     }
                 } else {
-                    if (*p_prev == '\\') {
+                    if (*p_prev == '\\' && *(p_prev-1) != '\\') {
                         if (is_string) {
                             is_string = false;
                         } else {
