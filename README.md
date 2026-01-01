@@ -320,6 +320,7 @@ int main() {
 
     JFH_free_map(obj);
     free(encoded);
+    return 0;
 }
 ```  
 
@@ -349,6 +350,7 @@ int main() {
 
     JFH_free_map(obj);
     free(json);
+    return 0;
 }
 ```  
 
@@ -517,6 +519,7 @@ int main() {
 
     JFH_free_map(obj);
     free(encoded);
+    return 0;
 }
 ```  
 
