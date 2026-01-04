@@ -80,6 +80,166 @@ static char *remove_whitespace(char *str) {
     return newstr;
 }
 
+static int st_invalid(char *str) {
+    if (!str) {
+        errno = EINVAL;
+        return 1;
+    }
+    if (strcmp(str, "true") == 0) return 0;
+    else if (strcmp(str, "false") == 0) return 0;
+    else if (strcmp(str, "null") == 0) return 0;
+    if (*str == '\"') return 0;
+
+    if (*str == '0') {
+        if (*(str + 1) != '\0' && *(str + 1) != '.') return 1;
+    }
+
+    bool dbl = false;
+    char *cur = str;
+    if (*cur == '-') cur++;
+    while (*cur) {
+        if (
+            *cur != '0' &&
+            *cur != '1' &&
+            *cur != '2' &&
+            *cur != '3' &&
+            *cur != '4' &&
+            *cur != '5' &&
+            *cur != '6' &&
+            *cur != '7' &&
+            *cur != '8' &&
+            *cur != '9'
+        ) {
+            if (*cur == '.') {
+                if (dbl) return 1;
+            } else return 1;
+        }
+        if (*cur == '.') {
+            if (dbl) return 1;
+            dbl = true;
+        }
+        cur++;
+    }
+    return 0;
+}
+
+static int st_getmode(char *str) {
+    if (!str) {
+        errno = EINVAL;
+        return -1;
+    }
+    if (strcmp(str, "null") == 0) return 0;
+    else if (strcmp(str, "true") == 0) return 1;
+    else if (strcmp(str, "false") == 0) return 2;
+    char *cur = str;
+    if (*cur == '\"') return 5;
+    else if (*cur == '-') cur++;
+
+    if (
+        *cur == '0' ||
+        *cur == '1' ||
+        *cur == '2' ||
+        *cur == '3' ||
+        *cur == '4' ||
+        *cur == '5' ||
+        *cur == '6' ||
+        *cur == '7' ||
+        *cur == '8' ||
+        *cur == '9'
+    ) {
+        while (*cur) {
+            if (*cur == '.') {
+                return 4;
+            }
+            if (
+                *cur != '0' &&
+                *cur != '1' &&
+                *cur != '2' &&
+                *cur != '3' &&
+                *cur != '4' &&
+                *cur != '5' &&
+                *cur != '6' &&
+                *cur != '7' &&
+                *cur != '8' &&
+                *cur != '9'
+            ) return -1;
+            cur++;
+        }
+        return 3;
+    }
+    errno = JFH_EJSON;
+    return -1;
+}
+
+static double convert_num(char c) {
+    switch (c) {
+        case '0': return 0.0;
+        case '1': return 1.0;
+        case '2': return 2.0;
+        case '3': return 3.0;
+        case '4': return 4.0;
+        case '5': return 5.0;
+        case '6': return 6.0;
+        case '7': return 7.0;
+        case '8': return 8.0;
+        case '9': return 9.0;
+        case '.': return -1.0;
+        case '-': return -2.0;
+        default: return 3.0;
+    }
+}
+
+static int stint_parse(char *str) {
+    if (!str) {
+        errno = EINVAL;
+        return 0;
+    }
+    int n = 0;
+    char *cur = str;
+    if (*cur == '-') cur++;
+    while (*cur) {
+        int cn = (int)convert_num(*cur);
+        if (cn == -3.0 || cn == -1.0) return 0;
+        else {
+            n *= 10;
+            n += cn;
+        }
+        cur++;
+    }
+    return (*str == '-') ? n * (-1) : n;
+}
+
+static double stdbl_parse(char *str) {
+    if (!str) {
+        errno = EINVAL;
+        return 0;
+    }
+    double n = 0.0;
+    int i = 1;
+    char *cur = str;
+    if (*cur == '-') cur++;
+    while (*cur) {
+        double cn = convert_num(*cur);
+        if (cn == -3.0) return 0;
+        else if (cn == -1.0) {
+            cur++;
+            while (*cur) {
+                cn = convert_num(*cur);
+                i *= 10;
+                n += cn / i;
+                cur++;
+            }
+            return (*str == '-') ? n * (-1.0) : n;
+        }
+        else {
+            n *= 10;
+            n += cn;
+        }
+        cur++;
+    }
+    return (*str == '-') ? n * (-1.0) : n;
+}
+
 static int st_write(char **cur, char **str, size_t *pos, size_t *alc_n, const char *src) {
     if (!cur || !str || !pos || !alc_n || !src) {
         errno = EINVAL;
@@ -650,167 +810,27 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj, char *keys, char *vals) {
             }
             if (!JFH_setarrH(*curobj, rkey, newarr)) {free(rkey); return 1;}
         } else {
-            curval = val;
-            if (
-                *curval == '0' ||
-                *curval == '1' ||
-                *curval == '2' ||
-                *curval == '3' ||
-                *curval == '4' ||
-                *curval == '5' ||
-                *curval == '6' ||
-                *curval == '7' ||
-                *curval == '8' ||
-                *curval == '9'
-            ) {
-                int num = 0;
-                double dbl = 0.0;
-                bool is_dbl = false;
-                while (*curval) {
-                    switch (*curval) {
-                        case '0': num *= 10; break;
-                        case '1': num *= 10; num++; break;
-                        case '2': num *= 10; num += 2; break;
-                        case '3': num *= 10; num += 3; break;
-                        case '4': num *= 10; num += 4; break;
-                        case '5': num *= 10; num += 5; break;
-                        case '6': num *= 10; num += 6; break;
-                        case '7': num *= 10; num += 7; break;
-                        case '8': num *= 10; num += 8; break;
-                        case '9': num *= 10; num += 9; break;
-                        case '.': break;
-                        default: errno = JFH_EJSON; {free(rkey); return 1;}
-                    }
-                    if (*curval == '.') {
-                        long i = 1;
-                        is_dbl = true;
-                        curval++;
-                        if (
-                            *curval != '0' &&
-                            *curval != '1' &&
-                            *curval != '2' &&
-                            *curval != '3' &&
-                            *curval != '4' &&
-                            *curval != '5' &&
-                            *curval != '6' &&
-                            *curval != '7' &&
-                            *curval != '8' &&
-                            *curval != '9'
-                        ) {
-                            errno = JFH_EJSON;
-                            {free(rkey); return 1;}
-                        }
-                        dbl += num;
-                        while (*curval) {
-                            i *= 10;
-                            switch (*curval) {
-                                case '1': dbl += 1.0 / i; break;
-                                case '2': dbl += 2.0 / i; break;
-                                case '3': dbl += 3.0 / i; break;
-                                case '4': dbl += 4.0 / i; break;
-                                case '5': dbl += 5.0 / i; break;
-                                case '6': dbl += 6.0 / i; break;
-                                case '7': dbl += 7.0 / i; break;
-                                case '8': dbl += 8.0 / i; break;
-                                case '9': dbl += 9.0 / i; break;
-                                case '0': break;
-                                default: errno = JFH_EJSON; {free(rkey); return 1;}
-                            }
-                            curval++;
-                        }
-                        break;
-                    }
-                    curval++;
-                }
-                if (is_dbl) {
-                    if (!JFH_setdoubleH(*curobj, key, dbl)) {free(rkey); return 1;}
-                } else {
-                    if (!JFH_setintH(*curobj, key, num)) {free(rkey); return 1;}
-                }
-            } else if (*curval == '-') {
-                curval++;
-                int num = 0;
-                double dbl = 0.0;
-                bool is_dbl = false;
-                while (*curval != '\0') {
-                    switch (*curval) {
-                        case '0': num *= 10; break;
-                        case '1': num *= 10; num++; break;
-                        case '2': num *= 10; num += 2; break;
-                        case '3': num *= 10; num += 3; break;
-                        case '4': num *= 10; num += 4; break;
-                        case '5': num *= 10; num += 5; break;
-                        case '6': num *= 10; num += 6; break;
-                        case '7': num *= 10; num += 7; break;
-                        case '8': num *= 10; num += 8; break;
-                        case '9': num *= 10; num += 9; break;
-                        case '.': break;
-                        default: errno = JFH_EJSON; {free(rkey); return 1;}
-                    }
-                    if (*curval == '.') {
-                        long i = 1;
-                        is_dbl = true;
-                        curval++;
-                        if (
-                            *curval != '0' &&
-                            *curval != '1' &&
-                            *curval != '2' &&
-                            *curval != '3' &&
-                            *curval != '4' &&
-                            *curval != '5' &&
-                            *curval != '6' &&
-                            *curval != '7' &&
-                            *curval != '8' &&
-                            *curval != '9'
-                        ) {
-                            errno = JFH_EJSON;
-                            {free(rkey); return 1;}
-                        }
-                        dbl += num;
-                        while (*curval) {
-                            i *= 10;
-                            switch (*curval) {
-                                case '1': dbl += 1.0 / i; break;
-                                case '2': dbl += 2.0 / i; break;
-                                case '3': dbl += 3.0 / i; break;
-                                case '4': dbl += 4.0 / i; break;
-                                case '5': dbl += 5.0 / i; break;
-                                case '6': dbl += 6.0 / i; break;
-                                case '7': dbl += 7.0 / i; break;
-                                case '8': dbl += 8.0 / i; break;
-                                case '9': dbl += 9.0 / i; break;
-                                case '0': break;
-                                default: errno = JFH_EJSON; {free(rkey); return 1;}
-                            }
-                            curval++;
-                        }
-                        break;
-                    }
-                    curval++;
-                }
-                if (is_dbl) {
-                    if (!JFH_setdoubleH(*curobj, key, dbl * (-1))) {free(rkey); return 1;}
-                } else {
-                    if (!JFH_setintH(*curobj, key, num * (-1))) {free(rkey); return 1;}
-                }
-            } else {
-                if (*val != '\"') {
-                    if (strcmp(val, "true") == 0) {
-                        if (!JFH_setboolH(*curobj, key, true)) {free(rkey); return 1;}
-                    } else if (strcmp(val, "false") == 0) {
-                        if (!JFH_setboolH(*curobj, key, false)) {free(rkey); return 1;}
-                    } else if (strcmp(val, "null") == 0) {
-                        if (!JFH_setnullH(*curobj, key)) {free(rkey); return 1;}
-                    } else {
-                        errno = JFH_EJSON;
-                        {free(rkey); return 1;}
-                    }
-                } else {
-                    char *new = _evalu(val);
-                    if (!new) {free(rkey); return 1;}
-                    if (!JFH_setstrH_nquots(*curobj, key, new)) {free(rkey); free(new); return 1;}
-                    free(new);
-                }
+            if (st_invalid(val)) {free(rkey); errno = JFH_EJSON; return 1;}
+            int mode = st_getmode(val);
+            if (mode == -1) {free(rkey); errno = JFH_EJSON; return 1;}
+            
+            if (mode == 0) {
+                if (!JFH_setnullH(*curobj, key)) {free(rkey); return 1;}  
+            } else if (mode == 1) {
+                if (!JFH_setboolH(*curobj, key, true)) {free(rkey); return 1;}
+            } else if (mode == 2) {
+                if (!JFH_setboolH(*curobj, key, false)) {free(rkey); return 1;}
+            } else if (mode == 3) {
+                int num = stint_parse(val);
+                if (!JFH_setintH(*curobj, key, num)) {free(rkey); return 1;}
+            } else if (mode == 4) {
+                double num = stdbl_parse(val);
+                if (!JFH_setdoubleH(*curobj, key, num)) {free(rkey); return 1;}
+            } else if (mode == 5) {
+                char *new = _evalu(val);
+                if (!new) {free(rkey); return 1;}
+                if (!JFH_setstrH_nquots(*curobj, key, new)) {free(rkey); return 1;}
+                free(new);
             }
         }
         free(rkey);
@@ -912,167 +932,27 @@ static int starr_parser(char *cur, jfh_array_t **curarr, char *keys, char *vals)
             }
             if (!JFH_setarrL(*curarr, newarr)) return 1;
         } else {
-            curval = val;
-            if (
-                *curval == '0' ||
-                *curval == '1' ||
-                *curval == '2' ||
-                *curval == '3' ||
-                *curval == '4' ||
-                *curval == '5' ||
-                *curval == '6' ||
-                *curval == '7' ||
-                *curval == '8' ||
-                *curval == '9'
-            ) {
-                int num = 0;
-                double dbl = 0.0;
-                bool is_dbl = false;
-                while (*curval != '\0') {
-                    switch (*curval) {
-                        case '0': num *= 10; break;
-                        case '1': num *= 10; num++; break;
-                        case '2': num *= 10; num += 2; break;
-                        case '3': num *= 10; num += 3; break;
-                        case '4': num *= 10; num += 4; break;
-                        case '5': num *= 10; num += 5; break;
-                        case '6': num *= 10; num += 6; break;
-                        case '7': num *= 10; num += 7; break;
-                        case '8': num *= 10; num += 8; break;
-                        case '9': num *= 10; num += 9; break;
-                        case '.': break;
-                        default: errno = JFH_EJSON; return 1;
-                    }
-                    if (*curval == '.') {
-                        long i = 1;
-                        is_dbl = true;
-                        curval++;
-                        if (
-                            *curval != '0' &&
-                            *curval != '1' &&
-                            *curval != '2' &&
-                            *curval != '3' &&
-                            *curval != '4' &&
-                            *curval != '5' &&
-                            *curval != '6' &&
-                            *curval != '7' &&
-                            *curval != '8' &&
-                            *curval != '9'
-                        ) {
-                            errno = JFH_EJSON;
-                            return 1;
-                        }
-                        dbl += num;
-                        while (*curval != '\0') {
-                            i *= 10;
-                            switch (*curval) {
-                                case '1': dbl += 1.0 / i; break;
-                                case '2': dbl += 2.0 / i; break;
-                                case '3': dbl += 3.0 / i; break;
-                                case '4': dbl += 4.0 / i; break;
-                                case '5': dbl += 5.0 / i; break;
-                                case '6': dbl += 6.0 / i; break;
-                                case '7': dbl += 7.0 / i; break;
-                                case '8': dbl += 8.0 / i; break;
-                                case '9': dbl += 9.0 / i; break;
-                                case '0': break;
-                                default: errno = JFH_EJSON; return 1;
-                            }
-                            curval++;
-                        }
-                        break;
-                    }
-                    curval++;
-                }
-                if (is_dbl) {
-                    if (!JFH_setdoubleL(*curarr, dbl)) return 1;
-                } else {
-                    if (!JFH_setintL(*curarr, num)) return 1;
-                }
-            } else if (*curval == '-') {
-                curval++;
-                int num = 0;
-                double dbl = 0.0;
-                bool is_dbl = false;
-                while (*curval != '\0') {
-                    switch (*curval) {
-                        case '0': num *= 10; break;
-                        case '1': num *= 10; num++; break;
-                        case '2': num *= 10; num += 2; break;
-                        case '3': num *= 10; num += 3; break;
-                        case '4': num *= 10; num += 4; break;
-                        case '5': num *= 10; num += 5; break;
-                        case '6': num *= 10; num += 6; break;
-                        case '7': num *= 10; num += 7; break;
-                        case '8': num *= 10; num += 8; break;
-                        case '9': num *= 10; num += 9; break;
-                        case '.': break;
-                        default: errno = JFH_EJSON; return 1;
-                    }
-                    if (*curval == '.') {
-                        long i = 1;
-                        is_dbl = true;
-                        curval++;
-                        if (
-                            *curval != '0' &&
-                            *curval != '1' &&
-                            *curval != '2' &&
-                            *curval != '3' &&
-                            *curval != '4' &&
-                            *curval != '5' &&
-                            *curval != '6' &&
-                            *curval != '7' &&
-                            *curval != '8' &&
-                            *curval != '9'
-                        ) {
-                            errno = JFH_EJSON;
-                            return 1;
-                        }
-                        dbl += num;
-                        while (*curval != '\0') {
-                            i *= 10;
-                            switch (*curval) {
-                                case '1': dbl += 1.0 / i; break;
-                                case '2': dbl += 2.0 / i; break;
-                                case '3': dbl += 3.0 / i; break;
-                                case '4': dbl += 4.0 / i; break;
-                                case '5': dbl += 5.0 / i; break;
-                                case '6': dbl += 6.0 / i; break;
-                                case '7': dbl += 7.0 / i; break;
-                                case '8': dbl += 8.0 / i; break;
-                                case '9': dbl += 9.0 / i; break;
-                                case '0': break;
-                                default: errno = JFH_EJSON; return 1;
-                            }
-                            curval++;
-                        }
-                        break;
-                    }
-                    curval++;
-                }
-                if (is_dbl) {
-                    if (!JFH_setdoubleL(*curarr, dbl * (-1))) return 1;
-                } else {
-                    if (!JFH_setintL(*curarr, num * (-1))) return 1;
-                }
-            } else {
-                if (*val != '\"') {
-                    if (strcmp(val, "true") == 0) {
-                        if (!JFH_setboolL(*curarr, true)) return 1;
-                    } else if (strcmp(val, "false") == 0) {
-                        if (!JFH_setboolL(*curarr, false)) return 1;
-                    } else if (strcmp(val, "null") == 0) {
-                        if (!JFH_setnullL(*curarr)) return 1;
-                    } else {
-                        errno = JFH_EJSON;
-                        return 1;
-                    }
-                } else {
-                    char *new = _evalu(val);
-                    if (!new) return 1;
-                    if (!JFH_setstrL_nquots(*curarr, new)) {free(new); return 1;}
-                    free(new);
-                }
+            if (st_invalid(val)) {errno = JFH_EJSON; return 1;}
+            int mode = st_getmode(val);
+            if (mode == -1) {errno = JFH_EJSON; return 1;}
+
+            if (mode == 0) {
+                if (!JFH_setnullL(*curarr)) return 1;
+            } else if (mode == 1) {
+                if (!JFH_setboolL(*curarr, true)) return 1;
+            } else if (mode == 2) {
+                if (!JFH_setboolL(*curarr, false)) return 1;
+            } else if (mode == 3) {
+                int num = stint_parse(val);
+                if (!JFH_setintL(*curarr, num)) return 1;
+            } else if (mode == 4) {
+                double num = stdbl_parse(val);
+                if (!JFH_setdoubleL(*curarr, num)) return 1;
+            } else if (mode == 5) {
+                char *new = _evalu(val);
+                if (!new) return 1;
+                if (!JFH_setstrL_nquots(*curarr, new)) return 1;
+                free(new);
             }
         }
         if (nest_index <= 0) break;
