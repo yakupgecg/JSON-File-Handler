@@ -24,6 +24,7 @@ static char *remove_whitespace(char *str) {
     size_t quots = 0;
     int braces = 0;
     int square_brackets = 0;
+    int escapes = 0;
     char *newstr = malloc(strlen(str) + 1);
     if (!newstr) {
         errno = ENOMEM;
@@ -31,26 +32,14 @@ static char *remove_whitespace(char *str) {
     }
     char *newcur = newstr;
     char *cur = str;
-    char *prev = str;
-    char *p_prev = str;
     bool is_string = false;
     while (*cur) {
         if (*cur == '\"') {
-            if (*prev != '\\') {
-                quots++;
+            if (escapes % 2 == 0) {
                 if (is_string) {
                     is_string = false;
                 } else {
                     is_string = true;
-                }
-            } else {
-                if (*p_prev == '\\' && (*(p_prev-1) != '\\' || *(p_prev-2) == '\\')) {
-                    quots++;
-                    if (is_string) {
-                        is_string = false;
-                    } else {
-                        is_string = true;
-                    }
                 }
             }
         }
@@ -67,8 +56,7 @@ static char *remove_whitespace(char *str) {
         } else if (*cur == ']' && !is_string) {
             square_brackets--;
         }
-        p_prev = prev;
-        prev = cur;
+        if (*cur == '\\') escapes++; else escapes = 0;
         cur++;
     }
     if (braces || square_brackets || quots % 2 != 0) {
@@ -582,7 +570,6 @@ char *JFH_indent_json(char *ajson, size_t indent_len) {
     }
     char *cur = json;
     char *prev = json;
-    char *p_prev = json;
     if (*cur != '{' && *cur != '[') {
         errno = JFH_EJSON;
         return NULL;
@@ -591,7 +578,8 @@ char *JFH_indent_json(char *ajson, size_t indent_len) {
     bool is_string = false;
     size_t alc_n = 256;
     int indentation = 0;
-    size_t JFH_str_len = strlen(json)+1;
+    int escapes = 0;
+    size_t str_len = strlen(json)+1;
     size_t len_i = 0;
     size_t nmem = 0;
     size_t k;
@@ -604,22 +592,14 @@ char *JFH_indent_json(char *ajson, size_t indent_len) {
         return NULL;
     }
     char *newcur = newjson;
-    for (i = 0; i < JFH_str_len; i++) {
+    for (i = 0; i < str_len; i++) {
         nmem = 0;
         if (*cur == '\"') {
-            if (*prev != '\\') {
+            if (escapes % 2 == 0) {
                 if (is_string) {
                     is_string = false;
                 } else {
                     is_string = true;
-                }
-            } else {
-                if (*p_prev == '\\' && (*(p_prev-1) != '\\' || *(p_prev-2) == '\\')) {
-                    if (is_string) {
-                        is_string = false;
-                    } else {
-                        is_string = true;
-                    }
                 }
             }
         } else if (*cur == '{' && !is_string) {
@@ -664,7 +644,6 @@ char *JFH_indent_json(char *ajson, size_t indent_len) {
                 len_i++;
             }
         }
-        p_prev = prev;
         prev = cur;
 	    *newcur = *cur;
         newcur++;
@@ -691,6 +670,7 @@ char *JFH_indent_json(char *ajson, size_t indent_len) {
                 len_i++;
             }
         }
+        if (*cur == '\\') escapes++; else escapes = 0;
 	    cur++;
 	    len_i++;
     }
@@ -710,14 +690,13 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj, char *keys, char *vals) {
     }
     int nest_index = 0;
     int last_brace = 1;
+    int escapes = 0;
     bool is_string = false;
     bool is_key = true;
     bool is_obj = false;
     bool is_arr = false;
     char *key = keys;
     char *val = vals;
-    char *prev = cur;
-    char *p_prev = cur;
     char *curkey;
     char *curval;
     while (*cur) {
@@ -731,19 +710,11 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj, char *keys, char *vals) {
                 curkey++;
             }
             if (*cur == '\"') {
-                if (*prev != '\\') {
+                if (escapes % 2 == 0) {
                     if (is_string) {
                         is_string = false;
                     } else {
                         is_string = true;
-                    }
-                } else {
-                    if (*p_prev == '\\' && (*(p_prev-1) != '\\' || *(p_prev-2) == '\\')) {
-                        if (is_string) {
-                            is_string = false;
-                        } else {
-                            is_string = true;
-                        }
                     }
                 }
             }
@@ -770,7 +741,6 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj, char *keys, char *vals) {
             if (*cur == ',' && !is_string && last_brace >= nest_index) {
                 if (*(cur + 1) == '}' || *(cur + 1) == ']' || *(cur + 1) == ',') return 1;
                 is_key = true;
-                prev = cur;
                 cur++;
                 break;
             }
@@ -782,8 +752,7 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj, char *keys, char *vals) {
                 if (*(cur + 1) == ',') return 1;
                 is_key = false;
             }
-            p_prev = prev;
-            prev = cur;
+            if (*cur == '\\') escapes++; else escapes = 0;
             cur++;
         }
         curkey--;
@@ -850,10 +819,9 @@ static int starr_parser(char *cur, jfh_array_t **curarr, char *keys, char *vals)
     }
     int nest_index = 1;
     int last_brace = 1;
+    int escapes = 0;
     char *val = vals;
     char *curval;
-    char *prev = cur;
-    char *p_prev = cur;
     bool is_string = false;
     bool is_obj = false;
     bool is_arr = false;
@@ -864,19 +832,11 @@ static int starr_parser(char *cur, jfh_array_t **curarr, char *keys, char *vals)
         is_arr = false;
         while (*cur) {
             if (*cur == '\"') {
-                if (*prev != '\\') {
+                if (escapes % 2 == 0) {
                     if (is_string) {
                         is_string = false;
                     } else {
                         is_string = true;
-                    }
-                } else {
-                    if (*p_prev == '\\' && (*(p_prev-1) != '\\' || *(p_prev-2) == '\\')) {
-                        if (is_string) {
-                            is_string = false;
-                        } else {
-                            is_string = true;
-                        }
                     }
                 }
             }
@@ -902,14 +862,12 @@ static int starr_parser(char *cur, jfh_array_t **curarr, char *keys, char *vals)
             if (nest_index <= 0) break;
             if (*cur == ',' && !is_string && last_brace >= nest_index) {
                 if (*(cur + 1) == '}' || *(cur + 1) == ']' || *(cur + 1) == ',') return 1;
-                prev = cur;
                 cur++;
                 break;
             }
+            if (*cur == '\\') escapes++; else escapes = 0;
             *curval = *cur;
             curval++;
-            p_prev = prev;
-            prev = cur;
             cur++;
         }
         *curval = '\0';
