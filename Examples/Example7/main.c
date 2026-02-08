@@ -70,11 +70,11 @@ int main() {
     a.w.pos_x = JFH_getelementbyindex(JFH_searchH(ewindow, "Position")->value.value.arr, 0)->value.value.i;
     a.w.pos_y = JFH_getelementbyindex(JFH_searchH(ewindow, "Position")->value.value.arr, 1)->value.value.i;
     a.w.visible = JFH_searchH(ewindow, "Visible")->value.value.b;
-    a.w.theme = JFH_searchH(ewindow, "Theme")->value.value.str.str;
+    a.w.theme = JFH_searchH(ewindow, "Theme")->value.value.str;
 	
-	a.conf.default_font = JFH_searchH(esystem_configurations, "Default font")->value.value.str.str;
-	a.conf.logo = JFH_searchH(esystem_configurations, "Logo")->value.value.str.str;
-	a.conf.supported_os = JFH_searchH(esystem_configurations, "Supported_os")->value.value.str.str;
+	a.conf.default_font = JFH_searchH(esystem_configurations, "Default font")->value.value.str;
+	a.conf.logo = JFH_searchH(esystem_configurations, "Logo")->value.value.str;
+	a.conf.supported_os = JFH_searchH(esystem_configurations, "Supported_os")->value.value.str;
 	a.conf.confirm_close = JFH_searchH(esystem_configurations, "Confirm_close")->value.value.b;
 	
 	a.aud.volume = JFH_searchH(eaudio, "Volume")->value.value.i;
@@ -91,7 +91,7 @@ int main() {
 	
 	jfh_array_t *cur = esaves;
 	while (cur) {
-		s->name = JFH_searchL(cur, "Name")->value.value.str.str;
+		s->name = JFH_searchL(cur, "Name")->value.value.str;
 		s->archived = JFH_searchL(cur, "Archived")->value.value.b;
 		s->data = JFH_searchL(cur, "Data")->value.value.obj;
 		s->mods = JFH_searchL(cur, "Mods")->value.value.arr;
