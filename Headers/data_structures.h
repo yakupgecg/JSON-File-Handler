@@ -6,6 +6,7 @@
 #include <errno.h>
 #include <stdbool.h>
 #include <string.h>
+#include <stdint.h>
 
 #ifndef HASHMAP_STRUCT_H
 #define HASHMAP_STRUCT_H
@@ -33,7 +34,7 @@ typedef struct {
     enum jfh_valuetype vt;
     union {
         char *str;
-        int i;
+        int64_t i;
         double dbl;
         bool b;
         jfh_obj_t *obj;

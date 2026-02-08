@@ -177,16 +177,16 @@ static double convert_num(char c) {
     }
 }
 
-static int stint_parse(char *str) {
+static int64_t stint_parse(char *str) {
     if (!str) {
         errno = EINVAL;
         return 0;
     }
-    int n = 0;
+    int64_t n = 0;
     char *cur = str;
     if (*cur == '-') cur++;
     while (*cur) {
-        int cn = (int)convert_num(*cur);
+        int64_t cn = (int64_t)convert_num(*cur);
         if (cn == -3.0 || cn == -1.0) return 0;
         else {
             n *= 10;
@@ -790,7 +790,7 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj, char *keys, char *vals) {
             } else if (mode == 2) {
                 if (!JFH_setboolH(*curobj, key, false)) {free(rkey); return 1;}
             } else if (mode == 3) {
-                int num = stint_parse(val);
+                int64_t num = stint_parse(val);
                 if (!JFH_setintH(*curobj, key, num)) {free(rkey); return 1;}
             } else if (mode == 4) {
                 double num = stdbl_parse(val);
@@ -901,7 +901,7 @@ static int starr_parser(char *cur, jfh_array_t **curarr, char *keys, char *vals)
             } else if (mode == 2) {
                 if (!JFH_setboolL(*curarr, false)) return 1;
             } else if (mode == 3) {
-                int num = stint_parse(val);
+                int64_t num = stint_parse(val);
                 if (!JFH_setintL(*curarr, num)) return 1;
             } else if (mode == 4) {
                 double num = stdbl_parse(val);

@@ -451,7 +451,7 @@ void JFH_setval(jfh_json_value_t *value, void *src, enum jfh_valuetype vt) {
             value->vt = JFH_STR;
             break;
         }
-        case JFH_INT: value->value.i = *(int*)src; value->vt = JFH_INT; break;
+        case JFH_INT: value->value.i = *(int64_t*)src; value->vt = JFH_INT; break;
         case JFH_DBL: value->value.dbl = *(double*)src; value->vt = JFH_DBL; break;
         case JFH_OBJ: value->value.obj = (jfh_obj_t*)src;  value->vt = JFH_OBJ; break;
         case JFH_LIST: value->value.arr = (jfh_array_t*)src; value->vt = JFH_LIST; break;
@@ -493,7 +493,7 @@ jfh_array_t *JFH_setstrL(jfh_array_t *arr, char *src) {
 }
 
 // Sets the object's or element's value to an integer
-jfh_obj_t *JFH_setintH(jfh_obj_t *obj, char *key, int src) {
+jfh_obj_t *JFH_setintH(jfh_obj_t *obj, char *key, int64_t src) {
     if (!obj) {
         errno = EINVAL;
         return NULL;
@@ -508,7 +508,7 @@ jfh_obj_t *JFH_setintH(jfh_obj_t *obj, char *key, int src) {
     return obj;
 }
 
-jfh_array_t *JFH_setintL(jfh_array_t *arr, int src) {
+jfh_array_t *JFH_setintL(jfh_array_t *arr, int64_t src) {
     if (!arr) {
         errno = EINVAL;
         return NULL;

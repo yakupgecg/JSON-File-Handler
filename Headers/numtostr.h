@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <stdint.h>
 
 // Don't confuse this file with decoding or parsing json strings
 
@@ -24,7 +25,7 @@ you can type
 setrawH(obj, str_Int("8"));
 */
 
-char *JFH_str_Int(int);
+char *JFH_str_Int(int64_t);
 char *JFH_str_Double(double);
 
 #endif

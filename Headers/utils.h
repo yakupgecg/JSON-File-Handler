@@ -84,8 +84,8 @@ jfh_obj_t *JFH_setstrH(jfh_obj_t *, char *, char *);
 jfh_array_t *JFH_setstrL(jfh_array_t *, char *);
 
 // Sets the object's or element's value to an integer
-jfh_obj_t *JFH_setintH(jfh_obj_t *, char *, int);
-jfh_array_t *JFH_setintL(jfh_array_t *, int);
+jfh_obj_t *JFH_setintH(jfh_obj_t *, char *, int64_t);
+jfh_array_t *JFH_setintL(jfh_array_t *, int64_t);
 
 // Sets the object's or element's to a double
 jfh_obj_t *JFH_setdoubleH(jfh_obj_t *, char *, double);

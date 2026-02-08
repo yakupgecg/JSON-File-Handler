@@ -1,13 +1,14 @@
 #include "..\Headers\numtostr.h"
+#include <inttypes.h>
 
-char *JFH_str_Int(int value) {
-    size_t size = snprintf(NULL, 0, "%d", value);
+char *JFH_str_Int(int64_t value) {
+    size_t size = snprintf(NULL, 0, "%" PRIi64, value);
     char *buffer = malloc(size + 1);
     if (!buffer) {
         errno = ENOMEM;
         return NULL;
     }
-    sprintf(buffer, "%d", value);
+    sprintf(buffer, "%" PRIi64, value);
     return buffer;
 }
 
