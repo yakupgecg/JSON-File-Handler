@@ -14,13 +14,15 @@
 /* This header defines structs, valuetypes, macros and variables */
 
 enum jfh_valuetype {
-    JFH_STR,   // String (can also be bool, null or any number)
-    JFH_INT,   // Integer
-    JFH_DBL,   // Double
-    JFH_LIST,  // Nested list
+    JFH_STR,    // String (can also be bool, null or any number)
+    JFH_INT,    // Integer
+    JFH_EXPI,   // Integer with an exponent
+    JFH_DBL,    // Double
+    JFH_EXPD,    // Double with an exponent
+    JFH_LIST,   // Nested list
     JFH_OBJ,    // Nested map
     JFH_BOOL,   // Boolean
-    JFH_NULL   // Null (can also be strings without quotes, but not practical and illegal in json)
+    JFH_NULL    // Null (can also be strings without quotes, but not practical and illegal in json)
 };
 
 #ifndef JFH_EJSON
@@ -34,8 +36,13 @@ typedef struct {
     enum jfh_valuetype vt;
     union {
         char *str;
-        int64_t i;
-        double dbl;
+        struct {
+            union {
+                int64_t i;
+                double dbl;
+            } val;
+            int32_t exp;
+        } num;
         bool b;
         jfh_obj_t *obj;
         jfh_array_t *arr;

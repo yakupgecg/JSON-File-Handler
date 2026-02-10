@@ -87,9 +87,17 @@ jfh_array_t *JFH_setstrL(jfh_array_t *, char *);
 jfh_obj_t *JFH_setintH(jfh_obj_t *, char *, int64_t);
 jfh_array_t *JFH_setintL(jfh_array_t *, int64_t);
 
+// Sets the object's or element's value to an integer with an exponent
+jfh_obj_t *JFH_setintexpH(jfh_obj_t *, char *, int64_t, int32_t);
+jfh_array_t *JFH_setintexpL(jfh_array_t *, int64_t, int32_t);
+
 // Sets the object's or element's to a double
 jfh_obj_t *JFH_setdoubleH(jfh_obj_t *, char *, double);
 jfh_array_t *JFH_setdoubleL(jfh_array_t *, double);
+
+// Sets the object's or element's to a double with an exponent
+jfh_obj_t *JFH_setdoubleexpH(jfh_obj_t *, char *, double, int32_t);
+jfh_array_t *JFH_setdoubleexpL(jfh_array_t *, double, int32_t);
 
 // Sets the object's or element's to a boolean value
 jfh_obj_t *JFH_setboolH(jfh_obj_t *, char *, bool);
