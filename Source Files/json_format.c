@@ -1,5 +1,7 @@
 #include "..\Headers\json_format.h"
 
+// TODO: Build support for exponentiation in this file like you did in utils.
+
 // This is a helper function since I am on windows and cannot use normal stdup()
 static char *str_dup(char *str) {
     if (!str) {
@@ -371,7 +373,7 @@ static int stobj_encoder(jfh_obj_t *curobj, char **str, char **cur, size_t *pos,
                 free(new);
                 break;
             } case JFH_INT: {
-                char *temp = JFH_str_Int(curobj->value.value.i);
+                char *temp = JFH_str_Int(curobj->value.value.num.val.i);
                 if(!temp) {
                     return 1;
                 }
@@ -379,7 +381,7 @@ static int stobj_encoder(jfh_obj_t *curobj, char **str, char **cur, size_t *pos,
                 free(temp);
                 break;
             } case JFH_DBL: {
-                char *temp = JFH_str_Double(curobj->value.value.dbl);
+                char *temp = JFH_str_Double(curobj->value.value.num.val.dbl);
                 if(!temp) {
                     return 1;
                 }
@@ -405,6 +407,30 @@ static int stobj_encoder(jfh_obj_t *curobj, char **str, char **cur, size_t *pos,
                 break;
             } case JFH_NULL: {
                 if (st_write(cur, str, pos, alc_n, "null")) return 1;
+                break;
+            }
+            case JFH_EXPI: {
+                char *temp = JFH_str_Int(curobj->value.value.num.val.i);
+                char *temp_exp = JFH_str_Int(curobj->value.value.num.exp);
+                if (
+                    st_write(cur, str, pos, alc_n, temp) ||
+                    st_write(cur, str, pos, alc_n, "e") ||
+                    st_write(cur, str, pos, alc_n, temp_exp)
+                ) return 1;
+                free(temp);
+                free(temp_exp);
+                break;
+            }
+            case JFH_EXPD: {
+                char *temp = JFH_str_Double(curobj->value.value.num.val.dbl);
+                char *temp_exp = JFH_str_Int(curobj->value.value.num.exp);
+                if (
+                    st_write(cur, str, pos, alc_n, temp) ||
+                    st_write(cur, str, pos, alc_n, "e") ||
+                    st_write(cur, str, pos, alc_n, temp_exp)
+                ) return 1;
+                free(temp);
+                free(temp_exp);
                 break;
             }
             default: errno = JFH_EJSON; return 1;
@@ -441,7 +467,7 @@ static int starr_encoder(jfh_array_t *curarr, char **str, char **cur, size_t *po
                 free(new);
                 break;
             } case JFH_INT: {
-                char *temp = JFH_str_Int(curarr->value.value.i);
+                char *temp = JFH_str_Int(curarr->value.value.num.val.i);
                 if(!temp) {
                     return 1;
                 }
@@ -449,7 +475,7 @@ static int starr_encoder(jfh_array_t *curarr, char **str, char **cur, size_t *po
                 free(temp);
                 break;
             } case JFH_DBL: {
-                char *temp = JFH_str_Double(curarr->value.value.dbl);
+                char *temp = JFH_str_Double(curarr->value.value.num.val.dbl);
                 if(!temp) {
                     return 1;
                 }
@@ -475,6 +501,30 @@ static int starr_encoder(jfh_array_t *curarr, char **str, char **cur, size_t *po
                 break;
             } case JFH_NULL: {
                 if (st_write(cur, str, pos, alc_n, "null")) return 1;
+                break;
+            }
+            case JFH_EXPI: {
+                char *temp = JFH_str_Int(curarr->value.value.num.val.i);
+                char *temp_exp = JFH_str_Int(curarr->value.value.num.exp);
+                if (
+                    st_write(cur, str, pos, alc_n, temp) ||
+                    st_write(cur, str, pos, alc_n, "e") ||
+                    st_write(cur, str, pos, alc_n, temp_exp)
+                ) return 1;
+                free(temp);
+                free(temp_exp);
+                break;
+            }
+            case JFH_EXPD: {
+                char *temp = JFH_str_Double(curarr->value.value.num.val.dbl);
+                char *temp_exp = JFH_str_Int(curarr->value.value.num.exp);
+                if (
+                    st_write(cur, str, pos, alc_n, temp) ||
+                    st_write(cur, str, pos, alc_n, "e") ||
+                    st_write(cur, str, pos, alc_n, temp_exp)
+                ) return 1;
+                free(temp);
+                free(temp_exp);
                 break;
             }
             default: errno = JFH_EJSON; return 1;
