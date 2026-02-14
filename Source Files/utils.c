@@ -997,11 +997,13 @@ jfh_json_value_t *JFH_copy_json_value(jfh_json_value_t *val, jfh_json_value_t *c
             cval->value.num.val.i = val->value.num.val.i;
             cval->value.num.exp = val->value.num.exp;
             cval->vt = JFH_EXPI;
+            break;
         }
         case JFH_EXPD: {
             cval->value.num.val.dbl = val->value.num.val.dbl;
             cval->value.num.exp = val->value.num.exp;
             cval->vt = JFH_EXPD;
+            break;
         }
         default: errno = EINVAL; return NULL;
     }
