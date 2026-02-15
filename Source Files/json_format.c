@@ -1,7 +1,5 @@
 #include "..\Headers\json_format.h"
 
-// TODO: Build support for exponentiation in this file like you did in utils.
-
 // This is a helper function since I am on windows and cannot use normal stdup()
 static char *str_dup(char *str) {
     if (!str) {
