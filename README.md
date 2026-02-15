@@ -69,17 +69,14 @@ JFH supports almost all features except a few.
 * Parsing
 * Encoding
 * Indenting
+* Exponents
 
 Basically everything needed for basic JSON work, but this isn't on the high level, yet.
 
 #### Unsupported features
 * Unicode
-* Exponents
-* Scientific notation
 
 These features are about to be added later since they are rarely used.
-Exponents or scientific notations aren't as hard as Unicode which needs the support for hexadecimal numbers and a lookup table
-for parsing.
 
 ### Structs
 

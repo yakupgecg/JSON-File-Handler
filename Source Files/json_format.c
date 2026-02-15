@@ -38,6 +38,7 @@ static char *remove_whitespace(char *str) {
     while (*cur) {
         if (*cur == '\"') {
             if (escapes % 2 == 0) {
+                quots++;
                 if (is_string) {
                     is_string = false;
                 } else {
@@ -81,10 +82,12 @@ static int st_invalid(char *str) {
     if (*str == '\"') return 0;
 
     if (*str == '0') {
-        if (*(str + 1) != '\0' && *(str + 1) != '.') return 1;
+        if (*(str + 1) != '\0' && *(str + 1) != '.' && *(str + 1) != 'e' && *(str + 1) != 'E') return 1;
     }
 
     bool dbl = false;
+    bool exp = false;
+    bool minus_exp = false;
     char *cur = str;
     if (*cur == '-') cur++;
     while (*cur) {
@@ -101,12 +104,27 @@ static int st_invalid(char *str) {
             *cur != '9'
         ) {
             if (*cur == '.') {
-                if (dbl) return 1;
+                if (dbl || exp) return 1;
+            } else if (*cur == 'e' || *cur == 'E') {
+                if (exp || *(cur-1) == '.') return 1;
+            } else if (*cur == '-') {
+                if ((*(cur-1) != 'e' && *(cur-1) != 'E') || *(cur+1) == '\0') return 1;
+                if (exp) {
+                    if (minus_exp) return 1;
+                    minus_exp = true;
+                } else {
+                    return 1;
+                }
+            } else if (*cur == '+') {
+                if ((*(cur-1) != 'e' && *(cur-1) != 'E') || *(cur+1) == '\0') return 1;
             } else return 1;
         }
         if (*cur == '.') {
             if (dbl) return 1;
             dbl = true;
+        } else if (*cur == 'e' || *cur == 'E') {
+            if (exp) return 1;
+            exp = true;
         }
         cur++;
     }
@@ -124,6 +142,7 @@ static int st_getmode(char *str) {
     char *cur = str;
     if (*cur == '\"') return 5;
     else if (*cur == '-') cur++;
+    bool dbl = false;
 
     if (
         *cur == '0' ||
@@ -138,8 +157,10 @@ static int st_getmode(char *str) {
         *cur == '9'
     ) {
         while (*cur) {
-            if (*cur == '.') {
-                return 4;
+            if (*cur == 'e' || *cur == 'E') {
+                if (dbl) return 7; else return 6;
+            } else if (*cur == '.') {
+                dbl = true;
             }
             if (
                 *cur != '0' &&
@@ -151,9 +172,13 @@ static int st_getmode(char *str) {
                 *cur != '6' &&
                 *cur != '7' &&
                 *cur != '8' &&
-                *cur != '9'
+                *cur != '9' &&
+                *cur != '.'
             ) return -1;
             cur++;
+        }
+        if (dbl) {
+            return 4;
         }
         return 3;
     }
@@ -175,7 +200,9 @@ static double convert_num(char c) {
         case '9': return 9.0;
         case '.': return -1.0;
         case '-': return -2.0;
-        default: return 3.0;
+        case 'e': return -4.0;
+        case 'E': return -4.0;
+        default: return -3.0;
     }
 }
 
@@ -188,8 +215,9 @@ static int64_t stint_parse(char *str) {
     char *cur = str;
     if (*cur == '-') cur++;
     while (*cur) {
-        int64_t cn = (int64_t)convert_num(*cur);
+        int64_t cn = (int)convert_num(*cur);
         if (cn == -3.0 || cn == -1.0) return 0;
+        if (cn == -4.0) return (*str == '-') ? n * (-1) : n;
         else {
             n *= 10;
             n += cn;
@@ -198,6 +226,7 @@ static int64_t stint_parse(char *str) {
     }
     return (*str == '-') ? n * (-1) : n;
 }
+
 
 static double stdbl_parse(char *str) {
     if (!str) {
@@ -215,11 +244,12 @@ static double stdbl_parse(char *str) {
             cur++;
             while (*cur) {
                 cn = convert_num(*cur);
+                if (cn == -4.0) return (*str == '-') ? n * (-1) : n;
                 i *= 10;
                 n += cn / i;
                 cur++;
             }
-            return (*str == '-') ? n * (-1.0) : n;
+            return (*str == '-') ? n * (-1) : n;
         }
         else {
             n *= 10;
@@ -228,6 +258,40 @@ static double stdbl_parse(char *str) {
         cur++;
     }
     return (*str == '-') ? n * (-1.0) : n;
+}
+
+static int32_t stexp_parse(char *str) {
+    if (!str) {
+        errno = EINVAL;
+        return 1;
+    }
+    int32_t n = 0;
+    char *cur = str;
+    if (*cur == '-' || *cur == '+') cur++;
+    while (*cur) {
+        int32_t cn = (int)convert_num(*cur);
+        if (cn == -3.0 || cn == -1.0 || cn == -4.0) return 1;
+        else {
+            n *= 10;
+            n += cn;
+        }
+        cur++;
+    }
+    return (*str == '-') ? n * (-1) : n;
+}
+
+static int32_t get_exp(char *str) {
+    if (!str) {
+        errno = EINVAL;
+        return 1;
+    }
+    char *cur = str;
+    while (*cur != 'e' && *cur != 'E') {
+        cur++;
+    }
+    cur++;
+    int32_t num = stexp_parse(cur);
+    return num;
 }
 
 static int st_write(char **cur, char **str, size_t *pos, size_t *alc_n, const char *src) {
@@ -724,6 +788,7 @@ char *JFH_indent_json(char *ajson, size_t indent_len) {
 	    cur++;
 	    len_i++;
     }
+    free(json);
     if (list_index || nest_index) {
         free(newjson);
         errno = JFH_EJSON;
@@ -850,6 +915,14 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj, char *keys, char *vals) {
                 if (!new) {free(rkey); return 1;}
                 if (!JFH_setstrH_nquots(*curobj, key, new)) {free(rkey); return 1;}
                 free(new);
+            } else if (mode == 6) {
+                int64_t num = stint_parse(val);
+                int32_t exp = get_exp(val);
+                if (!JFH_setintexpH(*curobj, key, num, exp)) {free(rkey); return 1;}
+            } else if (mode == 7) {
+                double num = stdbl_parse(val);
+                int32_t exp = get_exp(val);
+                if (!JFH_setdoubleexpH(*curobj, key, num, exp)) {free(rkey); return 1;}
             }
         }
         free(rkey);
@@ -961,6 +1034,14 @@ static int starr_parser(char *cur, jfh_array_t **curarr, char *keys, char *vals)
                 if (!new) return 1;
                 if (!JFH_setstrL_nquots(*curarr, new)) return 1;
                 free(new);
+            } else if (mode == 6) {
+                int64_t num = stint_parse(val);
+                int32_t exp = get_exp(val);
+                if (!JFH_setintexpL(*curarr, num, exp)) return 1;
+            } else if (mode == 7) {
+                double num = stdbl_parse(val);
+                int32_t exp = get_exp(val);
+                if (!JFH_setdoubleexpL(*curarr, num, exp)) return 1;
             }
         }
         if (nest_index <= 0) break;
@@ -1010,6 +1091,8 @@ jfh_obj_t *JFH_parse_obj(char *str) {
     jfh_obj_t *curobj = newobj;
     if (stobj_parser(cur, &curobj, keys, vals)) {
         JFH_free_map(newobj);
+        free(keys);
+        free(vals);
         free(json);
         return NULL;
     }
@@ -1057,6 +1140,8 @@ jfh_array_t *JFH_parse_arr(char *str) {
     jfh_array_t *curarr = newarr;
     if (starr_parser(cur, &curarr, keys, vals)) {
         JFH_free_list(newarr);
+        free(vals);
+        free(keys);
         free(json);
         return NULL;
     }
