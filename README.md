@@ -234,8 +234,8 @@ int main() {
 
     if (!obj) return 1;
 
-    JFH_setstrH(obj, "foo", "bar")
-    JFH_setintH(JFH_appendH(obj), "Example", 5)
+    JFH_setstrH(obj, "foo", "bar");
+    JFH_setintH(JFH_appendH(obj), "Example", 5);
 
     char *json = JFH_encode_obj(obj);
     if (!json) return 1;
