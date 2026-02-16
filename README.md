@@ -137,10 +137,7 @@ It's struct looks like:
 typedef struct {
     enum jfh_valuetype vt;
     union {
-        struct {
-            char *str;
-            size_t len;
-        } str;
+        char *str;
         int i;
         double dbl;
         bool b;
