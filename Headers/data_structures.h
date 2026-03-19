@@ -7,6 +7,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdint.h>
+#include <stdarg.h>
 
 #ifndef HASHMAP_STRUCT_H
 #define HASHMAP_STRUCT_H
@@ -29,8 +30,8 @@ enum jfh_valuetype {
 #define JFH_EJSON 200 // For errors with json strings
 #endif
 
-typedef struct jfh_Hmap jfh_obj_t;
-typedef struct jfh_Linkedlist jfh_array_t;
+typedef struct jfh_obj_t jfh_obj_t;
+typedef struct jfh_array_t jfh_array_t;
 
 typedef struct {
     enum jfh_valuetype vt;
@@ -49,18 +50,18 @@ typedef struct {
     } value;
 } jfh_json_value_t;
 
-typedef struct jfh_Hmap {
+typedef struct jfh_obj_t {
     char *key;
     jfh_json_value_t value;
-    struct jfh_Hmap *next;
-    struct jfh_Hmap *prev;
+    struct jfh_obj_t *next;
+    struct jfh_obj_t *prev;
     bool empty;
 } jfh_obj_t; // Object
 
-typedef struct jfh_Linkedlist {
+typedef struct jfh_array_t {
     jfh_json_value_t value;
-    struct jfh_Linkedlist *next;
-    struct jfh_Linkedlist *prev;
+    struct jfh_array_t *next;
+    struct jfh_array_t *prev;
     bool empty;
 } jfh_array_t; // Array
 
