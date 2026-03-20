@@ -19,7 +19,7 @@ enum jfh_valuetype {
     JFH_INT,    // Integer
     JFH_EXPI,   // Integer with an exponent
     JFH_DBL,    // Double
-    JFH_EXPD,    // Double with an exponent
+    JFH_EXPD,   // Double with an exponent
     JFH_LIST,   // Nested list
     JFH_OBJ,    // Nested map
     JFH_BOOL,   // Boolean
@@ -49,6 +49,11 @@ typedef struct {
         jfh_array_t *arr;
     } value;
 } jfh_json_value_t;
+
+typedef struct {
+    jfh_json_value_t val;
+    char *key;
+} jfh_val;
 
 typedef struct jfh_obj_t {
     char *key;

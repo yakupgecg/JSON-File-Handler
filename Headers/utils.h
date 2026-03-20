@@ -79,6 +79,10 @@ jfh_obj_t *JFH_resetkey(jfh_obj_t *, char *);
 // Sets the value of the json_value_t to void * depending on the valuetype (be cautious with void * and valuetype)
 void JFH_setval(jfh_json_value_t*, void *, enum jfh_valuetype);
 
+// Sets the object's or element's value to any jfh_val created by JFH_xH/L
+int JFH_setH(jfh_obj_t *, int, ...);
+int JFH_setL(jfh_array_t *, int, ...);
+
 // Sets the object's or element's value to a string
 jfh_obj_t *JFH_setstrH(jfh_obj_t *, char *, char *);
 jfh_array_t *JFH_setstrL(jfh_array_t *, char *);
@@ -133,5 +137,34 @@ jfh_array_t *JFH_copy_list(jfh_array_t *, jfh_array_t *);
 
 // Copies the given json value, either returns the copy or copies the json value to 2nd parameter json value
 jfh_json_value_t *JFH_copy_json_value(jfh_json_value_t *, jfh_json_value_t *);
+
+// The functions below return a jfh_val type that has a key and a jfh_json_value_t
+
+jfh_val JFH_strH(char *, char *);
+jfh_val JFH_strL(char *);
+
+jfh_val JFH_intH(char *, int64_t);
+jfh_val JFH_intL(int64_t);
+
+jfh_val JFH_intexpH(char *, int64_t, int32_t);
+jfh_val JFH_intexpL(int64_t, int32_t);
+
+jfh_val JFH_doubleH(char *, double);
+jfh_val JFH_doubleL(double);
+
+jfh_val JFH_doubleexpH(char *, double, int32_t);
+jfh_val JFH_doubleexpL(double, int32_t);
+
+jfh_val JFH_objH(char *, jfh_obj_t *);
+jfh_val JFH_objL(jfh_obj_t *);
+
+jfh_val JFH_arrH(char *, jfh_array_t *);
+jfh_val JFH_arrL(jfh_array_t *);
+
+jfh_val JFH_boolH(char *, bool);
+jfh_val JFH_boolL(bool);
+
+jfh_val JFH_nullH(char *);
+jfh_val JFH_nullL();
 
 #endif

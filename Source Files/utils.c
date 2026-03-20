@@ -470,6 +470,67 @@ void JFH_setval(jfh_json_value_t *value, void *src, enum jfh_valuetype vt) {
     }
 }
 
+int JFH_setH(jfh_obj_t *obj, int count, ...) {
+    if (!obj) {
+        errno = EINVAL;
+        return 1;
+    }
+    obj->empty = false;
+    va_list args;
+    va_start(args, count);
+    jfh_obj_t *cur = obj;
+
+    jfh_val val;
+    for (int i = 0; i < count; i++) {
+
+        val = va_arg(args, jfh_val);
+        if (!JFH_resetkey(cur, val.key)) return 1;
+        JFH_copy_json_value(&val.val, &cur->value);
+
+        if (i+1 >= count) {
+            break;
+        }
+
+        if (!cur->next) {
+            JFH_appendH(cur);
+        }
+        cur = cur->next;
+    }
+
+    va_end(args);
+    return 0;
+} 
+
+int JFH_setL(jfh_array_t *arr, int count, ...) {
+    if (!arr) {
+        errno = EINVAL;
+        return 1;
+    }
+    arr->empty = false;
+    va_list args;
+    va_start(args, count);
+    jfh_array_t *cur = arr;
+
+    jfh_val val;
+    for (int i = 0; i < count; i++) {
+
+        val = va_arg(args, jfh_val);
+        JFH_copy_json_value(&val.val, &cur->value);
+
+        if (i+1 >= count) {
+            break;
+        }
+
+        if (!cur->next) {
+            JFH_appendL(cur);
+        }
+        cur = cur->next;
+    }
+
+    va_end(args);
+    return 0;
+} 
+
 // Sets the object's or element's value to a string
 jfh_obj_t *JFH_setstrH(jfh_obj_t *obj, char *key, char *src) {
     if (!obj || !src) {
@@ -956,7 +1017,6 @@ jfh_json_value_t *JFH_copy_json_value(jfh_json_value_t *val, jfh_json_value_t *c
         errno = EINVAL;
         return NULL;
     }
-    JFH_free_json_value(cval);
     switch (val->vt) {
         case JFH_STR: {
             cval->value.str = str_dup(val->value.str);
@@ -1010,4 +1070,194 @@ jfh_json_value_t *JFH_copy_json_value(jfh_json_value_t *val, jfh_json_value_t *c
         default: errno = EINVAL; return NULL;
     }
     return cval;
+}
+
+jfh_val JFH_strH(char *key, char *str) {
+    jfh_val v;
+    v.key = str_dup(key);
+    v.val.value.str = str_dup(str);
+    v.val.vt = JFH_STR;
+
+    if (!key || !str) errno = EINVAL;
+    
+    return v;
+}
+
+jfh_val JFH_strL(char *str) {
+    jfh_val v;
+    v.key = NULL;
+    v.val.value.str = str_dup(str);
+    v.val.vt = JFH_STR;
+
+    if (!str) errno = EINVAL;
+    
+    return v;
+}
+
+jfh_val JFH_intH(char *key, int64_t num) {
+    jfh_val v;
+    v.key = str_dup(key);
+    v.val.value.num.val.i = num;
+    v.val.vt = JFH_INT;
+
+    if (!key) errno = EINVAL;
+    
+    return v;
+}
+
+jfh_val JFH_intL(int64_t num) {
+    jfh_val v;
+    v.key = NULL;
+    v.val.value.num.val.i = num;
+    v.val.vt = JFH_INT;
+    
+    return v;
+}
+
+jfh_val JFH_intexpH(char *key, int64_t num, int32_t exp) {
+    jfh_val v;
+    v.key = str_dup(key);
+    v.val.value.num.val.i = num;
+    v.val.value.num.exp = exp;
+    v.val.vt = JFH_EXPI;
+
+    if (!key) errno = EINVAL;
+    
+    return v;
+}
+
+jfh_val JFH_intexpL(int64_t num, int32_t exp) {
+    jfh_val v;
+    v.key = NULL;
+    v.val.value.num.val.i = num;
+    v.val.value.num.exp = exp;
+    v.val.vt = JFH_EXPI;
+    
+    return v;
+}
+
+jfh_val JFH_doubleH(char *key, double num) {
+    jfh_val v;
+    v.key = str_dup(key);
+    v.val.value.num.val.dbl = num;
+    v.val.vt = JFH_DBL;
+
+    if (!key) errno = EINVAL;
+    
+    return v;
+}
+
+jfh_val JFH_doubleL(double num) {
+    jfh_val v;
+    v.key = NULL;
+    v.val.value.num.val.dbl = num;
+    v.val.vt = JFH_DBL;
+    
+    return v;
+}
+
+jfh_val JFH_doubleexpH(char *key, double num, int32_t exp) {
+    jfh_val v;
+    v.key = str_dup(key);
+    v.val.value.num.val.dbl = num;
+    v.val.value.num.exp = exp;
+    v.val.vt = JFH_EXPD;
+
+    if (!key) errno = EINVAL;
+    
+    return v;
+}
+
+jfh_val JFH_doubleexpL(double num, int32_t exp) {
+    jfh_val v;
+    v.key = NULL;
+    v.val.value.num.val.dbl = num;
+    v.val.value.num.exp = exp;
+    v.val.vt = JFH_EXPD;
+    
+    return v;
+}
+
+jfh_val JFH_objH(char *key, jfh_obj_t *obj) {
+    jfh_val v;
+    v.key = str_dup(key);
+    v.val.value.obj = obj;
+    v.val.vt = JFH_OBJ;
+
+    if (!obj || !key) errno = EINVAL;
+    
+    return v;
+}
+
+jfh_val JFH_objL(jfh_obj_t *obj) {
+    jfh_val v;
+    v.key = NULL;
+    v.val.value.obj = obj;
+    v.val.vt = JFH_OBJ;
+
+    if (!obj) errno = EINVAL;
+    
+    return v;
+}
+
+jfh_val JFH_arrH(char *key, jfh_array_t *arr) {
+    jfh_val v;
+    v.key = str_dup(key);
+    v.val.value.arr = arr;
+    v.val.vt = JFH_LIST;
+
+    if (!key || !arr) errno = EINVAL;
+    
+    return v;
+}
+
+jfh_val JFH_arrL(jfh_array_t *arr) {
+    jfh_val v;
+    v.key = NULL;
+    v.val.value.arr = arr;
+    v.val.vt = JFH_LIST;
+
+    if (!arr) errno = EINVAL;
+    
+    return v;
+}
+
+jfh_val JFH_boolH(char *key, bool b) {
+    jfh_val v;
+    v.key = str_dup(key);
+    v.val.value.b = b;
+    v.val.vt = JFH_BOOL;
+
+    if (!key) errno = EINVAL;
+    
+    return v;
+}
+
+jfh_val JFH_boolL(bool b) {
+    jfh_val v;
+    v.key = NULL;
+    v.val.value.b = b;
+    v.val.vt = JFH_BOOL;
+    
+    return v;
+}
+
+jfh_val JFH_nullH(char *key) {
+    jfh_val v;
+    v.key = str_dup(key);
+    v.val.value.str = str_dup("null");
+    v.val.vt = JFH_NULL;
+
+    if (!key) errno = EINVAL;
+    
+    return v;
+}
+
+jfh_val JFH_nullL() {
+    jfh_val v;
+    v.key = NULL;
+    v.val.value.str = str_dup("null");
+    v.val.vt = JFH_NULL;
+    
+    return v;
 }
