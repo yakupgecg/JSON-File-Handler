@@ -56,8 +56,6 @@ Although this is "JSON"-File-Handler, this can also behave as the datatype map, 
 
 ### Features
 
-JFH supports almost all features except a few.
-
 #### Supported features
 * Nested objects and arrays
 * Empty objects and arrays
@@ -69,14 +67,13 @@ JFH supports almost all features except a few.
 * Parsing
 * Encoding
 * Indenting
-* Exponents
-
-Basically everything needed for basic JSON work, but this isn't on the high level, yet.
+* Scientific Notation (exponents)
 
 #### Unsupported features
 * Unicode
 
-These features are about to be added later since they are rarely used.
+Unicode is about to be added later because of the difficulty. You can put emojis and special characters on strings with this library, but this doesn't
+support escaped unicode, yet.
 
 ### Structs
 
@@ -149,27 +146,30 @@ typedef struct {
 
 jfh_valuetype can be one of 7 valuetypes:                                                               
 JFH_STR,    String  
-JFH_INT,    Integer  
-JFH_DBL,    Double  
-JFH_LIST,   Nested list  
-JFH_OBJ,    Nested map  
-JFH_BOOL,   Boolean  
-JFH_NULL    Null (can also be strings without quotes, but it is impractical and illegal in json)  
+JFH_INT,    Integer
+JFH_EXPI,   Integer with an exponent
+JFH_DBL,    Double 
+JFH_EXPD,   Double with an exponent
+JFH_LIST,   Nested list
+JFH_OBJ,    Nested map
+JFH_BOOL,   Boolean
+JFH_NULL    Null (can also be strings without quotes, but it is impractical and illegal in json)
 
 ### Important functions
 
 Here is a few important notes:
 1. Functions ending with H or M are for objects and functions ending with L are for arrays.
-2. The setter functions sets the value depending on the type, so there are setstr, setint, setdouble, setbool, setnull, setobj and setarr, of course starting with JFH_ and ending with H or L.
-3. All of the setter functions use the `void setval(jfh_json_value_t *value, void *src, enum jfh_valuetype vt)`. So if you want to edit at the lowest level, use that then, but make sure it's valid.
-4. Nearly all of the function return some kind of error code. Sometimes it might seem like it doesn't set errno, but that's with another function that already changes the errno.
+2. Nearly all of the function return some kind of error code with either errno or it's own error code.
+3. JFH_setH/L() function can set an object or an array a value (and a key).
 
 The most important functions: 
 
 * `jfh_obj_t *JFH_initM()`: Initializes a new object with every property set to null and returns a pointer to the object.
 * `jfh_array_t *JFH_initL()`: Initializes a new array with every property set to null and returns a pointer to the array.
-* `jfh_obj_t *JFH_setstrH(jfh_obj_t *obj, char *key, char *string)`: Sets an object's key to *key and value to *string and returns a pointer to the changed object.
-* `jfh_array_t *JFH_setstrL(jfh_obj_t *obj, char *string)`: Works the same way as **JFH_setstrH()**.
+* `jfh_obj_t *JFH_setH(jfh_obj_t *obj, int count, ...)`: Sets the value of an object with jfh_val that is returned by a function JFH_xH/L(), for example **JFH_strH()**, **JFH_intH()**, **JFH_boolH()**.
+* `jfh_array_t *JFH_setL(jfh_array_t *arr, int count, ...)`: Same as JFH_setH() but for arrays.
+* `jfh_val JFH_strH(char *key, char *str)`: Returns a jfh_val value to be used **JFH_setH/L()**. It includes variants like **JFH_intH()**, **JFH_objH()**, etc....
+* `jfh_val JFH_strL(char *str)`: Same as **JFH_strH()** but without a key (so it's for arrays).
 * `jfh_obj_t *JFH_appendH(jfh_obj_t *obj)`: Appends an object to a map and returns a pointer to it. Also a variant for arrays **JFH_appendL()**.
 * `jfh_obj_t *JFH_popH(jfh_obj_t *obj)`: Takes the last element of the map and disconnects it from the map and returns a pointer to the deleted object.
 * `jfh_obj_t *JFH_parse_obj(char *json)`: Parses the given json into a map and returns a pointer to it. Has a variant for arrays **JFH_parse_arr()**. Remember to free it using **JFH_free_map()** or **JFH_free_list()**.
@@ -205,6 +205,7 @@ JFH.h includes the following system libraries:
 #include <stdbool.h>
 #include <string.h>
 #include <inttypes.h>
+#include <stdarg.h>
 ```
 
 So you don't need to include these libraries if you use JFH.h
@@ -234,8 +235,7 @@ int main() {
 
     if (!obj) return 1;
 
-    JFH_setstrH(obj, "foo", "bar");
-    JFH_setintH(JFH_appendH(obj), "Example", 5);
+    JFH_setH(obj, 2, JFH_strH("foo", "bar"), JFH_intH("Example", 5));
 
     char *json = JFH_encode_obj(obj);
     if (!json) return 1;
@@ -272,10 +272,8 @@ int main() {
 
     if (!obj || !subobj) return 1;
 
-    JFH_setobjH(obj, "foo", subobj);
-
-    JFH_setdoubleH(subobj, "ExampleDbl", 3.141);
-    JFH_setintH(JFH_appendH(subobj), "ExampleNum", 123);
+    JFH_setH(obj, 1, JFH_objH("foo", subobj));
+    JFH_setH(subobj, 2, JFH_doubleH("ExampleDbl", 3.141), JFH_intH("ExampleNum", 123));
 
     char *json = JFH_indent_json(JFH_encode_obj(obj), 4);
     if (!json) return 1;
@@ -335,18 +333,18 @@ Output:
 #include <JFH.h>
 
 int main() {
-    char *json = "{\"Random city\": {\"Street1\": {\"Address1\": 521, \"Address2\": 859, \"Address3\": 210}, \"Street2\": {\"Address1\": 592, \"Address2\": 911}, \"Street3\": {\"Address1\": 110, \"Address2\": 219, \"Address3\": 251}}}"
+    char *json = "{\"Random city\": {\"Street1\": {\"Address1\": 521, \"Address2\": 859, \"Address3\": 210}, \"Street2\": {\"Address1\": 592, \"Address2\": 911}, \"Street3\": {\"Address1\": 110, \"Address2\": 219, \"Address3\": 251}}}";
 
     jfh_obj_t *obj = JFH_parse_obj(json);
     if (!obj) return 1;
     
     char *encoded = JFH_indent_json(JFH_encode_obj(obj), 4);
-    if (!encoded) = return 1;
+    if (!encoded) return 1;
 
     printf("JSON: \n%s\n", encoded);
 
     JFH_free_map(obj);
-    free(json);
+    free(encoded);
     return 0;
 }
 ```  
@@ -390,10 +388,7 @@ int main() {
     jfh_array_t *elm = JFH_initL();
     if (!elm) return 1;
 
-    JFH_setstrL(elm, "foo");
-    JFH_setstrL(JFH_appendL(elm), "bar");
-    JFH_setboolL(JFH_appendL(elm), true);
-	JFH_setintL(JFH_appendL(elm), 3);
+    JFH_setL(elm, 4, JFH_strL("foo"), JFH_strL("bar"), JFH_boolL(true), JFH_intL(3))
 
     char *json = JFH_indent_json(JFH_encode_arr(elm), 4);
     if (!json) return 1;
@@ -426,13 +421,21 @@ int main() {
     jfh_array_t *subelm = JFH_initL();
     if (!elm || !subelm) return 1;
 
-    JFH_setdoubleL(elm, 3.1415);
-    JFH_setnullL(JFH_appendL(elm));
-    JFH_setarrL(JFH_appendL(elm), subelm);
-
-    JFH_setboolL(subelm, true);
-    JFH_setintL(JFH_appendL(subelm), 123);
-    JFH_setstrL(JFH_appendL(subelm), "Hello, World!");
+    JFH_setL(
+        elm,
+        3,
+        JFH_doubleL(3.1415),
+        JFH_nullL(),
+        JFH_arrL(
+            JFH_setL(
+                subelm,
+                3,
+                JFH_boolL(true),
+                JFH_intL(123),
+                JFH_strL("Hello, World!")
+            )
+        )
+    );
 
     char *json = JFH_indent_json(JFH_encode_arr(elm), 4);
     if (!json) return 1;
