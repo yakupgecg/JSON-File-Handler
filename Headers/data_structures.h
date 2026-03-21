@@ -15,7 +15,7 @@
 /* This header defines structs, valuetypes, macros and variables */
 
 enum jfh_valuetype {
-    JFH_STR,    // String (can also be bool, null or any number)
+    JFH_STR,    // String
     JFH_INT,    // Integer
     JFH_EXPI,   // Integer with an exponent
     JFH_DBL,    // Double
