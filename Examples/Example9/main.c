@@ -14,7 +14,7 @@ int main() {
 	return 0;
 }
 
-/*
+/* (the program is supposed to fail)
 Expected output:
 
 Parsing failed

@@ -19,31 +19,44 @@ int main() {
 		return 1;
 	}
 
-	JFH_setstrH(obj, "Test", "Hello, \"World\"!");
-	JFH_setintH(JFH_appendH(obj), "Test2", 421);
-	JFH_setdoubleH(JFH_appendH(obj), "Test3", 22.1409);
-	JFH_setboolH(JFH_appendH(obj), "Test4", true);
-	JFH_setnullH(JFH_appendH(obj), "Test5");
-	JFH_setobjH(JFH_appendH(obj), "Test6", emptyobj);
-	JFH_setarrH(JFH_appendH(obj), "Test7", emptyarr);
-	JFH_setintH(JFH_appendH(obj), "Test8", -52);
-	JFH_setdoubleH(JFH_appendH(obj), "Test9", -26.6);
-	JFH_setobjH(JFH_appendH(obj), "Test10", subobj);
-	JFH_setarrH(JFH_appendH(obj), "Test11", subarr);
-
-	JFH_setstrH(subobj, "foo", "bar");
-
-	JFH_setintL(subarr, 1);
-	JFH_setintL(JFH_appendL(subarr), 2);
-	JFH_setintL(JFH_appendL(subarr), 3);
+	JFH_setH(
+		obj,
+		13,
+		JFH_strH("Test", "Hello, \"World\"!"),
+		JFH_intH("Test2", 421),
+		JFH_doubleH("Test3", 22.1409),
+		JFH_boolH("Test4", true),
+		JFH_nullH("Test5"),
+		JFH_objH("Test6", emptyobj),
+		JFH_arrH("Test7", emptyarr),
+		JFH_intH("Test8", -52),
+		JFH_doubleH("Test9", -26.6),
+		JFH_intexpH("Test10", 10, 3),
+		JFH_doubleexpH("Test11", -3.4, 2),
+		JFH_objH(
+			"Test12",
+			JFH_setH(
+				subobj,
+				1,
+				JFH_strH("foo", "bar")
+			)
+		),
+		JFH_arrH(
+			"Test13",
+			JFH_setL(
+				subarr,
+				3,
+				JFH_intL(1),
+				JFH_intL(2),
+				JFH_intL(3)
+			)
+		)
+	);
 
 	char *json = JFH_indent_json(JFH_encode_obj(obj), 4);
 	if (!json) {
+		printf("DING");
 		JFH_free_map(obj);
-		JFH_free_map(emptyobj);
-		JFH_free_list(emptyarr);
-		JFH_free_map(subobj);
-		JFH_free_list(subarr);
 		return 1;
 	}
 	
@@ -68,10 +81,12 @@ JSON:
     "Test7": [],
     "Test8": -52,
     "Test9": -26.600000,
-    "Test10": {
+	"Test10": 10e3,
+	"Test11": -3.4e2,
+    "Test12": {
         "foo": "bar"
     },
-    "Test11": [
+    "Test13": [
         1,
 		2,
 		3

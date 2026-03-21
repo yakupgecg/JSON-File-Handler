@@ -12,11 +12,9 @@ int main() {
         if (list) JFH_free_list(list);
         return 1;
     }
-    JFH_setintL(list, -7);
-    JFH_setboolL(JFH_appendL(list), true);
+    JFH_setL(list, 2, JFH_intL(-7), JFH_boolL(true));
 
-    JFH_setstrH(obj, "foo", "bar");
-    JFH_setarrH(obj, "Example list", list);
+    JFH_setH(obj, 2, JFH_strH("foo", "bar"), JFH_arrH("Example list", list));
 
     char *json = JFH_indent_json(JFH_encode_obj(obj), 4);
     if (!json) {

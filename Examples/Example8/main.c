@@ -13,7 +13,7 @@ int main() {
 	JFH_free_map(obj);
 	return 0;
 }
-/*
+/* (The program is supposed to fail)
 Expected output: 
 
 Parsing failed

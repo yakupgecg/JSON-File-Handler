@@ -12,9 +12,9 @@ int main() {
 
     jfh_obj_t *age = JFH_searchH(obj, "Age");
 
-    printf("age: %d\n", age->value.value.i);
+    printf("age: %d\n", age->value.value.num.val.i);
 
-    JFH_setintH(age, "Age", 27);
+    JFH_setH(age, 1, JFH_intH("Age", 27));
 
     char *encoded = JFH_indent_json(JFH_encode_obj(obj), 4);
     if (!encoded) {

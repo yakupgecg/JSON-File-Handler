@@ -65,10 +65,10 @@ int main() {
 	}
     app a;
 	
-    a.w.size_x = JFH_getelementbyindex(JFH_searchH(ewindow, "Size")->value.value.arr, 0)->value.value.i;
-    a.w.size_y = JFH_getelementbyindex(JFH_searchH(ewindow, "Size")->value.value.arr, 1)->value.value.i;
-    a.w.pos_x = JFH_getelementbyindex(JFH_searchH(ewindow, "Position")->value.value.arr, 0)->value.value.i;
-    a.w.pos_y = JFH_getelementbyindex(JFH_searchH(ewindow, "Position")->value.value.arr, 1)->value.value.i;
+    a.w.size_x = JFH_getelementbyindex(JFH_searchH(ewindow, "Size")->value.value.arr, 0)->value.value.num.val.i;
+    a.w.size_y = JFH_getelementbyindex(JFH_searchH(ewindow, "Size")->value.value.arr, 1)->value.value.num.val.i;
+    a.w.pos_x = JFH_getelementbyindex(JFH_searchH(ewindow, "Position")->value.value.arr, 0)->value.value.num.val.i;
+    a.w.pos_y = JFH_getelementbyindex(JFH_searchH(ewindow, "Position")->value.value.arr, 1)->value.value.num.val.i;
     a.w.visible = JFH_searchH(ewindow, "Visible")->value.value.b;
     a.w.theme = JFH_searchH(ewindow, "Theme")->value.value.str;
 	
@@ -77,7 +77,7 @@ int main() {
 	a.conf.supported_os = JFH_searchH(esystem_configurations, "Supported_os")->value.value.str;
 	a.conf.confirm_close = JFH_searchH(esystem_configurations, "Confirm_close")->value.value.b;
 	
-	a.aud.volume = JFH_searchH(eaudio, "Volume")->value.value.i;
+	a.aud.volume = JFH_searchH(eaudio, "Volume")->value.value.num.val.i;
 	a.aud.muted = JFH_searchH(eaudio, "Muted")->value.value.b;
 	
 	a.save_count = JFH_list_len(esaves);

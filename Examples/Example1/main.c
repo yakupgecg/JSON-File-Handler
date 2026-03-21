@@ -11,7 +11,7 @@ int main() {
 	jfh_obj_t *obj = JFH_parse_obj(json);
     if (!obj) return 1;
     
-    printf("Key                : %s\nValue              : %s\n", obj->key, obj->value.value.str.str);
+    printf("Key                : %s\nValue              : %s\n", obj->key, obj->value.value.str);
     JFH_free_map(obj);
     return 0;
 }

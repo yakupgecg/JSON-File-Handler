@@ -15,8 +15,7 @@ int main() {
         return 1;
     }
 
-    JFH_setobjH(obj, "emptyobj", emptyobj);
-    JFH_setarrH(JFH_appendH(obj), "emptyarr", emptyarr);
+    JFH_setH(obj, 2, JFH_objH("emptyobj", emptyobj), JFH_arrH("emptyarr", emptyarr));
 
     char *json = JFH_indent_json(JFH_encode_obj(obj), 4);
     if (!json) {
