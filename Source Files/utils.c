@@ -531,272 +531,6 @@ jfh_array_t *JFH_setL(jfh_array_t *arr, int count, ...) {
     return arr;
 } 
 
-// Sets the object's or element's value to a string
-jfh_obj_t *JFH_setstrH(jfh_obj_t *obj, char *key, char *src) {
-    if (!obj || !src) {
-        errno = EINVAL;
-        return NULL;
-    }
-    obj->empty = false;
-    if (key) {
-        if (!JFH_resetkey(obj, key)) {
-            return NULL;
-        }
-    }
-    JFH_setval(&obj->value, src, JFH_STR);
-    return obj;
-}
-
-jfh_array_t *JFH_setstrL(jfh_array_t *arr, char *src) {
-    if (!arr || !src) {
-        errno = EINVAL;
-        return NULL;
-    }
-    arr->empty = false;
-    JFH_setval(&arr->value, src, JFH_STR);
-    return arr;
-}
-
-// Sets the object's or element's value to an integer
-jfh_obj_t *JFH_setintH(jfh_obj_t *obj, char *key, int64_t src) {
-    if (!obj) {
-        errno = EINVAL;
-        return NULL;
-    }
-    obj->empty = false;
-    if (key) {
-        if (!JFH_resetkey(obj, key)) {
-            return NULL;
-        }
-    }
-    JFH_setval(&obj->value, &src, JFH_INT);
-    return obj;
-}
-
-jfh_array_t *JFH_setintL(jfh_array_t *arr, int64_t src) {
-    if (!arr) {
-        errno = EINVAL;
-        return NULL;
-    }
-    arr->empty = false;
-    JFH_setval(&arr->value, &src, JFH_INT);
-    return arr;
-}
-
-// Sets the object's or element's value to an integer with an exponent
-jfh_obj_t *JFH_setintexpH(jfh_obj_t *obj, char *key, int64_t src, int32_t exp) {
-    if (!obj) {
-        errno = EINVAL;
-        return NULL;
-    }
-    obj->empty = false;
-    if (key) {
-        if (!JFH_resetkey(obj, key)) {
-            return NULL;
-        }
-    }
-    JFH_setval(&obj->value, &src, JFH_EXPI);
-    obj->value.value.num.exp = exp;
-    return obj;
-}
-
-jfh_array_t *JFH_setintexpL(jfh_array_t *arr, int64_t src, int32_t exp) {
-    if (!arr) {
-        errno = EINVAL;
-        return NULL;
-    }
-    arr->empty = false;
-    JFH_setval(&arr->value, &src, JFH_EXPI);
-    arr->value.value.num.exp = exp;
-    return arr;
-}
-
-// Sets the object's or element's to a double
-jfh_obj_t *JFH_setdoubleH(jfh_obj_t *obj, char *key, double src) {
-    if (!obj) {
-        errno = EINVAL;
-        return NULL;
-    }
-    obj->empty = false;
-    if (key) {
-        if (!JFH_resetkey(obj, key)) {
-            return NULL;
-        }
-    }
-    JFH_setval(&obj->value, &src, JFH_DBL);
-    return obj;
-}
-
-jfh_array_t *JFH_setdoubleL(jfh_array_t *arr, double src) {
-    if (!arr) {
-        errno = EINVAL;
-        return NULL;
-    }
-    arr->empty = false;
-    JFH_setval(&arr->value, &src, JFH_DBL);
-    return arr;
-}
-
-// Sets the object's or element's value to a double with an exponent
-jfh_obj_t *JFH_setdoubleexpH(jfh_obj_t *obj, char *key, double src, int32_t exp) {
-    if (!obj) {
-        errno = EINVAL;
-        return NULL;
-    }
-    obj->empty = false;
-    if (key) {
-        if (!JFH_resetkey(obj, key)) {
-            return NULL;
-        }
-    }
-    JFH_setval(&obj->value, &src, JFH_EXPD);
-    obj->value.value.num.exp = exp;
-    return obj;
-}
-
-jfh_array_t *JFH_setdoubleexpL(jfh_array_t *arr, double src, int32_t exp) {
-    if (!arr) {
-        errno = EINVAL;
-        return NULL;
-    }
-    arr->empty = false;
-    JFH_setval(&arr->value, &src, JFH_EXPD);
-    arr->value.value.num.exp = exp;
-    return arr;
-}
-
-// Sets the object's or element's to a boolean value
-jfh_obj_t *JFH_setboolH(jfh_obj_t *obj, char *key, bool b) {
-    if (!obj) {
-        errno = EINVAL;
-        return NULL;
-    }
-    obj->empty = false;
-    if (key) {
-        if (!JFH_resetkey(obj, key)) {
-            return NULL;
-        }
-    }
-    JFH_setval(&obj->value, &b, JFH_BOOL);
-    return obj;
-}
-
-jfh_array_t *JFH_setboolL(jfh_array_t *arr, bool b) {
-    if (!arr) {
-        errno = EINVAL;
-        return NULL;
-    }
-    arr->empty = false;
-    JFH_setval(&arr->value, &b, JFH_BOOL);
-    return arr;
-}
-
-// Sets the object's or element's to null
-jfh_obj_t *JFH_setnullH(jfh_obj_t *obj, char *key) {
-    if (!obj) {
-        errno = EINVAL;
-        return NULL;
-    }
-    obj->empty = false;
-    if (key) {
-        if (!JFH_resetkey(obj, key)) {
-            return NULL;
-        }
-    }
-    JFH_setval(&obj->value, "null", JFH_NULL);
-    return obj;
-}
-
-jfh_array_t *JFH_setnullL(jfh_array_t *arr) {
-    if (!arr) {
-        errno = EINVAL;
-        return NULL;
-    }
-    arr->empty = false;
-    JFH_setval(&arr->value, "null", JFH_NULL);
-    return arr;
-}
-
-// Sets the object's or element's value to a string with no quotes
-jfh_obj_t *JFH_setstrH_nquots(jfh_obj_t *obj, char *key, char *src) {
-    if (!obj || !src) {
-        errno = EINVAL;
-        return NULL;
-    }
-    obj->empty = false;
-    if (key) {
-        if (!JFH_resetkey(obj, key)) {
-            return NULL;
-        }
-    }
-    JFH_setval(&obj->value, src, JFH_NULL);
-    obj->value.vt = JFH_STR;
-    return obj;
-}
-
-jfh_array_t *JFH_setstrL_nquots(jfh_array_t *arr, char *src) {
-    if (!arr || !src) {
-        errno = EINVAL;
-        return NULL;
-    }
-    arr->empty = false;
-    JFH_setval(&arr->value, src, JFH_NULL);
-    arr->value.vt = JFH_STR;
-    return arr;
-}
-
-// Sets the object's or element's to an object
-jfh_obj_t *JFH_setobjH(jfh_obj_t *obj, char *key, jfh_obj_t *src) {
-    if (!obj || !src) {
-        errno = EINVAL;
-        return NULL;
-    }
-    obj->empty = false;
-    if (key) {
-        if (!JFH_resetkey(obj, key)) {
-            return NULL;
-        }
-    }
-    JFH_setval(&obj->value, src, JFH_OBJ);
-    return obj;
-}
-
-jfh_array_t *JFH_setobjL(jfh_array_t *arr, jfh_obj_t *src) {
-    if (!arr || !src) {
-        errno = EINVAL;
-        return NULL;
-    }
-    arr->empty = false;
-    JFH_setval(&arr->value, src, JFH_OBJ);
-    return arr;
-}
-
-// Sets the object's or element's to an array
-jfh_obj_t *JFH_setarrH(jfh_obj_t *obj, char *key, jfh_array_t *src) {
-    if (!obj || !src) {
-        errno = EINVAL;
-        return NULL;
-    }
-    obj->empty = false;
-    if (key) {
-        if (!JFH_resetkey(obj, key)) {
-            return NULL;
-        }
-    }
-    JFH_setval(&obj->value, src, JFH_LIST);
-    return obj;
-}
-
-jfh_array_t *JFH_setarrL(jfh_array_t *arr, jfh_array_t *src) {
-    if (!arr || !src) {
-        errno = EINVAL;
-        return NULL;
-    }
-    
-    JFH_setval(&arr->value, src, JFH_LIST);
-    return arr;
-}
-
 // Copies the given object, either returns the copy or copies to another object.
 jfh_obj_t *JFH_copy_obj(jfh_obj_t *obj, jfh_obj_t *cobj) {
     if (!obj || !cobj) {
@@ -805,15 +539,15 @@ jfh_obj_t *JFH_copy_obj(jfh_obj_t *obj, jfh_obj_t *cobj) {
     }
     if (cobj) {
         switch (obj->value.vt) {
-            case JFH_STR: JFH_setstrH_nquots(cobj, obj->key, obj->value.value.str); break;
-            case JFH_INT: JFH_setintH(cobj, obj->key, obj->value.value.num.val.i); break;
-            case JFH_DBL: JFH_setdoubleH(cobj, obj->key, obj->value.value.num.val.dbl); break;
-            case JFH_OBJ: JFH_setobjH(cobj, obj->key, JFH_copy_map(obj->value.value.obj, NULL)); break;
-            case JFH_LIST: JFH_setarrH(cobj, obj->key, JFH_copy_list(obj->value.value.arr, NULL)); break;
-            case JFH_BOOL: JFH_setboolH(cobj, obj->key, obj->value.value.b); break;
-            case JFH_NULL: JFH_setnullH(cobj, obj->key); break;
-            case JFH_EXPI: JFH_setintexpH(cobj, obj->key, obj->value.value.num.val.i, obj->value.value.num.exp); break;
-            case JFH_EXPD: JFH_setdoubleexpH(cobj, obj->key, obj->value.value.num.val.dbl, obj->value.value.num.exp); break;
+            case JFH_STR: JFH_setH(cobj, 1, JFH_strH_nquots(obj->key, obj->value.value.str)); break;
+            case JFH_INT: JFH_setH(cobj, 1, JFH_intH(obj->key, obj->value.value.num.val.i)); break;
+            case JFH_DBL: JFH_setH(cobj, 1, JFH_doubleH(obj->key, obj->value.value.num.val.dbl)); break;
+            case JFH_OBJ: JFH_setH(cobj, 1, JFH_objH(obj->key, JFH_copy_map(obj->value.value.obj, NULL))); break;
+            case JFH_LIST: JFH_setH(cobj, 1, JFH_arrH(obj->key, JFH_copy_list(obj->value.value.arr, NULL))); break;
+            case JFH_BOOL: JFH_setH(cobj, 1, JFH_boolH(obj->key, obj->value.value.b)); break;
+            case JFH_NULL: JFH_setH(cobj, 1, JFH_nullH(obj->key)); break;
+            case JFH_EXPI: JFH_setH(cobj, 1, JFH_intexpH(obj->key, obj->value.value.num.val.i, obj->value.value.num.exp)); break;
+            case JFH_EXPD: JFH_setH(cobj, 1, JFH_doubleexpH(obj->key, obj->value.value.num.val.dbl, obj->value.value.num.exp)); break;
             default: errno = EINVAL; return NULL;
         }
         return cobj;
@@ -824,15 +558,15 @@ jfh_obj_t *JFH_copy_obj(jfh_obj_t *obj, jfh_obj_t *cobj) {
         return NULL;
     }
     switch (obj->value.vt) {
-        case JFH_STR: JFH_setstrH_nquots(newobj, obj->key, obj->value.value.str); break;
-        case JFH_INT: JFH_setintH(newobj, obj->key, obj->value.value.num.val.i); break;
-        case JFH_DBL: JFH_setdoubleH(newobj, obj->key, obj->value.value.num.val.dbl); break;
-        case JFH_OBJ: JFH_setobjH(newobj, obj->key, JFH_copy_map(obj->value.value.obj, NULL)); break;
-        case JFH_LIST: JFH_setarrH(newobj, obj->key, JFH_copy_list(obj->value.value.arr, NULL)); break;
-        case JFH_BOOL: JFH_setboolH(newobj, obj->key, obj->value.value.b); break;
-        case JFH_NULL: JFH_setnullH(newobj, obj->key); break;
-        case JFH_EXPI: JFH_setintexpH(newobj, obj->key, obj->value.value.num.val.i, obj->value.value.num.exp); break;
-        case JFH_EXPD: JFH_setdoubleexpH(newobj, obj->key, obj->value.value.num.val.dbl, obj->value.value.num.exp); break;
+        case JFH_STR: JFH_setH(newobj, 1, JFH_strH_nquots(obj->key, obj->value.value.str)); break;
+        case JFH_INT: JFH_setH(newobj, 1, JFH_intH(obj->key, obj->value.value.num.val.i)); break;
+        case JFH_DBL: JFH_setH(newobj, 1, JFH_doubleH(obj->key, obj->value.value.num.val.dbl)); break;
+        case JFH_OBJ: JFH_setH(newobj, 1, JFH_objH(obj->key, JFH_copy_map(obj->value.value.obj, NULL))); break;
+        case JFH_LIST: JFH_setH(newobj, 1, JFH_arrH(obj->key, JFH_copy_list(obj->value.value.arr, NULL))); break;
+        case JFH_BOOL: JFH_setH(newobj, 1, JFH_boolH(obj->key, obj->value.value.b)); break;
+        case JFH_NULL: JFH_setH(newobj, 1, JFH_nullH(obj->key)); break;
+        case JFH_EXPI: JFH_setH(newobj, 1, JFH_intexpH(obj->key, obj->value.value.num.val.i, obj->value.value.num.exp)); break;
+        case JFH_EXPD: JFH_setH(newobj, 1, JFH_doubleexpH(obj->key, obj->value.value.num.val.dbl, obj->value.value.num.exp)); break;
         default: errno = EINVAL; return NULL;
     }
     return newobj;
@@ -846,15 +580,15 @@ jfh_array_t *JFH_copy_element(jfh_array_t *element, jfh_array_t *celement) {
     }
     if (celement) {
         switch (element->value.vt) {
-            case JFH_STR: JFH_setstrL_nquots(celement, element->value.value.str); break;
-            case JFH_INT: JFH_setintL(celement, element->value.value.num.val.i); break;
-            case JFH_DBL: JFH_setdoubleL(celement, element->value.value.num.val.dbl); break;
-            case JFH_OBJ: JFH_setobjL(celement, JFH_copy_map(element->value.value.obj, NULL)); break;
-            case JFH_LIST: JFH_setarrL(celement, JFH_copy_list(element->value.value.arr, NULL)); break;
-            case JFH_BOOL: JFH_setboolL(celement, element->value.value.b); break;
-            case JFH_NULL: JFH_setnullL(celement); break;
-            case JFH_EXPI: JFH_setintexpL(celement, element->value.value.num.val.i, element->value.value.num.exp); break;
-            case JFH_EXPD: JFH_setdoubleexpL(celement, element->value.value.num.val.dbl, element->value.value.num.exp); break;
+            case JFH_STR: JFH_setL(celement, 1, JFH_strL_nquots(element->value.value.str)); break;
+            case JFH_INT: JFH_setL(celement, 1, JFH_intL(element->value.value.num.val.i)); break;
+            case JFH_DBL: JFH_setL(celement, 1, JFH_doubleL(element->value.value.num.val.dbl)); break;
+            case JFH_OBJ: JFH_setL(celement, 1, JFH_objL(JFH_copy_map(element->value.value.obj, NULL))); break;
+            case JFH_LIST: JFH_setL(celement, 1, JFH_arrL(JFH_copy_list(element->value.value.arr, NULL))); break;
+            case JFH_BOOL: JFH_setL(celement, 1, JFH_boolL(element->value.value.b)); break;
+            case JFH_NULL: JFH_setL(celement, 1, JFH_nullL()); break;
+            case JFH_EXPI: JFH_setL(celement, 1, JFH_intexpL(element->value.value.num.val.i, element->value.value.num.exp)); break;
+            case JFH_EXPD: JFH_setL(celement, 1, JFH_doubleexpL(element->value.value.num.val.dbl, element->value.value.num.exp)); break;
             default: errno = EINVAL; return NULL;
         }
         return celement;
@@ -865,15 +599,15 @@ jfh_array_t *JFH_copy_element(jfh_array_t *element, jfh_array_t *celement) {
         return NULL;
     }
     switch (element->value.vt) {
-        case JFH_STR: JFH_setstrL_nquots(newelement, element->value.value.str); break;
-        case JFH_INT: JFH_setintL(newelement, element->value.value.num.val.i); break;
-        case JFH_DBL: JFH_setdoubleL(newelement, element->value.value.num.val.dbl); break;
-        case JFH_OBJ: JFH_setobjL(newelement, JFH_copy_map(element->value.value.obj, NULL)); break;
-        case JFH_LIST: JFH_setarrL(newelement, JFH_copy_list(element->value.value.arr, NULL)); break;
-        case JFH_BOOL: JFH_setboolL(newelement, element->value.value.b); break;
-        case JFH_NULL: JFH_setnullL(newelement); break;
-        case JFH_EXPI: JFH_setintexpL(newelement, element->value.value.num.val.i, element->value.value.num.exp); break;
-        case JFH_EXPD: JFH_setdoubleexpL(newelement, element->value.value.num.val.dbl, element->value.value.num.exp); break;
+        case JFH_STR: JFH_setL(newelement, 1, JFH_strL_nquots(element->value.value.str)); break;
+        case JFH_INT: JFH_setL(newelement, 1, JFH_intL(element->value.value.num.val.i)); break;
+        case JFH_DBL: JFH_setL(newelement, 1, JFH_doubleL(element->value.value.num.val.dbl)); break;
+        case JFH_OBJ: JFH_setL(newelement, 1, JFH_objL(JFH_copy_map(element->value.value.obj, NULL))); break;
+        case JFH_LIST: JFH_setL(newelement, 1, JFH_arrL(JFH_copy_list(element->value.value.arr, NULL))); break;
+        case JFH_BOOL: JFH_setL(newelement, 1, JFH_boolL(element->value.value.b)); break;
+        case JFH_NULL: JFH_setL(newelement, 1, JFH_nullL()); break;
+        case JFH_EXPI: JFH_setL(newelement, 1, JFH_intexpL(element->value.value.num.val.i, element->value.value.num.exp)); break;
+        case JFH_EXPD: JFH_setL(newelement, 1, JFH_doubleexpL(element->value.value.num.val.dbl, element->value.value.num.exp)); break;
         default: errno = EINVAL; return NULL;
     }
     return newelement;
@@ -892,15 +626,15 @@ jfh_obj_t *JFH_copy_map(jfh_obj_t *map, jfh_obj_t *cmap) {
         ccur = JFH_initM();
         while (cur) {
             switch (cur->value.vt) {
-                case JFH_STR: JFH_setstrH_nquots(ccur, cur->key, cur->value.value.str); break;
-                case JFH_INT: JFH_setintH(ccur, cur->key, cur->value.value.num.val.i); break;
-                case JFH_DBL: JFH_setdoubleH(ccur, cur->key, cur->value.value.num.val.dbl); break;
-                case JFH_OBJ: JFH_setobjH(ccur, cur->key, JFH_copy_map(cur->value.value.obj, NULL)); break;
-                case JFH_LIST: JFH_setarrH(ccur, cur->key, JFH_copy_list(cur->value.value.arr, NULL)); break;
-                case JFH_BOOL: JFH_setboolH(ccur, cur->key, cur->value.value.b); break;
-                case JFH_NULL: JFH_setnullH(ccur, cur->key); break;
-                case JFH_EXPI: JFH_setintexpH(ccur, cur->key, cur->value.value.num.val.i, cur->value.value.num.exp); break;
-                case JFH_EXPD: JFH_setdoubleexpH(ccur, cur->key, cur->value.value.num.val.dbl, cur->value.value.num.exp); break;
+                case JFH_STR: JFH_setH(ccur, 1, JFH_strH_nquots(cur->key, cur->value.value.str)); break;
+                case JFH_INT: JFH_setH(ccur, 1, JFH_intH(cur->key, cur->value.value.num.val.i)); break;
+                case JFH_DBL: JFH_setH(ccur, 1, JFH_doubleH(cur->key, cur->value.value.num.val.dbl)); break;
+                case JFH_OBJ: JFH_setH(ccur, 1, JFH_objH(cur->key, JFH_copy_map(cur->value.value.obj, NULL))); break;
+                case JFH_LIST: JFH_setH(ccur, 1, JFH_arrH(cur->key, JFH_copy_list(cur->value.value.arr, NULL))); break;
+                case JFH_BOOL: JFH_setH(ccur, 1, JFH_boolH(cur->key, cur->value.value.b)); break;
+                case JFH_NULL: JFH_setH(ccur, 1, JFH_nullH(cur->key)); break;
+                case JFH_EXPI: JFH_setH(ccur, 1, JFH_intexpH(cur->key, cur->value.value.num.val.i, cur->value.value.num.exp)); break;
+                case JFH_EXPD: JFH_setH(ccur, 1, JFH_doubleexpH(cur->key, cur->value.value.num.val.dbl, cur->value.value.num.exp)); break;
                 default: errno = EINVAL; return NULL;
             }
             if (cur->next) {
@@ -921,15 +655,15 @@ jfh_obj_t *JFH_copy_map(jfh_obj_t *map, jfh_obj_t *cmap) {
     jfh_obj_t *newcur = newmap;
     while (cur) {
         switch (cur->value.vt) {
-            case JFH_STR: JFH_setstrH_nquots(newcur, cur->key, cur->value.value.str); break;
-            case JFH_INT: JFH_setintH(newcur, cur->key, cur->value.value.num.val.i); break;
-            case JFH_DBL: JFH_setdoubleH(newcur, cur->key, cur->value.value.num.val.dbl); break;
-            case JFH_OBJ: JFH_setobjH(newcur, cur->key, JFH_copy_map(cur->value.value.obj, NULL)); break;
-            case JFH_LIST: JFH_setarrH(newcur, cur->key, JFH_copy_list(cur->value.value.arr, NULL)); break;
-            case JFH_BOOL: JFH_setboolH(newcur, cur->key, cur->value.value.b); break;
-            case JFH_NULL: JFH_setnullH(newcur, cur->key); break;
-            case JFH_EXPI: JFH_setintexpH(newcur, cur->key, cur->value.value.num.val.i, cur->value.value.num.exp); break;
-            case JFH_EXPD: JFH_setdoubleexpH(newcur, cur->key, cur->value.value.num.val.dbl, cur->value.value.num.exp); break;
+            case JFH_STR: JFH_setH(newcur, 1, JFH_strH_nquots(cur->key, cur->value.value.str)); break;
+            case JFH_INT: JFH_setH(newcur, 1, JFH_intH(cur->key, cur->value.value.num.val.i)); break;
+            case JFH_DBL: JFH_setH(newcur, 1, JFH_doubleH(cur->key, cur->value.value.num.val.dbl)); break;
+            case JFH_OBJ: JFH_setH(newcur, 1, JFH_objH(cur->key, JFH_copy_map(cur->value.value.obj, NULL))); break;
+            case JFH_LIST: JFH_setH(newcur, 1, JFH_arrH(cur->key, JFH_copy_list(cur->value.value.arr, NULL))); break;
+            case JFH_BOOL: JFH_setH(newcur, 1, JFH_boolH(cur->key, cur->value.value.b)); break;
+            case JFH_NULL: JFH_setH(newcur, 1, JFH_nullH(cur->key)); break;
+            case JFH_EXPI: JFH_setH(newcur, 1, JFH_intexpH(cur->key, cur->value.value.num.val.i, cur->value.value.num.exp)); break;
+            case JFH_EXPD: JFH_setH(newcur, 1, JFH_doubleexpH(cur->key, cur->value.value.num.val.dbl, cur->value.value.num.exp)); break;
             default: errno = EINVAL; return NULL;
         }
         if (cur->next) {
@@ -958,15 +692,15 @@ jfh_array_t *JFH_copy_list(jfh_array_t *list, jfh_array_t *clist) {
         ccur = JFH_initL();
         while (cur) {
             switch (cur->value.vt) {
-                case JFH_STR: JFH_setstrL_nquots(ccur, cur->value.value.str); break;
-                case JFH_INT: JFH_setintL(ccur, cur->value.value.num.val.i); break;
-                case JFH_DBL: JFH_setdoubleL(ccur, cur->value.value.num.val.dbl); break;
-                case JFH_OBJ: JFH_setobjL(ccur, JFH_copy_map(cur->value.value.obj, NULL)); break;
-                case JFH_LIST: JFH_setarrL(ccur, JFH_copy_list(cur->value.value.arr, NULL)); break;
-                case JFH_BOOL: JFH_setboolL(ccur, cur->value.value.b); break;
-                case JFH_NULL: JFH_setnullL(ccur); break;
-                case JFH_EXPI: JFH_setintexpL(ccur, cur->value.value.num.val.i, cur->value.value.num.exp); break;
-                case JFH_EXPD: JFH_setdoubleexpL(ccur, cur->value.value.num.val.dbl, cur->value.value.num.exp); break;
+                case JFH_STR: JFH_setL(ccur, 1, JFH_strL_nquots(cur->value.value.str)); break;
+                case JFH_INT: JFH_setL(ccur, 1, JFH_intL(cur->value.value.num.val.i)); break;
+                case JFH_DBL: JFH_setL(ccur, 1, JFH_doubleL(cur->value.value.num.val.dbl)); break;
+                case JFH_OBJ: JFH_setL(ccur, 1, JFH_objL(JFH_copy_map(cur->value.value.obj, NULL))); break;
+                case JFH_LIST: JFH_setL(ccur, 1, JFH_arrL(JFH_copy_list(cur->value.value.arr, NULL))); break;
+                case JFH_BOOL: JFH_setL(ccur, 1, JFH_boolL(cur->value.value.b)); break;
+                case JFH_NULL: JFH_setL(ccur, 1, JFH_nullL()); break;
+                case JFH_EXPI: JFH_setL(ccur, 1, JFH_intexpL(cur->value.value.num.val.i, cur->value.value.num.exp)); break;
+                case JFH_EXPD: JFH_setL(ccur, 1, JFH_doubleexpL(cur->value.value.num.val.dbl, cur->value.value.num.exp)); break;
                 default: errno = EINVAL; return NULL;
             }
             if (cur->next) {
@@ -987,15 +721,15 @@ jfh_array_t *JFH_copy_list(jfh_array_t *list, jfh_array_t *clist) {
     jfh_array_t *newcur = newlist;
     while (cur) {
         switch (cur->value.vt) {
-            case JFH_STR: JFH_setstrL_nquots(newcur, cur->value.value.str); break;
-            case JFH_INT: JFH_setintL(newcur, cur->value.value.num.val.i); break;
-            case JFH_DBL: JFH_setdoubleL(newcur, cur->value.value.num.val.dbl); break;
-            case JFH_OBJ: JFH_setobjL(newcur, JFH_copy_map(cur->value.value.obj, NULL)); break;
-            case JFH_LIST: JFH_setarrL(newcur, JFH_copy_list(cur->value.value.arr, NULL)); break;
-            case JFH_BOOL: JFH_setboolL(newcur, cur->value.value.b); break;
-            case JFH_NULL: JFH_setnullL(newcur); break;
-            case JFH_EXPI: JFH_setintexpL(newcur, cur->value.value.num.val.i, cur->value.value.num.exp); break;
-            case JFH_EXPD: JFH_setdoubleexpL(newcur, cur->value.value.num.val.dbl, cur->value.value.num.exp); break;
+            case JFH_STR: JFH_setL(newcur, 1, JFH_strL_nquots(cur->value.value.str)); break;
+            case JFH_INT: JFH_setL(newcur, 1, JFH_intL(cur->value.value.num.val.i)); break;
+            case JFH_DBL: JFH_setL(newcur, 1, JFH_doubleL(cur->value.value.num.val.dbl)); break;
+            case JFH_OBJ: JFH_setL(newcur, 1, JFH_objL(JFH_copy_map(cur->value.value.obj, NULL))); break;
+            case JFH_LIST: JFH_setL(newcur, 1, JFH_arrL(JFH_copy_list(cur->value.value.arr, NULL))); break;
+            case JFH_BOOL: JFH_setL(newcur, 1, JFH_boolL(cur->value.value.b)); break;
+            case JFH_NULL: JFH_setL(newcur, 1, JFH_nullL()); break;
+            case JFH_EXPI: JFH_setL(newcur, 1, JFH_intexpL(cur->value.value.num.val.i, cur->value.value.num.exp)); break;
+            case JFH_EXPD: JFH_setL(newcur, 1, JFH_doubleexpL(cur->value.value.num.val.dbl, cur->value.value.num.exp)); break;
             default: errno = EINVAL; return NULL;
         }
         if (cur->next) {

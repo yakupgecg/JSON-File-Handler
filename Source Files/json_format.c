@@ -881,7 +881,7 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj, char *keys, char *vals) {
                 jfh_obj_t *newcurobj = newobj;
                 if (stobj_parser(val, &newcurobj, keys, vals)) {free(rkey); return 1;}
             }
-            if (!JFH_setobjH(*curobj, rkey, newobj)) {free(rkey); return 1;}
+            if (!JFH_setH(*curobj, 1, JFH_objH(rkey, newobj))) {free(rkey); return 1;}
         } else if (is_arr) {
             jfh_array_t *newarr = JFH_initL();
             if (!newarr) {free(rkey); return 1;}
@@ -890,37 +890,37 @@ static int stobj_parser(char *cur, jfh_obj_t **curobj, char *keys, char *vals) {
                 jfh_array_t *newcurarr = newarr;
                 if (starr_parser(val, &newcurarr, keys, vals)) {free(rkey); return 1;}
             }
-            if (!JFH_setarrH(*curobj, rkey, newarr)) {free(rkey); return 1;}
+            if (!JFH_setH(*curobj, 1, JFH_arrH(rkey, newarr))) {free(rkey); return 1;}
         } else {
             if (st_invalid(val)) {free(rkey); errno = JFH_EJSON; return 1;}
             int mode = st_getmode(val);
             if (mode == -1) {free(rkey); errno = JFH_EJSON; return 1;}
             
             if (mode == 0) {
-                if (!JFH_setnullH(*curobj, key)) {free(rkey); return 1;}  
+                if (!JFH_setH(*curobj, 1, JFH_nullH(key))) {free(rkey); return 1;}  
             } else if (mode == 1) {
-                if (!JFH_setboolH(*curobj, key, true)) {free(rkey); return 1;}
+                if (!JFH_setH(*curobj, 1, JFH_boolH(key, true))) {free(rkey); return 1;}
             } else if (mode == 2) {
-                if (!JFH_setboolH(*curobj, key, false)) {free(rkey); return 1;}
+                if (!JFH_setH(*curobj, 1, JFH_boolH(key, false))) {free(rkey); return 1;}
             } else if (mode == 3) {
                 int64_t num = stint_parse(val);
-                if (!JFH_setintH(*curobj, key, num)) {free(rkey); return 1;}
+                if (!JFH_setH(*curobj, 1, JFH_intH(key, num))) {free(rkey); return 1;}
             } else if (mode == 4) {
                 double num = stdbl_parse(val);
-                if (!JFH_setdoubleH(*curobj, key, num)) {free(rkey); return 1;}
+                if (!JFH_setH(*curobj, 1, JFH_doubleH(key, num))) {free(rkey); return 1;}
             } else if (mode == 5) {
                 char *new = _evalu(val);
                 if (!new) {free(rkey); return 1;}
-                if (!JFH_setstrH_nquots(*curobj, key, new)) {free(rkey); return 1;}
+                if (!JFH_setH(*curobj, 1, JFH_strH_nquots(key, new))) {free(rkey); return 1;}
                 free(new);
             } else if (mode == 6) {
                 int64_t num = stint_parse(val);
                 int32_t exp = get_exp(val);
-                if (!JFH_setintexpH(*curobj, key, num, exp)) {free(rkey); return 1;}
+                if (!JFH_setH(*curobj, 1, JFH_intexpH(key, num, exp))) {free(rkey); return 1;}
             } else if (mode == 7) {
                 double num = stdbl_parse(val);
                 int32_t exp = get_exp(val);
-                if (!JFH_setdoubleexpH(*curobj, key, num, exp)) {free(rkey); return 1;}
+                if (!JFH_setH(*curobj, 1, JFH_doubleexpH(key, num, exp))) {free(rkey); return 1;}
             }
         }
         free(rkey);
@@ -1000,7 +1000,7 @@ static int starr_parser(char *cur, jfh_array_t **curarr, char *keys, char *vals)
                 jfh_obj_t *newcurobj = newobj;
                 if (stobj_parser(val, &newcurobj, keys, vals)) return 1;
             }
-            if (!JFH_setobjL(*curarr, newobj)) return 1;
+            if (!JFH_setL(*curarr, 1, JFH_objL(newobj))) return 1;
         } else if (is_arr) {
             jfh_array_t *newarr = JFH_initL();
             if (!newarr) return 1;
@@ -1009,37 +1009,37 @@ static int starr_parser(char *cur, jfh_array_t **curarr, char *keys, char *vals)
                 jfh_array_t *newcurarr = newarr;
                 if (starr_parser(val, &newcurarr, keys, vals)) return 1;
             }
-            if (!JFH_setarrL(*curarr, newarr)) return 1;
+            if (!JFH_setL(*curarr, 1, JFH_arrL(newarr))) return 1;
         } else {
             if (st_invalid(val)) {errno = JFH_EJSON; return 1;}
             int mode = st_getmode(val);
             if (mode == -1) {errno = JFH_EJSON; return 1;}
 
             if (mode == 0) {
-                if (!JFH_setnullL(*curarr)) return 1;
+                if (!JFH_setL(*curarr, 1, JFH_nullL())) return 1;
             } else if (mode == 1) {
-                if (!JFH_setboolL(*curarr, true)) return 1;
+                if (!JFH_setL(*curarr, 1, JFH_boolL(true))) return 1;
             } else if (mode == 2) {
-                if (!JFH_setboolL(*curarr, false)) return 1;
+                if (!JFH_setL(*curarr, 1, JFH_boolL(false))) return 1;
             } else if (mode == 3) {
                 int64_t num = stint_parse(val);
-                if (!JFH_setintL(*curarr, num)) return 1;
+                if (!JFH_setL(*curarr, 1, JFH_intL(num))) return 1;
             } else if (mode == 4) {
                 double num = stdbl_parse(val);
-                if (!JFH_setdoubleL(*curarr, num)) return 1;
+                if (!JFH_setL(*curarr, 1, JFH_doubleL(num))) return 1;
             } else if (mode == 5) {
                 char *new = _evalu(val);
                 if (!new) return 1;
-                if (!JFH_setstrL_nquots(*curarr, new)) return 1;
+                if (!JFH_setL(*curarr, 1, JFH_strL_nquots(new))) return 1;
                 free(new);
             } else if (mode == 6) {
                 int64_t num = stint_parse(val);
                 int32_t exp = get_exp(val);
-                if (!JFH_setintexpL(*curarr, num, exp)) return 1;
+                if (!JFH_setL(*curarr, 1, JFH_intexpL(num, exp))) return 1;
             } else if (mode == 7) {
                 double num = stdbl_parse(val);
                 int32_t exp = get_exp(val);
-                if (!JFH_setdoubleexpL(*curarr, num, exp)) return 1;
+                if (!JFH_setL(*curarr, 1, JFH_intexpL(num, exp))) return 1;
             }
         }
         if (nest_index <= 0) break;

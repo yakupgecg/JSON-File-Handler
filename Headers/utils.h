@@ -83,46 +83,6 @@ void JFH_setval(jfh_json_value_t*, void *, enum jfh_valuetype);
 jfh_obj_t *JFH_setH(jfh_obj_t *, int, ...);
 jfh_array_t *JFH_setL(jfh_array_t *, int, ...);
 
-// Sets the object's or element's value to a string
-jfh_obj_t *JFH_setstrH(jfh_obj_t *, char *, char *);
-jfh_array_t *JFH_setstrL(jfh_array_t *, char *);
-
-// Sets the object's or element's value to an integer
-jfh_obj_t *JFH_setintH(jfh_obj_t *, char *, int64_t);
-jfh_array_t *JFH_setintL(jfh_array_t *, int64_t);
-
-// Sets the object's or element's value to an integer with an exponent
-jfh_obj_t *JFH_setintexpH(jfh_obj_t *, char *, int64_t, int32_t);
-jfh_array_t *JFH_setintexpL(jfh_array_t *, int64_t, int32_t);
-
-// Sets the object's or element's to a double
-jfh_obj_t *JFH_setdoubleH(jfh_obj_t *, char *, double);
-jfh_array_t *JFH_setdoubleL(jfh_array_t *, double);
-
-// Sets the object's or element's to a double with an exponent
-jfh_obj_t *JFH_setdoubleexpH(jfh_obj_t *, char *, double, int32_t);
-jfh_array_t *JFH_setdoubleexpL(jfh_array_t *, double, int32_t);
-
-// Sets the object's or element's to a boolean value
-jfh_obj_t *JFH_setboolH(jfh_obj_t *, char *, bool);
-jfh_array_t *JFH_setboolL(jfh_array_t *, bool);
-
-// Sets the object's or element's to null
-jfh_obj_t *JFH_setnullH(jfh_obj_t *, char *);
-jfh_array_t *JFH_setnullL(jfh_array_t *);
-
-// Sets the object's or element's value to a string with no quotes
-jfh_obj_t *JFH_setstrH_nquots(jfh_obj_t *, char *, char *);
-jfh_array_t *JFH_setstrL_nquots(jfh_array_t *, char *);
-
-// Sets the object's or element's to an object
-jfh_obj_t *JFH_setobjH(jfh_obj_t *, char *, jfh_obj_t *);
-jfh_array_t *JFH_setobjL(jfh_array_t *, jfh_obj_t *);
-
-// Sets the object's or element's to an array
-jfh_obj_t *JFH_setarrH(jfh_obj_t *, char *, jfh_array_t *);
-jfh_array_t *JFH_setarrL(jfh_array_t *, jfh_array_t *);
-
 // Copies the given object, either returns the copy or copies to another object.
 jfh_obj_t *JFH_copy_obj(jfh_obj_t *, jfh_obj_t *);
 
