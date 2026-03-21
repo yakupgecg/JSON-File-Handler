@@ -537,6 +537,7 @@ jfh_obj_t *JFH_copy_obj(jfh_obj_t *obj, jfh_obj_t *cobj) {
         errno = EINVAL;
         return NULL;
     }
+    if (obj->empty) return obj;
     if (cobj) {
         switch (obj->value.vt) {
             case JFH_STR: JFH_setH(cobj, 1, JFH_strH_nquots(obj->key, obj->value.value.str)); break;
@@ -578,6 +579,7 @@ jfh_array_t *JFH_copy_element(jfh_array_t *element, jfh_array_t *celement) {
         errno = EINVAL;
         return NULL;
     }
+    if (element->empty) return element;
     if (celement) {
         switch (element->value.vt) {
             case JFH_STR: JFH_setL(celement, 1, JFH_strL_nquots(element->value.value.str)); break;
@@ -619,6 +621,7 @@ jfh_obj_t *JFH_copy_map(jfh_obj_t *map, jfh_obj_t *cmap) {
         errno = EINVAL;
         return NULL;
     }
+    if (map->empty) return map;
     jfh_obj_t *cur = map;
     if (cmap) {
         jfh_obj_t *ccur = cmap;
@@ -685,6 +688,7 @@ jfh_array_t *JFH_copy_list(jfh_array_t *list, jfh_array_t *clist) {
         errno = EINVAL;
         return NULL;
     }
+    if (list->empty) return list;
     jfh_array_t *cur = list;
     if (clist) {
         jfh_array_t *ccur = clist;
