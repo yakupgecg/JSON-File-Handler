@@ -143,6 +143,9 @@ jfh_json_value_t *JFH_copy_json_value(jfh_json_value_t *, jfh_json_value_t *);
 jfh_val JFH_strH(char *, char *);
 jfh_val JFH_strL(char *);
 
+jfh_val JFH_strH_nquots(char *, char *);
+jfh_val JFH_strL_nquots(char *);
+
 jfh_val JFH_intH(char *, int64_t);
 jfh_val JFH_intL(int64_t);
 

@@ -1075,7 +1075,7 @@ jfh_json_value_t *JFH_copy_json_value(jfh_json_value_t *val, jfh_json_value_t *c
 jfh_val JFH_strH(char *key, char *str) {
     jfh_val v;
     v.key = str_dup(key);
-    v.val.value.str = str_dup(str);
+    v.val.value.str = quots(str);
     v.val.vt = JFH_STR;
 
     if (!key || !str) errno = EINVAL;
@@ -1084,6 +1084,28 @@ jfh_val JFH_strH(char *key, char *str) {
 }
 
 jfh_val JFH_strL(char *str) {
+    jfh_val v;
+    v.key = NULL;
+    v.val.value.str = quots(str);
+    v.val.vt = JFH_STR;
+
+    if (!str) errno = EINVAL;
+    
+    return v;
+}
+
+jfh_val JFH_strH_nquots(char *key, char *str) {
+    jfh_val v;
+    v.key = str_dup(key);
+    v.val.value.str = str_dup(str);
+    v.val.vt = JFH_STR;
+
+    if (!key || !str) errno = EINVAL;
+    
+    return v;
+}
+
+jfh_val JFH_strL_nquots(char *str) {
     jfh_val v;
     v.key = NULL;
     v.val.value.str = str_dup(str);
