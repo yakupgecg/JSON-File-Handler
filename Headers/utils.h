@@ -80,8 +80,8 @@ jfh_obj_t *JFH_resetkey(jfh_obj_t *, char *);
 void JFH_setval(jfh_json_value_t*, void *, enum jfh_valuetype);
 
 // Sets the object's or element's value to any jfh_val created by JFH_xH/L
-int JFH_setH(jfh_obj_t *, int, ...);
-int JFH_setL(jfh_array_t *, int, ...);
+jfh_obj_t *JFH_setH(jfh_obj_t *, int, ...);
+jfh_array_t *JFH_setL(jfh_array_t *, int, ...);
 
 // Sets the object's or element's value to a string
 jfh_obj_t *JFH_setstrH(jfh_obj_t *, char *, char *);

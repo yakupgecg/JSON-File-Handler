@@ -470,10 +470,10 @@ void JFH_setval(jfh_json_value_t *value, void *src, enum jfh_valuetype vt) {
     }
 }
 
-int JFH_setH(jfh_obj_t *obj, int count, ...) {
+jfh_obj_t *JFH_setH(jfh_obj_t *obj, int count, ...) {
     if (!obj) {
         errno = EINVAL;
-        return 1;
+        return NULL;
     }
     obj->empty = false;
     va_list args;
@@ -484,7 +484,7 @@ int JFH_setH(jfh_obj_t *obj, int count, ...) {
     for (int i = 0; i < count; i++) {
 
         val = va_arg(args, jfh_val);
-        if (!JFH_resetkey(cur, val.key)) return 1;
+        if (!JFH_resetkey(cur, val.key)) return NULL;
         JFH_copy_json_value(&val.val, &cur->value);
 
         if (i+1 >= count) {
@@ -498,13 +498,13 @@ int JFH_setH(jfh_obj_t *obj, int count, ...) {
     }
 
     va_end(args);
-    return 0;
+    return obj;
 } 
 
-int JFH_setL(jfh_array_t *arr, int count, ...) {
+jfh_array_t *JFH_setL(jfh_array_t *arr, int count, ...) {
     if (!arr) {
         errno = EINVAL;
-        return 1;
+        return NULL;
     }
     arr->empty = false;
     va_list args;
@@ -528,7 +528,7 @@ int JFH_setL(jfh_array_t *arr, int count, ...) {
     }
 
     va_end(args);
-    return 0;
+    return arr;
 } 
 
 // Sets the object's or element's value to a string
