@@ -1,6 +1,6 @@
 #include "..\Headers\json_format.h"
 
-// This is a helper function since I am on windows and cannot use normal stdup()
+// This is a helper function since I am on windows and cannot use normal strdup()
 static char *str_dup(char *str) {
     if (!str) {
         errno = EINVAL;
