@@ -400,7 +400,9 @@ static int stest_jsonlength(jfh_obj_t *obj, jfh_array_t *arr, bool init) {
     if (!obj && !arr) {
         return -1;
     } else if (obj && !arr) {
-        if (obj->empty) return 3;
+        if (obj->empty) {
+            if (init) return 3; else return 2;
+        }
         jfh_obj_t *curobj = obj;
         while (curobj) {
             buf += 3 + strlen(curobj->key); // For the key's quotes, : and the key itself
@@ -422,7 +424,9 @@ static int stest_jsonlength(jfh_obj_t *obj, jfh_array_t *arr, bool init) {
             }
         }
     } else if (!obj && arr) {
-        if (arr->empty) return 3;
+        if (arr->empty) {
+            if (init) return 3; else return 2;
+        }
         jfh_array_t *curarr = arr;
         while (curarr) {
             switch (curarr->value.vt) {
