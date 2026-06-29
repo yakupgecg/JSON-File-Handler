@@ -406,6 +406,61 @@ static char *_evalu(char *str) {
         return NULL;
 }
 
+// Estimates the needed json length for encoding.
+int stest_jsonlength(jfh_obj_t *obj, jfh_array_t *arr, bool init) {
+    long buf = 2; // For the { and } or [ and ]
+    if (init) buf = 3; // and null terminator
+    if (!obj && !arr) {
+        return -1;
+    } else if (obj && !arr) {
+        if (obj->empty) return 3;
+        jfh_obj_t *curobj = obj;
+        while (curobj) {
+            buf += 3 + strlen(curobj->key); // For the key's quotes, : and the key itself
+            char intbuf[128];
+            switch (curobj->value.vt) {
+                case JFH_STR: { buf += strlen(curobj->value.value.str); break; }
+                case JFH_INT: { buf += strlen(JFH_str_Int(curobj->value.value.num.val.i)); break; }
+                case JFH_DBL: { buf += strlen(JFH_str_Double(curobj->value.value.num.val.dbl)); break; }
+                case JFH_OBJ: { buf += stest_jsonlength(curobj->value.value.obj, NULL, false); break; }
+                case JFH_EXPI: { buf += 1 + strlen(JFH_str_Int(curobj->value.value.num.val.i)) + strlen(JFH_str_Int(curobj->value.value.num.exp)); break; }
+                case JFH_EXPD: { buf += 1 + strlen(JFH_str_Double(curobj->value.value.num.val.dbl)) + strlen(JFH_str_Int(curobj->value.value.num.exp)); break; }
+                case JFH_NULL: { buf += 4; break; }
+                case JFH_BOOL: { if (curobj->value.value.b) buf += 4; else buf += 5; break; }
+                case JFH_LIST: { buf += stest_jsonlength(NULL, curobj->value.value.arr, false); break; }
+                default: { return -2; }
+            }
+            curobj = curobj->next;
+            if (curobj) {
+                buf += 1; // For the ,
+            }
+        }
+    } else if (!obj && arr) {
+        if (arr->empty) return 3;
+        jfh_array_t *curarr = arr;
+        while (curarr) {
+            char intbuf[128];
+            switch (curarr->value.vt) {
+                case JFH_STR: { buf += strlen(curarr->value.value.str); break; }
+                case JFH_INT: { buf += strlen(JFH_str_Int(curarr->value.value.num.val.i)); break; }
+                case JFH_DBL: { buf += strlen(JFH_str_Double(curarr->value.value.num.val.dbl)); break; }
+                case JFH_OBJ: { buf += stest_jsonlength(curarr->value.value.obj, NULL, false); break; }
+                case JFH_EXPI: { buf += 1 + strlen(JFH_str_Int(curarr->value.value.num.val.i)) + strlen(JFH_str_Int(curarr->value.value.num.exp)); break; }
+                case JFH_EXPD: { buf += 1 + strlen(JFH_str_Double(curarr->value.value.num.val.dbl)) + strlen(JFH_str_Int(curarr->value.value.num.exp)); break; }
+                case JFH_NULL: { buf += 4; break; }
+                case JFH_BOOL: { if (curarr->value.value.b) buf += 4; else buf += 5; break; }
+                case JFH_LIST: { buf += stest_jsonlength(NULL, curarr->value.value.arr, false); break; }
+                default: { return -2; }
+            }
+            curarr = curarr->next;
+            if (curarr) {
+                buf += 1; // For the ,
+            }
+        }
+    }
+    return buf;
+}
+
 static int stobj_encoder(jfh_obj_t *curobj, char **str, char **cur, size_t *pos, size_t *alc_n) {
     if (!curobj) {
         errno = EINVAL;
