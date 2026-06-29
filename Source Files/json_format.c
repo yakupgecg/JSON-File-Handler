@@ -292,27 +292,14 @@ static int32_t get_exp(char *str) {
     return num;
 }
 
-static int st_write(char **cur, char **str, size_t *pos, size_t *alc_n, const char *src) {
-    if (!cur || !str || !pos || !alc_n || !src) {
+static int st_write(char **cur, const char *src) {
+    if (!cur || !src) {
         errno = EINVAL;
         return 1;
     }
     size_t len = strlen(src);
-    while (*pos + len+1 > *alc_n) {
-        *alc_n *= 2;
-        char *temp = realloc(*str, *alc_n);
-        if (!temp) {
-            free(*str);
-            *str = NULL;
-            errno = ENOMEM;
-            return 1;
-        }
-        *str = temp;
-        *cur = *str + *pos;
-    }
     memcpy(*cur, src, len);
     *cur += len;
-    *pos += len;
     return 0;
 }
 
@@ -407,7 +394,7 @@ static char *_evalu(char *str) {
 }
 
 // Estimates the needed json length for encoding.
-int stest_jsonlength(jfh_obj_t *obj, jfh_array_t *arr, bool init) {
+static int stest_jsonlength(jfh_obj_t *obj, jfh_array_t *arr, bool init) {
     long buf = 2; // For the { and } or [ and ]
     if (init) buf = 3; // and null terminator
     if (!obj && !arr) {
@@ -417,14 +404,13 @@ int stest_jsonlength(jfh_obj_t *obj, jfh_array_t *arr, bool init) {
         jfh_obj_t *curobj = obj;
         while (curobj) {
             buf += 3 + strlen(curobj->key); // For the key's quotes, : and the key itself
-            char intbuf[128];
             switch (curobj->value.vt) {
                 case JFH_STR: { buf += strlen(curobj->value.value.str); break; }
                 case JFH_INT: { buf += strlen(JFH_str_Int(curobj->value.value.num.val.i)); break; }
                 case JFH_DBL: { buf += strlen(JFH_str_Double(curobj->value.value.num.val.dbl)); break; }
                 case JFH_OBJ: { buf += stest_jsonlength(curobj->value.value.obj, NULL, false); break; }
-                case JFH_EXPI: { buf += 1 + strlen(JFH_str_Int(curobj->value.value.num.val.i)) + strlen(JFH_str_Int(curobj->value.value.num.exp)); break; }
-                case JFH_EXPD: { buf += 1 + strlen(JFH_str_Double(curobj->value.value.num.val.dbl)) + strlen(JFH_str_Int(curobj->value.value.num.exp)); break; }
+                case JFH_EXPI: { buf += 1 + strlen(JFH_str_Int(curobj->value.value.num.val.i)) + strlen(JFH_str_Int(curobj->value.value.num.exp)); break; } // 1+ For the exponent symbol
+                case JFH_EXPD: { buf += 1 + strlen(JFH_str_Double(curobj->value.value.num.val.dbl)) + strlen(JFH_str_Int(curobj->value.value.num.exp)); break; } // 1+ For the exponent symbol
                 case JFH_NULL: { buf += 4; break; }
                 case JFH_BOOL: { if (curobj->value.value.b) buf += 4; else buf += 5; break; }
                 case JFH_LIST: { buf += stest_jsonlength(NULL, curobj->value.value.arr, false); break; }
@@ -439,14 +425,13 @@ int stest_jsonlength(jfh_obj_t *obj, jfh_array_t *arr, bool init) {
         if (arr->empty) return 3;
         jfh_array_t *curarr = arr;
         while (curarr) {
-            char intbuf[128];
             switch (curarr->value.vt) {
                 case JFH_STR: { buf += strlen(curarr->value.value.str); break; }
                 case JFH_INT: { buf += strlen(JFH_str_Int(curarr->value.value.num.val.i)); break; }
                 case JFH_DBL: { buf += strlen(JFH_str_Double(curarr->value.value.num.val.dbl)); break; }
                 case JFH_OBJ: { buf += stest_jsonlength(curarr->value.value.obj, NULL, false); break; }
-                case JFH_EXPI: { buf += 1 + strlen(JFH_str_Int(curarr->value.value.num.val.i)) + strlen(JFH_str_Int(curarr->value.value.num.exp)); break; }
-                case JFH_EXPD: { buf += 1 + strlen(JFH_str_Double(curarr->value.value.num.val.dbl)) + strlen(JFH_str_Int(curarr->value.value.num.exp)); break; }
+                case JFH_EXPI: { buf += 1 + strlen(JFH_str_Int(curarr->value.value.num.val.i)) + strlen(JFH_str_Int(curarr->value.value.num.exp)); break; } // 1+ For the exponent symbol
+                case JFH_EXPD: { buf += 1 + strlen(JFH_str_Double(curarr->value.value.num.val.dbl)) + strlen(JFH_str_Int(curarr->value.value.num.exp)); break; } // 1+ For the exponent symbol
                 case JFH_NULL: { buf += 4; break; }
                 case JFH_BOOL: { if (curarr->value.value.b) buf += 4; else buf += 5; break; }
                 case JFH_LIST: { buf += stest_jsonlength(NULL, curarr->value.value.arr, false); break; }
@@ -461,31 +446,31 @@ int stest_jsonlength(jfh_obj_t *obj, jfh_array_t *arr, bool init) {
     return buf;
 }
 
-static int stobj_encoder(jfh_obj_t *curobj, char **str, char **cur, size_t *pos, size_t *alc_n) {
+static int stobj_encoder(jfh_obj_t *curobj, char **cur) {
     if (!curobj) {
         errno = EINVAL;
         return 1;
     }
-    if (st_write(cur, str, pos, alc_n, "{")) return 1;
+    if (st_write(cur, "{")) return 1;
     if (curobj->empty == true) {
-        if (st_write(cur, str, pos, alc_n, "}")) return 1;
+        if (st_write(cur, "}")) return 1;
         return 0;
     }
     while (curobj) {
         if (
-            st_write(cur, str, pos, alc_n, "\"") ||
-            st_write(cur, str, pos, alc_n, curobj->key) ||
-            st_write(cur, str, pos, alc_n, "\"") ||
-            st_write(cur, str, pos, alc_n, ":")
+            st_write(cur, "\"") ||
+            st_write(cur, curobj->key) ||
+            st_write(cur, "\"") ||
+            st_write(cur, ":")
         ) return 1;
         switch (curobj->value.vt) {
             case JFH_STR: {
                 char *new = evalu(curobj->value.value.str);
                 if (!new) return 1;
                 if ( 
-                    (st_write(cur, str, pos, alc_n, "\"")) ||
-                    (st_write(cur, str, pos, alc_n, new)) ||
-                    (st_write(cur, str, pos, alc_n, "\""))
+                    (st_write(cur, "\"")) ||
+                    (st_write(cur, new)) ||
+                    (st_write(cur, "\""))
                 ) return 1;
                 free(new);
                 break;
@@ -494,7 +479,7 @@ static int stobj_encoder(jfh_obj_t *curobj, char **str, char **cur, size_t *pos,
                 if(!temp) {
                     return 1;
                 }
-                if (st_write(cur, str, pos, alc_n, temp)) return 1;
+                if (st_write(cur, temp)) return 1;
                 free(temp);
                 break;
             } case JFH_DBL: {
@@ -502,37 +487,37 @@ static int stobj_encoder(jfh_obj_t *curobj, char **str, char **cur, size_t *pos,
                 if(!temp) {
                     return 1;
                 }
-                if (st_write(cur, str, pos, alc_n, temp)) return 1;
+                if (st_write(cur, temp)) return 1;
                 free(temp);
                 break;
             }
             case JFH_OBJ:{
-                int r = stobj_encoder(curobj->value.value.obj, str, cur, pos, alc_n);
+                int r = stobj_encoder(curobj->value.value.obj, cur);
                 if (r) {
                     return 1;
                 }
                 break;
             }
             case JFH_LIST: {
-                int r = starr_encoder(curobj->value.value.arr, str, cur, pos, alc_n);
+                int r = starr_encoder(curobj->value.value.arr, cur);
                 if (r) {
                     return 1;
                 }
                 break;
             } case JFH_BOOL: {
-                if (st_write(cur, str, pos, alc_n, curobj->value.value.b ? "true" : "false")) return 1;
+                if (st_write(cur, curobj->value.value.b ? "true" : "false")) return 1;
                 break;
             } case JFH_NULL: {
-                if (st_write(cur, str, pos, alc_n, "null")) return 1;
+                if (st_write(cur, "null")) return 1;
                 break;
             }
             case JFH_EXPI: {
                 char *temp = JFH_str_Int(curobj->value.value.num.val.i);
                 char *temp_exp = JFH_str_Int(curobj->value.value.num.exp);
                 if (
-                    st_write(cur, str, pos, alc_n, temp) ||
-                    st_write(cur, str, pos, alc_n, "e") ||
-                    st_write(cur, str, pos, alc_n, temp_exp)
+                    st_write(cur, temp) ||
+                    st_write(cur, "e") ||
+                    st_write(cur, temp_exp)
                 ) return 1;
                 free(temp);
                 free(temp_exp);
@@ -542,9 +527,9 @@ static int stobj_encoder(jfh_obj_t *curobj, char **str, char **cur, size_t *pos,
                 char *temp = JFH_str_Double(curobj->value.value.num.val.dbl);
                 char *temp_exp = JFH_str_Int(curobj->value.value.num.exp);
                 if (
-                    st_write(cur, str, pos, alc_n, temp) ||
-                    st_write(cur, str, pos, alc_n, "e") ||
-                    st_write(cur, str, pos, alc_n, temp_exp)
+                    st_write(cur, temp) ||
+                    st_write(cur, "e") ||
+                    st_write(cur, temp_exp)
                 ) return 1;
                 free(temp);
                 free(temp_exp);
@@ -554,21 +539,21 @@ static int stobj_encoder(jfh_obj_t *curobj, char **str, char **cur, size_t *pos,
         }
         curobj = curobj->next;
         if (curobj) {
-            if (st_write(cur, str, pos, alc_n, ",")) return 1;
+            if (st_write(cur, ",")) return 1;
         }
     }
-    if (st_write(cur, str, pos, alc_n, "}")) return 1;
+    if (st_write(cur, "}")) return 1;
     return 0;
 }
 
-static int starr_encoder(jfh_array_t *curarr, char **str, char **cur, size_t *pos, size_t *alc_n) {
+static int starr_encoder(jfh_array_t *curarr, char **cur) {
     if (!curarr) {
         errno = EINVAL;
         return 1;
     }
-    if (st_write(cur, str, pos, alc_n, "[")) return 1;
+    if (st_write(cur, "[")) return 1;
     if (curarr->empty == true) {
-        if (st_write(cur, str, pos, alc_n, "]")) return 1;
+        if (st_write(cur, "]")) return 1;
         return 0;
     }
     while (curarr) {
@@ -577,9 +562,9 @@ static int starr_encoder(jfh_array_t *curarr, char **str, char **cur, size_t *po
                 char *new = evalu(curarr->value.value.str);
                 if (!new) return 1;
                 if ( 
-                    (st_write(cur, str, pos, alc_n, "\"")) ||
-                    (st_write(cur, str, pos, alc_n, new)) ||
-                    (st_write(cur, str, pos, alc_n, "\""))
+                    (st_write(cur, "\"")) ||
+                    (st_write(cur, new)) ||
+                    (st_write(cur, "\""))
                 ) return 1;
                 free(new);
                 break;
@@ -588,7 +573,7 @@ static int starr_encoder(jfh_array_t *curarr, char **str, char **cur, size_t *po
                 if(!temp) {
                     return 1;
                 }
-                if (st_write(cur, str, pos, alc_n, temp)) return 1;
+                if (st_write(cur, temp)) return 1;
                 free(temp);
                 break;
             } case JFH_DBL: {
@@ -596,37 +581,37 @@ static int starr_encoder(jfh_array_t *curarr, char **str, char **cur, size_t *po
                 if(!temp) {
                     return 1;
                 }
-                if (st_write(cur, str, pos, alc_n, temp)) return 1;
+                if (st_write(cur, temp)) return 1;
                 free(temp);
                 break;
             }
             case JFH_OBJ: {
-                int r = stobj_encoder(curarr->value.value.obj, str, cur, pos, alc_n);
+                int r = stobj_encoder(curarr->value.value.obj, cur);
                 if (r) {
                     return 1;
                 }
                 break;
             }
             case JFH_LIST: {
-                int r = starr_encoder(curarr->value.value.arr, str, cur, pos, alc_n);
+                int r = starr_encoder(curarr->value.value.arr, cur);
                 if (r) {
                     return 1;
                 }
                 break;
             } case JFH_BOOL: {
-                if (st_write(cur, str, pos, alc_n, curarr->value.value.b ? "true" : "false")) return 1;
+                if (st_write(cur, curarr->value.value.b ? "true" : "false")) return 1;
                 break;
             } case JFH_NULL: {
-                if (st_write(cur, str, pos, alc_n, "null")) return 1;
+                if (st_write(cur, "null")) return 1;
                 break;
             }
             case JFH_EXPI: {
                 char *temp = JFH_str_Int(curarr->value.value.num.val.i);
                 char *temp_exp = JFH_str_Int(curarr->value.value.num.exp);
                 if (
-                    st_write(cur, str, pos, alc_n, temp) ||
-                    st_write(cur, str, pos, alc_n, "e") ||
-                    st_write(cur, str, pos, alc_n, temp_exp)
+                    st_write(cur, temp) ||
+                    st_write(cur, "e") ||
+                    st_write(cur, temp_exp)
                 ) return 1;
                 free(temp);
                 free(temp_exp);
@@ -636,9 +621,9 @@ static int starr_encoder(jfh_array_t *curarr, char **str, char **cur, size_t *po
                 char *temp = JFH_str_Double(curarr->value.value.num.val.dbl);
                 char *temp_exp = JFH_str_Int(curarr->value.value.num.exp);
                 if (
-                    st_write(cur, str, pos, alc_n, temp) ||
-                    st_write(cur, str, pos, alc_n, "e") ||
-                    st_write(cur, str, pos, alc_n, temp_exp)
+                    st_write(cur, temp) ||
+                    st_write(cur, "e") ||
+                    st_write(cur, temp_exp)
                 ) return 1;
                 free(temp);
                 free(temp_exp);
@@ -648,10 +633,10 @@ static int starr_encoder(jfh_array_t *curarr, char **str, char **cur, size_t *po
         }
         curarr = curarr->next;
         if (curarr) {
-            if (st_write(cur, str, pos, alc_n, ",")) return 1;
+            if (st_write(cur, ",")) return 1;
         }
     }
-    if (st_write(cur, str, pos, alc_n, "]")) return 1;
+    if (st_write(cur, "]")) return 1;
     return 0;
 }
 
@@ -661,8 +646,7 @@ char *JFH_encode_obj(jfh_obj_t *obj) {
         errno = EINVAL;
         return NULL;
     }
-    size_t alc_n = 256;
-    size_t pos = 0;
+    size_t alc_n = stest_jsonlength(obj, NULL, true);
     char *str = malloc(alc_n);
     if (!str) {
         errno = ENOMEM;
@@ -670,21 +654,10 @@ char *JFH_encode_obj(jfh_obj_t *obj) {
     }
     char *cur = str;
     jfh_obj_t *curobj = obj;
-    int r = stobj_encoder(curobj, &str, &cur, &pos, &alc_n);
+    int r = stobj_encoder(curobj, &cur);
     if (r) {
         free(str);
         return NULL;
-    }
-    while (pos >= alc_n) {
-        alc_n *= 2;
-        char *temp = realloc(str, alc_n);
-        if (!temp) {
-            free(str);
-            errno = ENOMEM;
-            return NULL;
-        }
-        str = temp;
-        cur += *str + pos;
     }
     *cur = '\0';
     return str;
@@ -696,8 +669,7 @@ char *JFH_encode_arr(jfh_array_t *arr) {
         errno = EINVAL;
         return NULL;
     }
-    size_t alc_n = 256;
-    size_t pos = 0;
+    size_t alc_n = stest_jsonlength(NULL, arr, true);
     char *str = malloc(alc_n);
     if (!str) {
         free(str);
@@ -706,20 +678,9 @@ char *JFH_encode_arr(jfh_array_t *arr) {
     }
     char *cur = str;
     jfh_array_t *curarr = arr;
-    int r = starr_encoder(curarr, &str, &cur, &pos, &alc_n);
+    int r = starr_encoder(curarr, &cur);
     if (r) {
         return NULL;
-    }
-    while (pos >= alc_n) {
-        alc_n *= 2;
-        char *temp = realloc(str, alc_n);
-        if (!temp) {
-            free(str);
-            errno = ENOMEM;
-            return NULL;
-        }
-        str = temp;
-        cur += *str + pos;
     }
     *cur = '\0';
     return str;
