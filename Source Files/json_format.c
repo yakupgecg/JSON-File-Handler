@@ -650,7 +650,14 @@ char *JFH_encode_obj(jfh_obj_t *obj) {
         errno = EINVAL;
         return NULL;
     }
-    size_t alc_n = stest_jsonlength(obj, NULL, true);
+    long alc_n = stest_jsonlength(obj, NULL, true);
+    if (alc_n == -1) {
+        errno = EINVAL;
+        return NULL;
+    } else if (alc_n == -2) {
+        errno = JFH_EJSON;
+        return NULL;
+    }
     char *str = malloc(alc_n);
     if (!str) {
         errno = ENOMEM;
@@ -673,7 +680,14 @@ char *JFH_encode_arr(jfh_array_t *arr) {
         errno = EINVAL;
         return NULL;
     }
-    size_t alc_n = stest_jsonlength(NULL, arr, true);
+    long alc_n = stest_jsonlength(NULL, arr, true);
+    if (alc_n == -1) {
+        errno = EINVAL;
+        return NULL;
+    } else if (alc_n == -2) {
+        errno = JFH_EJSON;
+        return NULL;
+    }
     char *str = malloc(alc_n);
     if (!str) {
         free(str);
