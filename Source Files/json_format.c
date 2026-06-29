@@ -405,9 +405,11 @@ static int stest_jsonlength(jfh_obj_t *obj, jfh_array_t *arr, bool init) {
         }
         jfh_obj_t *curobj = obj;
         while (curobj) {
-            buf += 3 + strlen(curobj->key); // For the key's quotes, : and the key itself
+            char *key = evalu(curobj->key);
+            buf += 3 + strlen(key); // For the key's quotes, : and the key itself
+            free(key);
             switch (curobj->value.vt) {
-                case JFH_STR: { buf += strlen(curobj->value.value.str); break; }
+                case JFH_STR: { char *str = evalu(curobj->value.value.str); buf += strlen(str) + 2; free(str); break; }
                 case JFH_INT: { buf += strlen(JFH_str_Int(curobj->value.value.num.val.i)); break; }
                 case JFH_DBL: { buf += strlen(JFH_str_Double(curobj->value.value.num.val.dbl)); break; }
                 case JFH_OBJ: { buf += stest_jsonlength(curobj->value.value.obj, NULL, false); break; }
@@ -430,7 +432,7 @@ static int stest_jsonlength(jfh_obj_t *obj, jfh_array_t *arr, bool init) {
         jfh_array_t *curarr = arr;
         while (curarr) {
             switch (curarr->value.vt) {
-                case JFH_STR: { buf += strlen(curarr->value.value.str); break; }
+                case JFH_STR: { char *str = evalu(curarr->value.value.str); buf += strlen(str) + 2; free(str); break; }
                 case JFH_INT: { buf += strlen(JFH_str_Int(curarr->value.value.num.val.i)); break; }
                 case JFH_DBL: { buf += strlen(JFH_str_Double(curarr->value.value.num.val.dbl)); break; }
                 case JFH_OBJ: { buf += stest_jsonlength(curarr->value.value.obj, NULL, false); break; }
