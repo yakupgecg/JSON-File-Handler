@@ -10,7 +10,7 @@
     functions and includes string handling
 */
 
-static int stest_jsonlength(jfh_obj_t *, jfh_array_t *, bool);
+static int st_jsonlength(jfh_obj_t *, jfh_array_t *, bool);
 static int stobj_encoder(jfh_obj_t *, char **);
 static int starr_encoder(jfh_array_t *, char **);
 char *JFH_encode_obj(jfh_obj_t *);
