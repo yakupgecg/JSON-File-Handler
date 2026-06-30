@@ -724,16 +724,59 @@ char *JFH_indent_json(char *ajson, size_t indent_len) {
     }
 		
     bool is_string = false;
-    size_t alc_n = 256;
+    size_t alc_n = 0;
     int indentation = 0;
     int escapes = 0;
     size_t str_len = strlen(json)+1;
-    size_t len_i = 0;
-    size_t nmem = 0;
     size_t k;
     size_t i;
     int nest_index = 0;
     int list_index = 0;
+    
+    for (i = 0; i < str_len; i++) {
+        alc_n++;
+        if (*cur == '\"') {
+            if (escapes % 2 == 0) {
+                if (is_string) {
+                    is_string = false;
+                } else {
+                    is_string = true;
+                }
+            }
+        } else if (*cur == '{' && *(cur+1) != '}'  && !is_string) {
+            nest_index++;
+            indentation++;
+            alc_n += 1 + indentation * indent_len;
+        } else if (*cur == '}' && *prev != '{' && !is_string) {
+            nest_index--;
+            indentation--;
+            alc_n += 1 + indentation * indent_len;
+        } else if (*cur == '[' && *(cur+1) != ']' && !is_string) {
+            list_index++;
+            indentation++;
+            alc_n += 1 + indentation * indent_len;
+        } else if (*cur == ']' && *prev != '[' && !is_string) {
+            list_index--;
+            indentation--;
+            alc_n +=  1 + indentation * indent_len;
+        } else if (*cur == ',' && !is_string) {
+            alc_n += 1 + indentation * indent_len;
+        } else if (*cur == ':' && !is_string) {
+            alc_n += 1;
+        }
+        
+        prev = cur;
+        if (*cur == '\\') escapes++; else escapes = 0;
+        cur++;
+    }
+    if (list_index || nest_index) {
+        free(json);
+        errno = JFH_EJSON;
+        return NULL;
+    }
+    cur = json;
+    prev = json;
+    is_string = false;
     char *newjson = malloc(alc_n);
     if (!newjson) {
         errno = ENOMEM;
@@ -741,7 +784,6 @@ char *JFH_indent_json(char *ajson, size_t indent_len) {
     }
     char *newcur = newjson;
     for (i = 0; i < str_len; i++) {
-        nmem = 0;
         if (*cur == '\"') {
             if (escapes % 2 == 0) {
                 if (is_string) {
@@ -751,45 +793,20 @@ char *JFH_indent_json(char *ajson, size_t indent_len) {
                 }
             }
         } else if (*cur == '{' && !is_string) {
-            nest_index++;
             indentation++;
-            nmem += indentation * indent_len + 1;
         } else if (*cur == '}' && !is_string) {
-            nest_index--;
             indentation--;
-            nmem += indentation * indent_len + 1;
         } else if (*cur == '[' && !is_string) {
-            list_index++;
             indentation++;
-            nmem += indentation * indent_len + 1;
         } else if (*cur == ']' && !is_string) {
-            list_index--;
             indentation--;
-            nmem += indentation * indent_len + 1;
-	    } else if (*cur == ':' && !is_string) {
-            nmem += 1;
-        } else if (*cur == ',' && !is_string) {
-            nmem += indentation * indent_len + 1;
-        }
-        while (len_i + nmem >= alc_n) {
-            alc_n *= 2;
-            char *temp = realloc(newjson, alc_n);
-            if (!temp) {
-                errno = ENOMEM;
-                free(newjson);
-                return NULL;
-            }
-            newjson = temp;
-			newcur = newjson + len_i;
         }
         if ((*cur == '}' || *cur == ']') && !is_string && (*prev != '{' && *prev != '[')) {
             *newcur = '\n';
             newcur++;
-            len_i++;
             for (k = 0; k < indentation * indent_len; k++) {
                 *newcur = ' ';
                 newcur++;
-                len_i++;
             }
         }
         prev = cur;
@@ -798,36 +815,25 @@ char *JFH_indent_json(char *ajson, size_t indent_len) {
         if (*cur == ':' && !is_string) {
             *newcur = ' ';
             newcur++;
-	        len_i++;
 	    } else if (*cur == ',' && !is_string) {
             *newcur = '\n';
             newcur++;
-            len_i++;
             for (k = 0; k < indentation * indent_len; k++) {
                 *newcur = ' ';
                 newcur++;
-                len_i++;
             }
         } else if ((*cur == '{' || *cur == '[') && !is_string && (*(cur+1) != '}' && *(cur+1) != ']')) {
             *newcur = '\n';
             newcur++;
-            len_i++;
             for (k = 0; k < indentation * indent_len; k++) {
                 *newcur = ' ';
                 newcur++;
-                len_i++;
             }
         }
         if (*cur == '\\') escapes++; else escapes = 0;
 	    cur++;
-	    len_i++;
     }
     free(json);
-    if (list_index || nest_index) {
-        free(newjson);
-        errno = JFH_EJSON;
-        return NULL;
-    }
     *newcur = '\0';
     return newjson;
 }
