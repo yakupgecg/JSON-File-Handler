@@ -393,8 +393,8 @@ static char *_evalu(char *str) {
         return NULL;
 }
 
-// Estimates the needed json length for encoding.
-static int stest_jsonlength(jfh_obj_t *obj, jfh_array_t *arr, bool init) {
+// Calculates the needed space for the encoders to encode a json object or array.
+static int st_jsonlength(jfh_obj_t *obj, jfh_array_t *arr, bool init) {
     long buf = 2; // For the { and } or [ and ]
     if (init) buf = 3; // and null terminator
     if ((!obj && !arr) || (obj && arr)) {
@@ -412,12 +412,12 @@ static int stest_jsonlength(jfh_obj_t *obj, jfh_array_t *arr, bool init) {
                 case JFH_STR: { char *str = evalu(curobj->value.value.str); buf += strlen(str) + 2; free(str); break; }
                 case JFH_INT: { buf += strlen(JFH_str_Int(curobj->value.value.num.val.i)); break; }
                 case JFH_DBL: { buf += strlen(JFH_str_Double(curobj->value.value.num.val.dbl)); break; }
-                case JFH_OBJ: { buf += stest_jsonlength(curobj->value.value.obj, NULL, false); break; }
+                case JFH_OBJ: { buf += st_jsonlength(curobj->value.value.obj, NULL, false); break; }
                 case JFH_EXPI: { buf += 1 + strlen(JFH_str_Int(curobj->value.value.num.val.i)) + strlen(JFH_str_Int(curobj->value.value.num.exp)); break; } // 1+ For the exponent symbol
                 case JFH_EXPD: { buf += 1 + strlen(JFH_str_Double(curobj->value.value.num.val.dbl)) + strlen(JFH_str_Int(curobj->value.value.num.exp)); break; } // 1+ For the exponent symbol
                 case JFH_NULL: { buf += 4; break; }
                 case JFH_BOOL: { if (curobj->value.value.b) buf += 4; else buf += 5; break; }
-                case JFH_LIST: { buf += stest_jsonlength(NULL, curobj->value.value.arr, false); break; }
+                case JFH_LIST: { buf += st_jsonlength(NULL, curobj->value.value.arr, false); break; }
                 default: { return -2; }
             }
             curobj = curobj->next;
@@ -435,12 +435,12 @@ static int stest_jsonlength(jfh_obj_t *obj, jfh_array_t *arr, bool init) {
                 case JFH_STR: { char *str = evalu(curarr->value.value.str); buf += strlen(str) + 2; free(str); break; }
                 case JFH_INT: { buf += strlen(JFH_str_Int(curarr->value.value.num.val.i)); break; }
                 case JFH_DBL: { buf += strlen(JFH_str_Double(curarr->value.value.num.val.dbl)); break; }
-                case JFH_OBJ: { buf += stest_jsonlength(curarr->value.value.obj, NULL, false); break; }
+                case JFH_OBJ: { buf += st_jsonlength(curarr->value.value.obj, NULL, false); break; }
                 case JFH_EXPI: { buf += 1 + strlen(JFH_str_Int(curarr->value.value.num.val.i)) + strlen(JFH_str_Int(curarr->value.value.num.exp)); break; } // 1+ For the exponent symbol
                 case JFH_EXPD: { buf += 1 + strlen(JFH_str_Double(curarr->value.value.num.val.dbl)) + strlen(JFH_str_Int(curarr->value.value.num.exp)); break; } // 1+ For the exponent symbol
                 case JFH_NULL: { buf += 4; break; }
                 case JFH_BOOL: { if (curarr->value.value.b) buf += 4; else buf += 5; break; }
-                case JFH_LIST: { buf += stest_jsonlength(NULL, curarr->value.value.arr, false); break; }
+                case JFH_LIST: { buf += st_jsonlength(NULL, curarr->value.value.arr, false); break; }
                 default: { return -2; }
             }
             curarr = curarr->next;
@@ -652,7 +652,7 @@ char *JFH_encode_obj(jfh_obj_t *obj) {
         errno = EINVAL;
         return NULL;
     }
-    long alc_n = stest_jsonlength(obj, NULL, true);
+    long alc_n = st_jsonlength(obj, NULL, true);
     if (alc_n == -1) {
         errno = EINVAL;
         return NULL;
@@ -682,7 +682,7 @@ char *JFH_encode_arr(jfh_array_t *arr) {
         errno = EINVAL;
         return NULL;
     }
-    long alc_n = stest_jsonlength(NULL, arr, true);
+    long alc_n = st_jsonlength(NULL, arr, true);
     if (alc_n == -1) {
         errno = EINVAL;
         return NULL;
