@@ -41,7 +41,7 @@ Nested objects or arrays, have another object or array in their value, looks lik
 {"Example object": [1, 2, {"object2": "value"}]}
 ```
 
-Technically they can be nested infinitely but it completely depends on how much you have memory available.
+Technically they can be nested infinitely but it depends on how big is your stack and heap memory.
 
 But we can't get data straight out from a JSON string, and that is why we need json parsers. They turn a json string into a datatype that the machine understands.
 But you probably wonder how did the weather service turn data into JSON strings, that's where encoders come in, they turn data into a json string.
@@ -52,7 +52,7 @@ More information about json in this link: http://www.json.org/
 
 JSON-File-Handler (Also **JFH**) is meant to be a JSON library for basic work with json. But I wouldn't say this is on the "high level" yet, since
 things like unicode & scientific notation are missing, sadly.
-Although this is "JSON"-File-Handler, this can also behave as the datatype map, which it was originally meant to be.
+Although this is "JSON"-File-Handler, this can also behave as Linked List, which it was originally meant to be.
 
 ### Features
 
@@ -72,7 +72,7 @@ Although this is "JSON"-File-Handler, this can also behave as the datatype map, 
 #### Unsupported features
 * Unicode
 
-Unicode is about to be added later because of the difficulty. You can put emojis and special characters on strings with this library, but this doesn't
+Unicode is about to be added later because of the system's vastness. You can put emojis and special characters on strings with this library (though will get corrupted almost certainly), but this doesn't
 support escaped unicode, yet.
 
 ### Structs
@@ -99,7 +99,7 @@ typedef struct jfh_Hmap {
 } jfh_obj_t;
 ```
 
-You might wonder why the bool `empty` exists, and that is for handling empty structures. Sometimes there might be a nested object or an array that doesn't have anything ({} or []). For example:
+The `empty` variable is for empty structures (Like {} or []).
 
 ```json
 {"emptyobject": {}}
@@ -135,8 +135,13 @@ typedef struct {
     enum jfh_valuetype vt;
     union {
         char *str;
-        int i;
-        double dbl;
+        struct {
+            union {
+                int64_t i;
+                double dbl;
+            } val;
+            int32_t exp;
+        } num;
         bool b;
         jfh_obj_t *obj;
         jfh_array_t *arr;
