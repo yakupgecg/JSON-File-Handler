@@ -397,7 +397,7 @@ static char *_evalu(char *str) {
 static int stest_jsonlength(jfh_obj_t *obj, jfh_array_t *arr, bool init) {
     long buf = 2; // For the { and } or [ and ]
     if (init) buf = 3; // and null terminator
-    if (!obj && !arr) {
+    if ((!obj && !arr) || (obj && arr)) {
         return -1;
     } else if (obj && !arr) {
         if (obj->empty) {
