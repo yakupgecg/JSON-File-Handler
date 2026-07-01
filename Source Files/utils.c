@@ -115,7 +115,7 @@ int JFH_free_pair(jfh_obj_t *pair) {
     if (pair->key) {
         free(pair->key);
     }
-    if (JFH_free_json_value(&pair->value) == 1) {
+    if (JFH_free_json_value(&pair->value)) {
         free(pair);
         errno = EINVAL;
         return 1;
@@ -130,7 +130,7 @@ int JFH_free_element(jfh_array_t *element) {
         errno = EINVAL;
         return 1;
     }
-    if (!JFH_free_json_value(&element->value)) {
+    if (JFH_free_json_value(&element->value)) {
         free(element);
         errno = EINVAL;
         return 1;
