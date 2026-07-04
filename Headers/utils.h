@@ -16,9 +16,6 @@ size_t JFH_map_len(jfh_obj_t *);
 // Returns the length of the list
 size_t JFH_list_len(jfh_array_t *);
 
-//Frees a json value
-int JFH_free_json_value(jfh_json_value_t *);
-
 // Forcefully frees a object
 int JFH_free_pair(jfh_obj_t *);
 
@@ -31,47 +28,23 @@ int JFH_free_map(jfh_obj_t *);
 // Frees the JFH_list (or frees every element after the given element)
 int JFH_free_list(jfh_array_t *);
 
-// Returns the object that has the given key
-jfh_obj_t *JFH_pairbykey(jfh_obj_t *, char *);
-
 // Returns the object that has the given key, but object was searched across nested objects.
 jfh_obj_t *JFH_searchH(jfh_obj_t *, char *);
 
 // Returns the first object found anywhere in the list.  
 jfh_obj_t *JFH_searchL(jfh_array_t *, char *);
 
-// Returns the element by index in the given list
-jfh_array_t *JFH_getelementbyindex(jfh_array_t *, size_t);
-
 // This will initalize a hashmap and then return a pointer to it
 jfh_obj_t *JFH_initM();
+
+// Initializes a list
+jfh_array_t *JFH_initL();
 
 // Returns the last object in a hash map
 jfh_obj_t *JFH_last_pair(jfh_obj_t *);
 
 // Returns the last element in a list
 jfh_array_t *JFH_last_element(jfh_array_t *);
-
-// Initializes a list
-jfh_array_t *JFH_initL();
-
-// Adds a object to the end of the given map and returns it
-jfh_obj_t *JFH_appendH(jfh_obj_t *);
-
-// Adds an element to the end of the given list and returns it
-jfh_array_t *JFH_appendL(jfh_array_t *);
-
-//Adds an object after the given obj
-jfh_obj_t *JFH_insertH(jfh_obj_t *);
-
-//Adds an element after the given element
-jfh_array_t *JFH_insertL(jfh_array_t *);
-
-// Removes the last object and returns it
-jfh_obj_t *JFH_popH(jfh_obj_t *);
-
-// Removes the last element and returns it
-jfh_array_t *JFH_popL(jfh_array_t *);
 
 // Resets pairs key to the given string
 jfh_obj_t *JFH_resetkey(jfh_obj_t *, char *);

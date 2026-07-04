@@ -1,7 +1,7 @@
 #include "..\Headers\utils.h"
 
 // This is a helper function since I am on windows and cannot use normal strdup()
-static char *str_dup(char *str) {
+static char *str_dup(const char *str) {
     if (!str) {
         errno = EINVAL;
         return NULL;
@@ -86,26 +86,6 @@ size_t JFH_list_len(jfh_array_t *list) {
     return len;
 }
 
-//Frees a json value
-int JFH_free_json_value(jfh_json_value_t *val) {
-    if (!val) {
-        errno = EINVAL;
-        return 1;
-    }
-    if (val->vt == JFH_OBJ) {
-        if (val->value.obj) JFH_free_map(val->value.obj);
-        val->value.obj = NULL;
-    } else if (val->vt == JFH_LIST) {
-        if (val->value.arr) JFH_free_list(val->value.arr);
-        val->value.arr = NULL;
-    } else if (val->vt == JFH_STR) {
-        if (val->value.str) free(val->value.str);
-        val->value.str = NULL;
-    }
-    val->vt = 0;
-    return 0;
-}
-
 // Forcefully frees a pair
 int JFH_free_pair(jfh_obj_t *pair) {
     if (!pair) {
@@ -115,10 +95,15 @@ int JFH_free_pair(jfh_obj_t *pair) {
     if (pair->key) {
         free(pair->key);
     }
-    if (JFH_free_json_value(&pair->value)) {
-        free(pair);
-        errno = EINVAL;
-        return 1;
+    if (pair->value.vt == JFH_OBJ) {
+        if (pair->value.value.obj) JFH_free_map(pair->value.value.obj);
+        pair->value.value.obj = NULL;
+    } else if (pair->value.vt == JFH_LIST) {
+        if (pair->value.value.arr) JFH_free_list(pair->value.value.arr);
+        pair->value.value.arr = NULL;
+    } else if (pair->value.vt == JFH_STR) {
+        if (pair->value.value.str) free(pair->value.value.str);
+        pair->value.value.str = NULL;
     }
     free(pair);
     return 0;
@@ -130,10 +115,15 @@ int JFH_free_element(jfh_array_t *element) {
         errno = EINVAL;
         return 1;
     }
-    if (JFH_free_json_value(&element->value)) {
-        free(element);
-        errno = EINVAL;
-        return 1;
+    if (element->value.vt == JFH_OBJ) {
+        if (element->value.value.obj) JFH_free_map(element->value.value.obj);
+        element->value.value.obj = NULL;
+    } else if (element->value.vt == JFH_LIST) {
+        if (element->value.value.arr) JFH_free_list(element->value.value.arr);
+        element->value.value.arr = NULL;
+    } else if (element->value.vt == JFH_STR) {
+        if (element->value.value.str) free(element->value.value.str);
+        element->value.value.str = NULL;
     }
     free(element);
     return 0;
@@ -171,23 +161,7 @@ int JFH_free_list(jfh_array_t *list) {
     return 0;
 }
 
-// Returns the map, which has the key to find
-jfh_obj_t *JFH_pairbykey(jfh_obj_t *root, char *key) {
-    if (!root || !key) {
-        errno = EINVAL;
-        return NULL;
-    }
-    jfh_obj_t *current = root;
-    while (current) {
-        if (strcmp(current->key, key) == 0) {
-            return current;
-        }
-        current = current->next;
-    }
-    return NULL;
-}
-
-// Returns the first object found anywhere in the root.
+// Returns the first object found anywhere in the root (and it's subroots).
 jfh_obj_t *JFH_searchH(jfh_obj_t *root, char *key) {
     if (!root || !key) {
         errno = EINVAL;
@@ -214,7 +188,7 @@ jfh_obj_t *JFH_searchH(jfh_obj_t *root, char *key) {
     return NULL;
 }
 
-// Returns the first object found anywhere in the list.
+// Returns the first object found anywhere in the list (and it's sublists).
 jfh_obj_t *JFH_searchL(jfh_array_t *root, char *key) {
     if (!root || !key) {
         errno = EINVAL;
@@ -238,21 +212,6 @@ jfh_obj_t *JFH_searchL(jfh_array_t *root, char *key) {
     return NULL;
 }
 
-// Returns the element by index. For example if index is 1 it returns root->next
-jfh_array_t *JFH_getelementbyindex(jfh_array_t *root, size_t index) {
-    if (!root) {
-        errno = EINVAL;
-        return NULL;
-    }
-    if (JFH_list_len(root) < index) return JFH_last_element(root);
-    jfh_array_t *current = root;
-    size_t i;
-    for (i = 0; i < index; i++) {
-        current = current->next;
-    }
-    return current;
-}
-
 // This will initalize a map and then return a pointer to it
 jfh_obj_t *JFH_initM() {
     jfh_obj_t *map = malloc(sizeof(jfh_obj_t));
@@ -274,8 +233,23 @@ jfh_obj_t *JFH_initM() {
     return map;
 }
 
+// Initializes a list
+jfh_array_t *JFH_initL() {
+    jfh_array_t *list = malloc(sizeof(jfh_array_t));
+    if (!list) {
+        errno = ENOMEM;
+        return NULL;
+    }
+    list->next = NULL;
+    list->prev = NULL;
+    list->value.value.str = NULL;
+    list->value.vt = 0;
+    list->empty = true;
+    return list;
+}
+
 // Returns the last pair in a map
-jfh_obj_t *JFH_last_pair(jfh_obj_t *root) {
+jfh_obj_t *JFH_last_obj(jfh_obj_t *root) {
     if (!root) {
         errno = EINVAL;
         return NULL;
@@ -300,127 +274,6 @@ jfh_array_t *JFH_last_element(jfh_array_t *root) {
     return current;
 }
 
-// Initializes a list
-jfh_array_t *JFH_initL() {
-    jfh_array_t *list = malloc(sizeof(jfh_array_t));
-    if (!list) {
-        errno = ENOMEM;
-        return NULL;
-    }
-    list->next = NULL;
-    list->prev = NULL;
-    list->value.value.str = NULL;
-    list->value.vt = 0;
-    list->empty = true;
-    return list;
-}
-
-// Adds a pair to the end of the given map and returns it
-jfh_obj_t *JFH_appendH(jfh_obj_t *map) {
-    if (!map) {
-        errno = EINVAL;
-        return NULL;
-    }
-    map->empty = false;
-    jfh_obj_t *current = map;
-    while (current->next) {
-        current = current->next;
-    }
-    current->next = JFH_initM();
-    if (!current->next) {
-        errno = ENOMEM;
-        return NULL;
-    }
-    current->next->prev = current;
-    return current->next;
-}
-
-// Adds an element to the end of the given list and returns it
-jfh_array_t *JFH_appendL(jfh_array_t *list) {
-    if (!list) {
-        errno = EINVAL;
-        return NULL;
-    }
-    list->empty = false;
-    jfh_array_t *current = list;
-    while (current->next) {
-        current = current->next;
-    }
-    current->next = JFH_initL();
-    if (!current->next) {
-        errno = ENOMEM;
-        return NULL;
-    }
-    current->next->prev = current;
-    return current->next;
-}
-
-// Adds an object after the given obj
-jfh_obj_t *JFH_insertH(jfh_obj_t *obj) {
-    if (!obj) {
-        errno = EINVAL;
-        return NULL;
-    }
-    obj->empty = false;
-    jfh_obj_t *newobj = JFH_initM();
-    if (!newobj) {
-        errno = ENOMEM;
-        return NULL;
-    }
-    newobj->next = obj->next;
-    newobj->prev = obj;
-    if (obj->next) {
-        obj->next->prev = newobj;
-    }
-    obj->next = newobj;
-    return newobj;
-}
-
-//Adds an element after the given element
-jfh_array_t *JFH_insertL(jfh_array_t *element) {
-    if (!element) {
-        errno = EINVAL;
-        return NULL;
-    }
-    element->empty = false;
-    jfh_array_t *newelement = JFH_initL();
-    if (!newelement) {
-        errno = ENOMEM;
-        return NULL;
-    }
-    newelement->next = element->next;
-    newelement->prev = element;
-    if (element->next) {
-        element->next->prev = newelement;
-    }
-    element->next = newelement;
-    return newelement;
-}
-
-// Removes the last object and returns it
-jfh_obj_t *JFH_popH(jfh_obj_t *obj) {
-    if (!obj) {
-        errno = EINVAL;
-        return NULL;
-    }
-    jfh_obj_t *last = JFH_last_pair(obj);
-    last->prev->next = NULL;
-    last->prev = NULL;
-    return last;
-}
-
-// Removes the last element and returns it
-jfh_array_t *JFH_popL(jfh_array_t *element) {
-    if (!element) {
-        errno = EINVAL;
-        return NULL;
-    }
-    jfh_array_t *last = JFH_last_element(element);
-    last->prev->next = NULL;
-    last->prev = NULL;
-    return last;
-}
-
 // Resets pairs key to the given string
 jfh_obj_t *JFH_resetkey(jfh_obj_t *pair, char *key) {
     if (!pair || !key) {
@@ -443,8 +296,17 @@ void JFH_setval(jfh_json_value_t *value, void *src, enum jfh_valuetype vt) {
         errno = EINVAL;
         return;
     }
-    
-    JFH_free_json_value(value);
+
+    if (value->vt == JFH_OBJ) {
+        if (value->value.obj) JFH_free_map(value->value.obj);
+        value->value.obj = NULL;
+    } else if (value->vt == JFH_LIST) {
+        if (value->value.arr) JFH_free_list(value->value.arr);
+        value->value.arr = NULL;
+    } else if (value->vt == JFH_STR) {
+        if (value->value.str) free(value->value.str);
+        value->value.str = NULL;
+    }
 
     switch (vt) {
         case JFH_STR: {
@@ -492,7 +354,8 @@ jfh_obj_t *JFH_setH(jfh_obj_t *obj, int count, ...) {
         }
 
         if (!cur->next) {
-            JFH_appendH(cur);
+            cur->next = JFH_initM();
+            cur->next->prev = cur;
         }
         cur = cur->next;
     }
@@ -522,14 +385,15 @@ jfh_array_t *JFH_setL(jfh_array_t *arr, int count, ...) {
         }
 
         if (!cur->next) {
-            JFH_appendL(cur);
+            cur->next = JFH_initL();
+            cur->next->prev = cur;
         }
         cur = cur->next;
     }
 
     va_end(args);
     return arr;
-} 
+}
 
 // Copies the given object, either returns the copy or copies to another object.
 jfh_obj_t *JFH_copy_obj(jfh_obj_t *obj, jfh_obj_t *cobj) {
