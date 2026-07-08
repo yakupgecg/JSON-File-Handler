@@ -57,19 +57,19 @@ jfh_obj_t *JFH_setH(jfh_obj_t *, int, ...);
 jfh_array_t *JFH_setL(jfh_array_t *, int, ...);
 
 // Copies the given object, either returns the copy or copies to another object.
-jfh_obj_t *JFH_copy_obj(jfh_obj_t *, jfh_obj_t *);
+jfh_obj_t *JFH_copy_obj(jfh_obj_t *);
 
 // Copies the given element, either returns the copy or copies to another element.
-jfh_array_t *JFH_copy_element(jfh_array_t *, jfh_array_t *);
+jfh_array_t *JFH_copy_element(jfh_array_t *);
 
 // Copies the given map, either returns the copy or copies the whole map to another map.
-jfh_obj_t *JFH_copy_map(jfh_obj_t *, jfh_obj_t *);
+jfh_obj_t *JFH_copy_map(jfh_obj_t *);
 
 // Copies the given list, either returns the copy or copies the whole list to another list.
-jfh_array_t *JFH_copy_list(jfh_array_t *, jfh_array_t *);
+jfh_array_t *JFH_copy_list(jfh_array_t *);
 
 // Copies the given json value, either returns the copy or copies the json value to 2nd parameter json value
-jfh_json_value_t *JFH_copy_json_value(jfh_json_value_t *, jfh_json_value_t *);
+jfh_json_value_t JFH_copy_json_value(jfh_json_value_t);
 
 // The functions below return a jfh_val type that has a key and a jfh_json_value_t
 

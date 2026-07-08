@@ -1,7 +1,7 @@
 #include "..\Headers\json_format.h"
 
 // This is a helper function since I am on windows and cannot use normal strdup()
-static char *str_dup(char *str) {
+static char *str_dup(const char *str) {
     if (!str) {
         errno = EINVAL;
         return NULL;
