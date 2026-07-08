@@ -52,9 +52,13 @@ jfh_obj_t *JFH_resetkey(jfh_obj_t *, char *);
 // Sets the value of the json_value_t to void * depending on the valuetype (be cautious with void * and valuetype)
 void JFH_setval(jfh_json_value_t*, void *, enum jfh_valuetype);
 
-// Sets the object's or element's value to any jfh_val created by JFH_xH/L
+// Inserts a set of members/elements either in a new or in the middle of an already existing object/array.
 jfh_obj_t *JFH_setH(jfh_obj_t *, int, ...);
 jfh_array_t *JFH_setL(jfh_array_t *, int, ...);
+
+// Replaces a set of members/elements in the given object/array with the given members/elements (...) 
+jfh_obj_t *JFH_replaceH(jfh_obj_t *, int, ...);
+jfh_array_t *JFH_replaceL(jfh_array_t *, int, ...);
 
 // Copies the given object, either returns the copy or copies to another object.
 jfh_obj_t *JFH_copy_obj(jfh_obj_t *);

@@ -332,7 +332,85 @@ void JFH_setval(jfh_json_value_t *value, void *src, enum jfh_valuetype vt) {
     }
 }
 
+// Inserts a set of members either in a new or in the middle of an already existing object.
 jfh_obj_t *JFH_setH(jfh_obj_t *obj, int count, ...) {
+    if (!obj) {
+        errno = EINVAL;
+        return NULL;
+    }
+    obj->empty = false;
+    va_list args;
+    va_start(args, count);
+    jfh_obj_t *cur = obj;
+
+    jfh_val val;
+    for (int i = 0; i < count; i++) {
+
+        val = va_arg(args, jfh_val);
+        if (!JFH_resetkey(cur, val.key)) return NULL;
+        cur->value = JFH_copy_json_value(val.val);
+
+        if (i+1 >= count) {
+            break;
+        }
+
+        if (cur->next) {
+            jfh_obj_t *newobj = JFH_initM();
+            newobj->next = cur->next;
+            cur->next->prev = newobj;
+            cur->next = newobj;
+            newobj->prev = cur;
+        } else {
+            cur->next = JFH_initM();
+            cur->next->prev = cur;
+        }
+        cur = cur->next;
+    }
+
+    va_end(args);
+    return obj;
+} 
+
+// Inserts a set of elements either in a new or in the middle of an already existing array.
+jfh_array_t *JFH_setL(jfh_array_t *arr, int count, ...) {
+    if (!arr) {
+        errno = EINVAL;
+        return NULL;
+    }
+    arr->empty = false;
+    va_list args;
+    va_start(args, count);
+    jfh_array_t *cur = arr;
+
+    jfh_val val;
+    for (int i = 0; i < count; i++) {
+
+        val = va_arg(args, jfh_val);
+        cur->value = JFH_copy_json_value(val.val);
+
+        if (i+1 >= count) {
+            break;
+        }
+
+        if (cur->next) {
+            jfh_array_t *newobj = JFH_initL();
+            newobj->next = cur->next;
+            cur->next->prev = newobj;
+            cur->next = newobj;
+            newobj->prev = cur;
+        } else {
+            cur->next = JFH_initL();
+            cur->next->prev = cur;
+        }
+        cur = cur->next;
+    }
+
+    va_end(args);
+    return arr;
+}
+
+// Replaces a set of members in the given object with the given members (...)
+jfh_obj_t *JFH_replaceH(jfh_obj_t *obj, int count, ...) {
     if (!obj) {
         errno = EINVAL;
         return NULL;
@@ -362,9 +440,10 @@ jfh_obj_t *JFH_setH(jfh_obj_t *obj, int count, ...) {
 
     va_end(args);
     return obj;
-} 
+}
 
-jfh_array_t *JFH_setL(jfh_array_t *arr, int count, ...) {
+// Replaces a set of elements in the given array with the given elements (...)
+jfh_array_t *JFH_replaceL(jfh_array_t *arr, int count, ...) {
     if (!arr) {
         errno = EINVAL;
         return NULL;
