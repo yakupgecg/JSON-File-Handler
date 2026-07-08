@@ -60,6 +60,10 @@ jfh_array_t *JFH_setL(jfh_array_t *, int, ...);
 jfh_obj_t *JFH_replaceH(jfh_obj_t *, int, ...);
 jfh_array_t *JFH_replaceL(jfh_array_t *, int, ...);
 
+// Removes a number of members/elements and returns them
+jfh_obj_t *JFH_removeH(jfh_obj_t *);
+jfh_array_t *JFH_removeL(jfh_array_t *);
+
 // Copies the given object, either returns the copy or copies to another object.
 jfh_obj_t *JFH_copy_obj(jfh_obj_t *);
 

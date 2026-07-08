@@ -474,6 +474,60 @@ jfh_array_t *JFH_replaceL(jfh_array_t *arr, int count, ...) {
     return arr;
 }
 
+// Removes a member from an object
+jfh_obj_t *JFH_removeH(jfh_obj_t *obj) {
+    if (!obj) {
+        errno = EINVAL;
+        return NULL;
+    }
+    bool is_empty = false;
+    jfh_obj_t *removed = JFH_initM();
+    if (obj->prev) {
+        obj->prev->next = obj->next;
+    }
+    if (obj->next) {
+        obj->next->prev = obj->prev;
+    }
+    if (!obj->next && !obj->prev) {
+        is_empty = true;
+    }
+    obj->next = NULL;
+    obj->prev = NULL;
+    removed = JFH_copy_obj(obj);
+    JFH_free_pair(obj);
+    if (is_empty) {
+        removed->empty = true;
+    }
+    return removed;
+}
+
+// Removes an element from an array
+jfh_array_t *JFH_removeL(jfh_array_t *arr) {
+    if (!arr) {
+        errno = EINVAL;
+        return NULL;
+    }
+    bool is_empty = false;
+    jfh_array_t *removed = JFH_initL();
+    if (arr->prev) {
+        arr->prev->next = arr->next;
+    }
+    if (arr->next) {
+        arr->next->prev = arr->prev;
+    }
+    if (!arr->next && !arr->prev) {
+        is_empty = true;
+    }
+    arr->next = NULL;
+    arr->prev = NULL;
+    removed = JFH_copy_element(arr);
+    JFH_free_element(arr);
+    if (is_empty) {
+        removed->empty = true;
+    }
+    return removed;
+}
+
 // Copies the given object, either returns the copy or copies to another object.
 jfh_obj_t *JFH_copy_obj(jfh_obj_t *obj) {
     if (!obj) {
@@ -613,8 +667,8 @@ jfh_json_value_t JFH_copy_json_value(jfh_json_value_t val) {
         case JFH_EXPD: { cval.value.num.val.dbl = val.value.num.val.dbl; cval.value.num.exp = val.value.num.exp; cval.vt = JFH_EXPD; break; }
         case JFH_OBJ: { cval.value.obj = JFH_copy_map(val.value.obj); cval.vt = JFH_OBJ; break; }
         case JFH_LIST: { cval.value.arr = JFH_copy_list(val.value.arr); cval.vt = JFH_LIST; break; }
-        case JFH_NULL: { JFH_setval(&cval, "null", JFH_NULL); cval.vt = JFH_NULL; break; }
-        case JFH_BOOL: { JFH_setval(&cval, val.value.b ? "true" : "false", JFH_BOOL); cval.vt = JFH_BOOL; break; }
+        case JFH_NULL: { JFH_setval(&cval, "null", JFH_NULL); break; }
+        case JFH_BOOL: { JFH_setval(&cval, val.value.b ? "true" : "false", JFH_BOOL); break; }
         default: errno = EINVAL; return cval;
     }
     return cval;
